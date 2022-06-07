@@ -1,0 +1,92 @@
+
+Discarded input sections
+
+ .text          0x00000000        0x0 build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+ .data          0x00000000        0x0 build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+ .bss           0x00000000        0x0 build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+DCT1_FLASH       0x08004000         0x00004000         xr
+DCT2_FLASH       0x08008000         0x00004000         xr
+APP_FLASH        0x0800c000         0x000f4000         xr
+SRAM             0x20000000         0x00040000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x00000320                __STACKSIZE__ = 0x320
+
+.glue_7         0x08004000        0x0
+ .glue_7        0x08004000        0x0 linker stubs
+
+.glue_7t        0x08004000        0x0
+ .glue_7t       0x08004000        0x0 linker stubs
+
+.vfp11_veneer   0x08004000        0x0
+ .vfp11_veneer  0x08004000        0x0 linker stubs
+
+.v4_bx          0x08004000        0x0
+ .v4_bx         0x08004000        0x0 linker stubs
+
+.iplt           0x08004000        0x0
+ .iplt          0x08004000        0x0 build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+
+.igot.plt       0x20000000        0x0
+ .igot.plt      0x20000000        0x0 build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+
+.rodata         0x08004000     0x1000
+                0x08004000                dct_location = .
+ *(.rodata.initial_dct)
+ *(.rodata.wiced_apps_lut)
+ .rodata.wiced_apps_lut
+                0x08004000     0x1000 build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+                0x08004000                wiced_apps_lut
+ *(.rodata.wiced_apps_lut_fill)
+ *(.rodata._app_dct)
+                0x08005000                dct_end = .
+                [!provide]                PROVIDE (dct_full_size_loc, LENGTH (DCT1_FLASH))
+                [!provide]                PROVIDE (dct_used_size_loc, (dct_end - ORIGIN (DCT1_FLASH)))
+LOAD build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+LOAD f:/43xxx_wi-fi/tools/arm_gnu/win32/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libstdc++.a
+LOAD f:/43xxx_wi-fi/tools/arm_gnu/win32/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libm.a
+START GROUP
+LOAD f:/43xxx_wi-fi/tools/arm_gnu/win32/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v7e-m\libgcc.a
+LOAD f:/43xxx_wi-fi/tools/arm_gnu/win32/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a
+END GROUP
+OUTPUT(build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/APPS.elf elf32-littlearm)
+
+.rel.dyn        0x08005000        0x0
+ .rel.iplt      0x08005000        0x0 build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+
+.debug_info     0x00000000      0x1bc
+ .debug_info    0x00000000      0x1bc build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+
+.debug_abbrev   0x00000000       0xc3
+ .debug_abbrev  0x00000000       0xc3 build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+
+.debug_aranges  0x00000000       0x18
+ .debug_aranges
+                0x00000000       0x18 build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+
+.debug_line     0x00000000      0x125
+ .debug_line    0x00000000      0x125 build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+
+.debug_str      0x00000000      0x245
+ .debug_str     0x00000000      0x245 build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+                                0x28f (size before relaxing)
+
+.comment        0x00000000       0x7f
+ .comment       0x00000000       0x7f build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+                                 0x80 (size before relaxing)
+
+.ARM.attributes
+                0x00000000       0x33
+ .ARM.attributes
+                0x00000000       0x33 build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o
+
+Cross Reference Table
+
+Symbol                                            File
+wiced_apps_lut                                    build/demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP/apps_header.o

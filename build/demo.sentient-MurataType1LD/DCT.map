@@ -1,0 +1,102 @@
+
+Discarded input sections
+
+ .text          0x00000000        0x0 build/demo.sentient-MurataType1LD/internal_dct.o
+ .data          0x00000000        0x0 build/demo.sentient-MurataType1LD/internal_dct.o
+ .bss           0x00000000        0x0 build/demo.sentient-MurataType1LD/internal_dct.o
+ .text._start   0x00000000        0xe build/demo.sentient-MurataType1LD/internal_dct.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+DCT1_FLASH       0x08004000         0x00004000         xr
+DCT2_FLASH       0x08008000         0x00004000         xr
+APP_FLASH        0x0800c000         0x000f4000         xr
+SRAM             0x20000000         0x00040000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0x00000320                __STACKSIZE__ = 0x320
+
+.glue_7         0x08004000        0x0
+ .glue_7        0x08004000        0x0 linker stubs
+
+.glue_7t        0x08004000        0x0
+ .glue_7t       0x08004000        0x0 linker stubs
+
+.vfp11_veneer   0x08004000        0x0
+ .vfp11_veneer  0x08004000        0x0 linker stubs
+
+.v4_bx          0x08004000        0x0
+ .v4_bx         0x08004000        0x0 linker stubs
+
+.iplt           0x08004000        0x0
+ .iplt          0x08004000        0x0 build/demo.sentient-MurataType1LD/internal_dct.o
+
+.igot.plt       0x20000000        0x0
+ .igot.plt      0x20000000        0x0 build/demo.sentient-MurataType1LD/internal_dct.o
+
+.rodata         0x08004000     0x1f40
+                0x08004000                dct_location = .
+ *(.rodata.initial_dct)
+ .rodata.initial_dct
+                0x08004000     0x1f40 build/demo.sentient-MurataType1LD/internal_dct.o
+                0x08004000                initial_dct
+ *(.rodata.wiced_apps_lut)
+ *(.rodata.wiced_apps_lut_fill)
+ *(.rodata._app_dct)
+                0x08005f40                dct_end = .
+                0x00004000                PROVIDE (dct_full_size_loc, LENGTH (DCT1_FLASH))
+                0x00001f40                PROVIDE (dct_used_size_loc, (dct_end - ORIGIN (DCT1_FLASH)))
+LOAD build/demo.sentient-MurataType1LD/internal_dct.o
+LOAD f:/43xxx_wi-fi/tools/arm_gnu/win32/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libstdc++.a
+LOAD f:/43xxx_wi-fi/tools/arm_gnu/win32/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libm.a
+START GROUP
+LOAD f:/43xxx_wi-fi/tools/arm_gnu/win32/bin/../lib/gcc/arm-none-eabi/7.2.1/thumb/v7e-m\libgcc.a
+LOAD f:/43xxx_wi-fi/tools/arm_gnu/win32/bin/../lib/gcc/arm-none-eabi/7.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m\libc.a
+END GROUP
+OUTPUT(build/demo.sentient-MurataType1LD/DCT.elf elf32-littlearm)
+
+.rel.dyn        0x08005f40        0x0
+ .rel.iplt      0x08005f40        0x0 build/demo.sentient-MurataType1LD/internal_dct.o
+
+.debug_info     0x00000000     0x1239
+ .debug_info    0x00000000     0x1239 build/demo.sentient-MurataType1LD/internal_dct.o
+
+.debug_abbrev   0x00000000      0x190
+ .debug_abbrev  0x00000000      0x190 build/demo.sentient-MurataType1LD/internal_dct.o
+
+.debug_aranges  0x00000000       0x20
+ .debug_aranges
+                0x00000000       0x20 build/demo.sentient-MurataType1LD/internal_dct.o
+
+.debug_ranges   0x00000000       0x10
+ .debug_ranges  0x00000000       0x10 build/demo.sentient-MurataType1LD/internal_dct.o
+
+.debug_line     0x00000000      0x17c
+ .debug_line    0x00000000      0x17c build/demo.sentient-MurataType1LD/internal_dct.o
+
+.debug_str      0x00000000     0x248b
+ .debug_str     0x00000000     0x248b build/demo.sentient-MurataType1LD/internal_dct.o
+                               0x2526 (size before relaxing)
+
+.comment        0x00000000       0x7f
+ .comment       0x00000000       0x7f build/demo.sentient-MurataType1LD/internal_dct.o
+                                 0x80 (size before relaxing)
+
+.ARM.attributes
+                0x00000000       0x33
+ .ARM.attributes
+                0x00000000       0x33 build/demo.sentient-MurataType1LD/internal_dct.o
+
+.debug_frame    0x00000000       0x30
+ .debug_frame   0x00000000       0x30 build/demo.sentient-MurataType1LD/internal_dct.o
+
+Cross Reference Table
+
+Symbol                                            File
+_start                                            build/demo.sentient-MurataType1LD/internal_dct.o
+dct_full_size_loc                                 build/demo.sentient-MurataType1LD/internal_dct.o
+dct_used_size_loc                                 build/demo.sentient-MurataType1LD/internal_dct.o
+initial_dct                                       build/demo.sentient-MurataType1LD/internal_dct.o

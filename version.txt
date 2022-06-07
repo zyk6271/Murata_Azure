@@ -1,0 +1,2 @@
+WICED Version: Wiced_006.006.000.0009
+54140c5acfaf45c86e7b06bba21685769d3e9cda
