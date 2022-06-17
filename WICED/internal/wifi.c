@@ -676,7 +676,7 @@ wiced_result_t wiced_join_ap( void )
 #endif
 {
     unsigned int             a;
-    //int                      retries;
+    int                      retries;
     wiced_config_ap_entry_t* ap;
     wiced_result_t           result = WICED_NO_STORED_AP_IN_DCT;
 
@@ -695,8 +695,7 @@ wiced_result_t wiced_join_ap( void )
         goto exit;
     }
 
-    //for ( retries = WICED_JOIN_RETRY_ATTEMPTS; retries != 0; --retries )
-    while(1)
+    for ( retries = WICED_JOIN_RETRY_ATTEMPTS; retries != 0; --retries )
     {
         /* Try all stored APs */
         for ( a = start; a < CONFIG_AP_LIST_SIZE; ++a )
@@ -1333,7 +1332,7 @@ static wiced_result_t handshake_error_callback( void* arg )
 {
     wiced_result_t          res = WICED_SUCCESS;
     unsigned int            a;
-    //int                     retries;
+    int                     retries;
     wiced_config_ap_entry_t *ap;
 
     UNUSED_PARAMETER( arg );
@@ -1343,8 +1342,7 @@ static wiced_result_t handshake_error_callback( void* arg )
     /* Explicitly leave AP and then rejoin */
     wiced_leave_ap( WICED_STA_INTERFACE );
 
-//    for ( retries = WICED_JOIN_RETRY_ATTEMPTS; retries != 0; --retries )
-    while(1)
+    for ( retries = WICED_JOIN_RETRY_ATTEMPTS; retries != 0; --retries )
     {
         /* Try all stored APs */
         for ( a = 0; a < CONFIG_AP_LIST_SIZE; ++a )

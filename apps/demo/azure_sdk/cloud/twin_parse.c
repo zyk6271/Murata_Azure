@@ -85,8 +85,8 @@ void get_device_twin_document(void)
 }
 void parse_twin_message(az_span const message_span)
 {
-    uint32_t value;
     EventBits_t EventValue;
+    uint32_t value;
 
     az_json_reader jr;
     az_json_reader_init(&jr, message_span, NULL);
@@ -257,8 +257,11 @@ void parse_twin_message(az_span const message_span)
                 az_json_reader_next_token(&jr);
                 az_json_token_get_uint32(&jr,&value);
                 IOT_SAMPLE_LOG_SUCCESS("parse tpr ok,value is %d",value);
-                telemetry_value = value;
-                telemetry_period_set(value);
+                if(value != telemetry_value)
+                {
+                    telemetry_value = value;
+                    telemetry_period_set(value);
+                }
             }
             az_json_reader_next_token(&jr);
         }

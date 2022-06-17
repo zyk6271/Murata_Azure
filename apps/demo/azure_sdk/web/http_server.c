@@ -46,5 +46,6 @@ END_OF_HTTP_PAGE_DATABASE();
 
 void http_start( void )
 {
+    wifi_status_change(1);
     wiced_http_server_start( &syr_server, 5333, MAX_SOCKETS, web_pages, WICED_AP_INTERFACE, DEFAULT_URL_PROCESSOR_STACK_SIZE );
 }

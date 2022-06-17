@@ -108,8 +108,8 @@ wiced_result_t mqtt_core_deinit( mqtt_connection_t *conn )
             wiced_rtos_thread_join( &mqtt_socket->net_thread );
             wiced_rtos_delete_thread( &mqtt_socket->net_thread );
         }
+        wiced_rtos_deinit_mutex(&conn->lock);
     }
-    wiced_rtos_deinit_mutex(&conn->lock);
     return WICED_SUCCESS;
 }
 
@@ -707,7 +707,7 @@ exit:
     }
     wiced_rtos_unlock_mutex( &conn->lock );
 }
-extern wiced_semaphore_t mqtt_restart_sem;
+extern void mqtt_reconnect_release(void);
 static void mqtt_thread_main( uint32_t arg )
 {
     mqtt_connection_t *conn = (mqtt_connection_t*)arg;
@@ -736,7 +736,7 @@ static void mqtt_thread_main( uint32_t arg )
                 break;
 
             case MQTT_DISCONNECT_EVENT:
-                wiced_rtos_set_semaphore( &mqtt_restart_sem );
+                mqtt_reconnect_release();
                 break;
 
             default:

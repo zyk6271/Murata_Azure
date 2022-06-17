@@ -171,7 +171,7 @@ extern "C"
 
 /************************************************************************
  * WICED Join Options */
-#define WICED_JOIN_RETRY_ATTEMPTS             (5)
+#define WICED_JOIN_RETRY_ATTEMPTS             (10)
 
 /************************************************************************
  * WICED TLS Options */

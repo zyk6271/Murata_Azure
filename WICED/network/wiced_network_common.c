@@ -50,6 +50,7 @@
 #endif /* #ifdef NETWORK_CONFIG_APPLICATION_DEFINED */
 
 #include "wiced_power_logger.h"
+#include "heart.h"
 #define MAC_ADDRESS_LOCALLY_ADMINISTERED_BIT  0x02
 /* IP networking status */
 wiced_bool_t ip_networking_inited[WICED_INTERFACE_MAX];
@@ -286,7 +287,7 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
 #ifdef WICED_USE_WIFI_TWO_STA_INTERFACE
             result = wiced_join_ap( WICED_STA_INTERFACE );
 #else
-            result = wiced_join_ap( );
+            wiced_join_ap( );
 #endif
         }
 #ifdef WICED_USE_ETHERNET_INTERFACE

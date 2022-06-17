@@ -66,11 +66,29 @@ static wiced_result_t print_app_dct( void )
 
     return WICED_SUCCESS;
 }
+static void link_up( void *arg)
+{
+    UNUSED_PARAMETER(arg);
+    WPRINT_APP_INFO( ("Network connection is up\n") );
+
+}
+static void link_down( void *arg)
+{
+    UNUSED_PARAMETER(arg);
+    WPRINT_APP_INFO( ("Network connection is down\n") );
+
+    wiced_network_down(WICED_STA_INTERFACE);
+    wifi_restart_release();
+}
 void application_start( void )
 {
     wiced_init();
+    uart_init();
+    wifi_status_change(0);
     print_wifi_config_dct();
     print_app_dct();
+    wifi_watch_init();
+    mqtt_watch_init();
     if(ap_flag)
     {
         wiced_network_up_default( &interface, &device_init_ip_settings );
@@ -78,11 +96,16 @@ void application_start( void )
     }
     else
     {
-        wiced_network_up( WICED_STA_INTERFACE, WICED_USE_EXTERNAL_DHCP_SERVER, NULL );
+        wiced_network_register_link_callback( link_up, NULL, link_down, NULL, WICED_STA_INTERFACE );
+        while(wiced_network_up( WICED_STA_INTERFACE, WICED_USE_EXTERNAL_DHCP_SERVER, NULL ) != WICED_SUCCESS)
+        {
+            WPRINT_APP_INFO( ("wiced_network_up retry\n") );
+            wiced_rtos_delay_milliseconds(1000);
+        }
+        keep_alive();
         mqtt_init();
         azure_start();
     }
-    uart_init();
     while(1)
     {
         wiced_rtos_delay_milliseconds(1000);

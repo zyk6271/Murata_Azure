@@ -153,7 +153,7 @@ typedef enum
 #define WICED_PLATFORM_BUTTON_COUNT  ( 2 )
 
 /* UART port used for standard I/O */
-#define STDIO_UART ( WICED_UART_1)
+#define STDIO_UART ( WICED_UART_2 )
 
 /* SPI flash is present */
 #define WICED_PLATFORM_INCLUDES_SPI_FLASH

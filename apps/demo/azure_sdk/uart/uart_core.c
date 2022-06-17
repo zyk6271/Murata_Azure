@@ -631,6 +631,10 @@ void data_handle(unsigned short offset,uint32_t value_len)
             info_single_upload(CND_PUT_CMD,value);
             device_status.info.cnd = value;
             break;
+        case WFT_SET_CMD:
+            set_factory();
+            platform_mcu_reset();
+            break;
         default:
             break;
         }

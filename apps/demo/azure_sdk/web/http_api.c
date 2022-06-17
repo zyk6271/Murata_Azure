@@ -150,3 +150,21 @@ uint8_t set_config(wiced_ssid_t ssid,char security,wiced_wep_key_t password)
         return 0;
     }
 }
+uint8_t set_factory(void)
+{
+    uint8_t ret = WICED_SUCCESS;
+    save_config temp_config;
+    temp_config.ap_entry.details.security = WICED_SECURITY_OPEN;
+    temp_config.device_configured = WICED_TRUE;
+    wiced_dct_write(&temp_config, DCT_WIFI_CONFIG_SECTION, 0, sizeof(temp_config) );
+    if(ret == WICED_SUCCESS)
+    {
+        printf("set_factory is ok\r\n");
+        return 1;
+    }
+    else
+    {
+        printf("set_factory is fail,code is %d\r\n",ret);
+        return 0;
+    }
+}

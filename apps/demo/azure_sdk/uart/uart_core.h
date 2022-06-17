@@ -1,4 +1,4 @@
-#define Control_UART 1
+#define Control_UART 0
 
 #define WIFI_DATA_PROCESS_LMT           1024             //单包1024byte
 #define WIFI_UART_RECV_BUF_LMT          1024              //串口数据接收缓存区大小,如MCU的RAM不够,可缩小
@@ -85,6 +85,8 @@
 #define         COE_GET_CMD                  0x39
 #define         COE_PUT_CMD                  0x3A
 #define         CND_PUT_CMD                  0x3B
+#define         WFS_SET_CMD                  0x3C
+#define         WFT_SET_CMD                  0x3D
 
 #define         EVENT_CONFIG_RSE_GET         1<<0
 #define         EVENT_CONFIG_RSE_SET         1<<1

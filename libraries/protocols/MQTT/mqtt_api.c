@@ -97,7 +97,6 @@ wiced_result_t wiced_mqtt_connect( wiced_mqtt_object_t mqtt_obj, wiced_ip_addres
         args.username_flag = 1;
         args.username.str = (uint8_t*) conninfo->username;
         args.username.len = (uint16_t) strlen( (char*) conninfo->username );
-        WPRINT_APP_INFO(("username len is %d\r\n",args.username.len));
     }
     else
     {
@@ -109,7 +108,6 @@ wiced_result_t wiced_mqtt_connect( wiced_mqtt_object_t mqtt_obj, wiced_ip_addres
         args.password_flag = 1;
         args.password.str = (uint8_t*) conninfo->password;
         args.password.len = (uint16_t) strlen( (char*) conninfo->password );
-        WPRINT_APP_INFO(("password len is %d\r\n",args.password.len));
     }
     else
     {
