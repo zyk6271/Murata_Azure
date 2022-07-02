@@ -9,6 +9,7 @@ wiced_semaphore_t wifi_restart_sem;
 wiced_semaphore_t mqtt_reconnect_sem;
 
 uint8_t link_status;
+uint8_t wifi_status;
 
 #define KEEP_ALIVE_ID_NFD          0
 #define KEEP_ALIVE_PERIOD_NFD_MSEC 5000
@@ -128,7 +129,13 @@ void wifi_watch_init(void)
     wiced_rtos_init_semaphore( &wifi_restart_sem );
     wiced_rtos_create_thread( &wifi_watch, 3, "wifi_watch", wifi_watch_callback, 4096, 0 );
 }
+
 void wifi_status_change(uint8_t value)
 {
-    wifi_uart_write_command_value(WFS_SET_CMD,value);
+    wifi_status = value;
+    wifi_uart_write_command_value(WST_SET_CMD,value);
+}
+void wifi_status_get(void)
+{
+    wifi_uart_write_command_value(WST_SET_CMD,wifi_status);
 }

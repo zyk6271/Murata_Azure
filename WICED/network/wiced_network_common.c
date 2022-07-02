@@ -39,6 +39,7 @@
 #include "wiced_low_power.h"
 #include "internal/wiced_internal_api.h"
 #include "wwd_assert.h"
+#include "heart.h"
 #ifdef WICED_USE_ETHERNET_INTERFACE
 #include "platform_ethernet.h"
 #endif /* ifdef WICED_USE_ETHERNET_INTERFACE */
@@ -287,6 +288,7 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
 #ifdef WICED_USE_WIFI_TWO_STA_INTERFACE
             result = wiced_join_ap( WICED_STA_INTERFACE );
 #else
+            wifi_status_change(2);
             wiced_join_ap( );
 #endif
         }

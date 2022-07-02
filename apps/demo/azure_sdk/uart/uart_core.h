@@ -85,8 +85,9 @@
 #define         COE_GET_CMD                  0x39
 #define         COE_PUT_CMD                  0x3A
 #define         CND_PUT_CMD                  0x3B
-#define         WFS_SET_CMD                  0x3C
-#define         WFT_SET_CMD                  0x3D
+#define         WST_GET_CMD                  0x3C
+#define         WST_SET_CMD                  0x3D
+#define         WFA_SET_CMD                  0x3E
 
 #define         EVENT_CONFIG_RSE_GET         1<<0
 #define         EVENT_CONFIG_RSE_SET         1<<1
