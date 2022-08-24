@@ -95,7 +95,49 @@ void http_get_flush_value(char *msg,uint32_t msg_size,uint32_t value)
     free(key_tmp);
     free(cjson_str);
 }
-void http_set_flush_value(char code,char *msg,uint32_t msg_size,char * value,uint32_t value_size)
+void http_get_flush_string(char *msg,uint32_t msg_size,char* value,uint32_t value_size)
+{
+    char *cjson_str = NULL;
+    char *key_tmp = calloc(msg_size+1,sizeof(char));
+    strncpy(key_tmp,msg,msg_size);
+    char *value_tmp = calloc(value_size+1,sizeof(char));
+    strncpy(value_tmp,value,value_size);
+    cJSON * root = cJSON_CreateObject();
+    cJSON_AddItemToObject(root, key_tmp, cJSON_CreateString(value_tmp));
+    cjson_str = cJSON_PrintUnformatted(root);
+    wiced_http_response_stream_enable_chunked_transfer( now_stream );
+    wiced_http_response_stream_write( now_stream, (const void*)cjson_str, strlen( cjson_str ));
+    wiced_http_response_stream_flush( now_stream );
+    wiced_http_response_stream_disable_chunked_transfer( now_stream );
+    cJSON_Delete(root);
+    free(key_tmp);
+    free(value_tmp);
+    free(cjson_str);
+}
+void http_set_flush_value(char code,char *msg,uint32_t msg_size,uint32_t value)
+{
+    char *cjson_str = NULL;
+    char *key_tmp = calloc(msg_size + 1,sizeof(char));
+    strncpy(key_tmp,msg,msg_size);
+    char *value_tmp = calloc(10,sizeof(char));
+    itoa(value_tmp,value,10);
+    char *cat_tmp = calloc(msg_size + strlen(value_tmp) + 1,sizeof(char));
+    strcpy(cat_tmp,key_tmp);
+    strcat(cat_tmp,value_tmp);
+    cJSON * root = cJSON_CreateObject();
+    cJSON_AddItemToObject(root, cat_tmp, cJSON_CreateString("OK"));
+    cjson_str = cJSON_PrintUnformatted(root);
+    wiced_http_response_stream_enable_chunked_transfer( now_stream );
+    wiced_http_response_stream_write( now_stream, (const void*)cjson_str, strlen( cjson_str ));
+    wiced_http_response_stream_flush( now_stream );
+    wiced_http_response_stream_disable_chunked_transfer( now_stream );
+    cJSON_Delete(root);
+    free(cat_tmp);
+    free(key_tmp);
+    free(value_tmp);
+    free(cjson_str);
+}
+void http_set_flush_string(char code,char *msg,uint32_t msg_size,char * value,uint32_t value_size)
 {
     char *cjson_str = NULL;
     char *key_tmp = calloc(msg_size + 1,sizeof(char));
