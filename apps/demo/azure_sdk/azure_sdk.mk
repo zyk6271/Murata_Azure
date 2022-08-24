@@ -48,6 +48,7 @@ GLOBAL_INCLUDES += \
                    
 $(NAME)_SOURCES :=  azure_sdk.c \
                     heart.c \
+                    storage.c \
                     web/http_server.c \
                     web/http_callback.c \
                     web/http_api.c \

@@ -29,12 +29,12 @@ static az_span const bat_name = AZ_SPAN_LITERAL_FROM_STR("bat");
 static az_span const ala_name = AZ_SPAN_LITERAL_FROM_STR("ala");
 static az_span const alr_name = AZ_SPAN_LITERAL_FROM_STR("alr");
 
-DEFINE_APP_DCT(dct_read_write_app_dct_t)
-{
-    .uint8_var          = 99,
-    .uint32_var         = 99999999,
-    .string_var         = "The DCT says hi!"
-};
+//DEFINE_APP_DCT(dct_read_write_app_dct_t)
+//{
+//    .uint8_var          = 99,
+//    .uint32_var         = 99999999,
+//    .string_var         = "The DCT says hi!"
+//};
 
 void telemetry_upload(void)
 {

@@ -263,7 +263,6 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
                 WICED_POWER_LOGGER( EVENT_PROC_ID_WIFI, EVENT_ID_WIFI_DATA, EVENT_DESC_WIFI_IDLE );
                 return result;
             }
-
             result = (wiced_result_t) wwd_wifi_start_ap( &soft_ap->SSID, soft_ap->security, (uint8_t*) soft_ap->security_key, soft_ap->security_key_length, soft_ap->channel );
             if ( result != WICED_SUCCESS )
             {
@@ -309,7 +308,6 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
         WICED_POWER_LOGGER( EVENT_PROC_ID_WIFI, EVENT_ID_WIFI_DATA, EVENT_DESC_WIFI_IDLE );
         return result;
     }
-
     result = wiced_ip_up( interface, config, ip_settings );
     if ( result != WICED_SUCCESS )
     {

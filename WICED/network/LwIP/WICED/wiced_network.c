@@ -396,7 +396,6 @@ wiced_result_t wiced_ip_up( wiced_interface_t interface, wiced_network_config_t 
     {
         return WICED_SUCCESS;
     }
-
     static_ip = ( ( config == WICED_USE_STATIC_IP || config == WICED_USE_INTERNAL_DHCP_SERVER) && ip_settings != NULL )? WICED_TRUE : WICED_FALSE;
 
     /* Enable the network interface */
@@ -413,13 +412,11 @@ wiced_result_t wiced_ip_up( wiced_interface_t interface, wiced_network_config_t 
         ip4_addr_set_zero( &ipaddr );
         ip4_addr_set_zero( &netmask );
     }
-
     if ( NULL == netif_add( &IP_HANDLE(interface), &ipaddr, &netmask, &gw, (void*) (ptrdiff_t) WICED_TO_WWD_INTERFACE( interface ), ethernetif_init, ethernet_input ) )
     {
         WPRINT_NETWORK_ERROR(( "Could not add network interface\n" ));
         return WICED_ERROR;
     }
-
 #if LWIP_IPV6
     /* Set the IPv6 linklocal address using our MAC */
     WPRINT_NETWORK_INFO( ("Setting IPv6 link-local address\n") );

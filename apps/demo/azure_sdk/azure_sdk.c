@@ -10,16 +10,19 @@
 #include "wiced.h"
 #include "azure_server.h"
 #include "dct_read_write_dct.h"
+#include "storage.h"
 
 uint8_t ap_flag = 0;
 wiced_interface_t interface;
 extern uint32_t telemetry_value;
-const wiced_ip_setting_t device_init_ip_settings =
+const wiced_ip_setting_t ip_settings =
 {
-    INITIALISER_IPV4_ADDRESS( .ip_address, MAKE_IPV4_ADDRESS(192,168, 0 ,1) ),
+    INITIALISER_IPV4_ADDRESS( .ip_address, MAKE_IPV4_ADDRESS(192,168, 4 ,1) ),
     INITIALISER_IPV4_ADDRESS( .netmask,    MAKE_IPV4_ADDRESS(255,255,255,0) ),
-    INITIALISER_IPV4_ADDRESS( .gateway,    MAKE_IPV4_ADDRESS(192,168, 0 ,1) ),
+    INITIALISER_IPV4_ADDRESS( .gateway,    MAKE_IPV4_ADDRESS(192,168, 4 ,1) ),
 };
+
+
 wiced_result_t print_wifi_config_dct( void )
 {
     platform_dct_wifi_config_t* dct_wifi_config = NULL;
@@ -37,7 +40,7 @@ wiced_result_t print_wifi_config_dct( void )
     WPRINT_APP_INFO( ( "    device_configured               : %d \r\n", dct_wifi_config->device_configured ) );
     WPRINT_APP_INFO( ( "    stored_ap_list[0]  (SSID)       : %s \r\n", dct_wifi_config->stored_ap_list[0].details.SSID.value ) );
     WPRINT_APP_INFO( ( "    stored_ap_list[0]  (Passphrase) : %s \r\n", dct_wifi_config->stored_ap_list[0].security_key ) );
-    WPRINT_APP_INFO( ( "    stored_ap_list[0]  (security) : %d \r\n",   dct_wifi_config->stored_ap_list[0].details.security ) );
+    WPRINT_APP_INFO( ( "    stored_ap_list[0]  (security)   : %d \r\n",   dct_wifi_config->stored_ap_list[0].details.security ) );
     WPRINT_APP_INFO( ( "    soft_ap_settings   (SSID)       : %s \r\n", dct_wifi_config->soft_ap_settings.SSID.value ) );
     WPRINT_APP_INFO( ( "    soft_ap_settings   (Passphrase) : %s \r\n", dct_wifi_config->soft_ap_settings.security_key ) );
     WPRINT_APP_INFO( ( "    DCT mac_address                 : ") );
@@ -51,18 +54,18 @@ wiced_result_t print_wifi_config_dct( void )
 }
 static wiced_result_t print_app_dct( void )
 {
-    dct_read_write_app_dct_t* dct_app = NULL;
+    user_app_t* dct_app = NULL;
 
     if ( wiced_dct_read_lock( (void**) &dct_app, WICED_FALSE, DCT_APP_SECTION, 0, sizeof( *dct_app ) ) != WICED_SUCCESS )
     {
         return WICED_ERROR;
     }
 
-    WPRINT_APP_INFO( ( "    telemetry_value              : %u \r\n", (unsigned int)((dct_read_write_app_dct_t*)dct_app)->uint32_var ) );
+    WPRINT_APP_INFO( ( "    telemetry_value              : %u \r\n", (unsigned int)((user_app_t*)dct_app)->telemetry_period ) );
 
     wiced_dct_read_unlock( dct_app, WICED_FALSE );
 
-    telemetry_value = (unsigned int)((dct_read_write_app_dct_t*)dct_app)->uint32_var ;
+    telemetry_value = (unsigned int)((user_app_t*)dct_app)->telemetry_period ;
 
     return WICED_SUCCESS;
 }
@@ -86,12 +89,11 @@ void application_start( void )
     uart_init();
     wifi_status_change(0);
     print_wifi_config_dct();
-    print_app_dct();
-    wifi_watch_init();
-    mqtt_watch_init();
+    dct_app_all_print();
+    //print_app_dct();
     if(ap_flag)
     {
-        wiced_network_up_default( &interface, &device_init_ip_settings );
+        wiced_network_up(WICED_AP_INTERFACE, WICED_USE_INTERNAL_DHCP_SERVER, &ip_settings);
         http_start();
     }
     else
@@ -102,6 +104,8 @@ void application_start( void )
             WPRINT_APP_INFO( ("wiced_network_up retry\n") );
             wiced_rtos_delay_milliseconds(1000);
         }
+        wifi_watch_init();
+        mqtt_watch_init();
         keep_alive();
         mqtt_init();
         azure_start();
