@@ -76,7 +76,6 @@ extern "C" {
 
 /* This is the network interface the device will work with */
 #define WICED_NETWORK_INTERFACE   WICED_AP_INTERFACE
-
 /******************************************************
  *                   Enumerations
  ******************************************************/

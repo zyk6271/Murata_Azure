@@ -31,10 +31,6 @@ void azure_env_init(void)
 
     iot_sample_read_environment_variables(SAMPLE_TYPE, SAMPLE_NAME, &env_vars);
 
-    char mqtt_endpoint_buffer[128];
-    iot_sample_create_mqtt_endpoint(
-        SAMPLE_TYPE, &env_vars, mqtt_endpoint_buffer, sizeof(mqtt_endpoint_buffer));
-
     rc = az_iot_hub_client_init(&hub_client, env_vars.hub_hostname, env_vars.hub_device_id, NULL);
     if (az_result_failed(rc))
     {

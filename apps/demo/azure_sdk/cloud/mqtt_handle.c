@@ -6,6 +6,7 @@
 #include <mqtt_api.h>
 #include "wiced.h"
 #include "mqtt_handle.h"
+#include "storage.h"
 
 #include "iot_sample_common.h"
 #include "azure/az_core.h"
@@ -23,6 +24,11 @@ EventGroupHandle_t MQTT_EventHandler;
 uint8_t MQTT_Resolving = WICED_NOT_CONNECTED;
 uint8_t MQTT_Connected = WICED_NOT_CONNECTED;
 
+char* endpoint_adress = NULL;
+char* device_id = NULL;
+char* endpoint_user = NULL;
+char* endpoint_key = NULL;
+
 #define MQTT_TYPE_CONNECT_REQ_EVENT         1<<0
 #define MQTT_TYPE_DISCONNECTED_EVENT        1<<1
 #define MQTT_TYPE_PUBLISHED_EVENT           1<<2
@@ -36,9 +42,6 @@ static wiced_mqtt_callback_t callbacks = mqtt_connection_event_cb;
 static wiced_mqtt_security_t security;
 
 //#define MQTT_BROKER_ADDRESS                 "SYRKR.azure-devices.net"
-//#define WICED_PUBTOPIC                      "devices/syr_1/messages/events/"
-//#define WICED_SUBTOPIC                      "devices/syr_1/messages/devicebound/#"
-//#define WICED_MESSAGE_STR                   "HELLO WICED"
 //#define CLIENT_ID                           "syr_1"
 //#define WICED_MQTT_TIMEOUT                  (8000)
 //#define WICED_MQTT_DELAY_IN_MILLISECONDS    (1000)
@@ -46,14 +49,14 @@ static wiced_mqtt_security_t security;
 //#define USERNAME                           "SYRKR.azure-devices.net/syr_1/?api-version=2020-09-30"
 //#define PASSWORD                           "SharedAccessSignature sr=SYRKR.azure-devices.net%2Fdevices%2Fsyr_1&sig=R%2B6FcDtPHSHo7muafCA3oGWd3iNDquVSXmOcuFoE4Gw%3D&se=36001654129759"
 
-#define MQTT_BROKER_ADDRESS                 "iotChinaTest.azure-devices.net"
-#define WICED_TOPIC                         "devices/rsa22030001/messages/events/"
-#define CLIENT_ID                           "rsa22030001"
-#define WICED_MQTT_TIMEOUT                  (10000)
-#define WICED_MQTT_DELAY_IN_MILLISECONDS    (1000)
-#define MQTT_MAX_RESOURCE_SIZE              (0x7fffffff)
-#define USERNAME                           "iotChinaTest.azure-devices.net/rsa22030001/?api-version=2020-09-30"
-#define PASSWORD                           "SharedAccessSignature sr=iotChinaTest.azure-devices.net%2Fdevices%2Frsa22030001&sig=RSckYK2T1ilb13XrneeUaGG85y71rvu8vVLQyRDeeMk%3D&se=101649317205"
+char MQTT_BROKER_ADDRESS[]=                 "iotChinaTest.azure-devices.net";
+char CLIENT_ID[]=                           "rsa22030001";
+int WICED_MQTT_TIMEOUT=                     (10000);
+int WICED_MQTT_DELAY_IN_MILLISECONDS=       (1000);
+int MQTT_MAX_RESOURCE_SIZE=                 (0x7fffffff);
+char USERNAME[]=                           "iotChinaTest.azure-devices.net/rsa22030001/?api-version=2020-09-30";
+char PASSWORD[]=                           "SharedAccessSignature sr=iotChinaTest.azure-devices.net%2Fdevices%2Frsa22030001&sig=RSckYK2T1ilb13XrneeUaGG85y71rvu8vVLQyRDeeMk%3D&se=101649317205";
+
 void handle_iot_message(wiced_mqtt_topic_msg_t* msg)
 {
     //Initialize the incoming topic to a span
@@ -149,10 +152,10 @@ wiced_result_t mqtt_conn_open( wiced_mqtt_object_t mqtt_obj, wiced_ip_address_t 
     conninfo.port_number = 0;                   /* set to 0 indicates library to use default settings */
     conninfo.mqtt_version = WICED_MQTT_PROTOCOL_VER4;
     conninfo.clean_session = 1;
-    conninfo.client_id = (uint8_t*) CLIENT_ID;
+    conninfo.client_id = (uint8_t*) device_id;
     conninfo.keep_alive = 60;
-    conninfo.password = (uint8_t*)PASSWORD;
-    conninfo.username = (uint8_t*)USERNAME;
+    conninfo.username = (uint8_t*)endpoint_user;
+    conninfo.password = (uint8_t*)endpoint_key;
     conninfo.peer_cn = NULL;
 
     ret = wiced_mqtt_connect( mqtt_obj, address, interface, callback, security, &conninfo );
@@ -223,7 +226,7 @@ void mqtt_connect_azure(void)
     while(MQTT_Resolving == WICED_NOT_CONNECTED)
     {
         WPRINT_APP_INFO( ( "Resolving IP address of MQTT broker...\n" ) );
-        ret = wiced_hostname_lookup( MQTT_BROKER_ADDRESS, &broker_address, 10000, WICED_STA_INTERFACE );
+        ret = wiced_hostname_lookup( endpoint_adress, &broker_address, 10000, WICED_STA_INTERFACE );
         WPRINT_APP_INFO(("Resolved Broker IP: %u.%u.%u.%u\n\n", (uint8_t)(GET_IPV4_ADDRESS(broker_address) >> 24),
                          (uint8_t)(GET_IPV4_ADDRESS(broker_address) >> 16),
                          (uint8_t)(GET_IPV4_ADDRESS(broker_address) >> 8),
@@ -276,6 +279,47 @@ void mqtt_disconnect_azure(void)
 {
     wiced_mqtt_deinit(mqtt_object);
 }
+void mqtt_config_read(void)
+{
+    user_app_t *app_t = calloc(sizeof(user_app_t), sizeof(char));
+    dct_app_all_read(&app_t);
+    if(app_t->init_flag==1)
+    {
+        endpoint_adress = calloc(sizeof(app_t->endpointAddress), sizeof(char));
+        strncpy(endpoint_adress,app_t->endpointAddress,strlen(app_t->endpointAddress));
+
+        device_id = calloc(sizeof(app_t->device_id), sizeof(char));
+        strncpy(device_id,app_t->device_id,strlen(app_t->device_id));
+
+        endpoint_user = calloc(sizeof(app_t->endpointAddress) + sizeof(app_t->device_id) + 30, sizeof(char));
+        strncpy(endpoint_user,app_t->endpointAddress,strlen(app_t->endpointAddress));
+        strcat(endpoint_user,"/");
+        strcat(endpoint_user,device_id);
+        strcat(endpoint_user,"/?api-version=2020-09-30");
+
+        endpoint_key = calloc(sizeof(app_t->primaryKey), sizeof(char));
+        strncpy(endpoint_key,app_t->primaryKey,strlen(app_t->primaryKey));
+    }
+    else
+    {
+        endpoint_adress = calloc(sizeof(MQTT_BROKER_ADDRESS), sizeof(char));
+        strncpy(endpoint_adress,MQTT_BROKER_ADDRESS,strlen(MQTT_BROKER_ADDRESS));
+
+        device_id = calloc(sizeof(CLIENT_ID), sizeof(char));
+        strncpy(device_id,CLIENT_ID,strlen(CLIENT_ID));
+
+        endpoint_user = calloc(sizeof(USERNAME), sizeof(char));
+        strncpy(endpoint_user,USERNAME,strlen(USERNAME));
+
+        endpoint_key = calloc(sizeof(PASSWORD), sizeof(char));
+        strncpy(endpoint_key,PASSWORD,strlen(PASSWORD));
+    }
+    free(app_t);
+    printf("endpoint_adress is %s\r\n",endpoint_adress);
+    printf("device_id is %s\r\n",device_id);
+    printf("endpoint_user is %s\r\n",endpoint_user);
+    printf("endpoint_key is %s\r\n",endpoint_key);
+}
 void mqtt_init(void)
 {
     uint32_t size_out;
@@ -283,6 +327,8 @@ void mqtt_init(void)
     security.ca_cert_len = size_out;
 
     MQTT_EventHandler = xEventGroupCreate();
+
+    mqtt_config_read();
 
     mqtt_object = (wiced_mqtt_object_t) malloc( WICED_MQTT_OBJECT_MEMORY_SIZE_REQUIREMENT );
     if ( mqtt_object == NULL )

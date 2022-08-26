@@ -525,11 +525,11 @@ void data_handle(unsigned short offset,uint32_t value_len)
         xEventGroupSetBits(Info_EventHandler,EVENT_INFO_SUP_GET);
         break;
     case VER_GET_CMD:
-        device_status.info.ver = value;
+        //device_status.info.ver = value;
         xEventGroupSetBits(Info_EventHandler,EVENT_INFO_VER_GET);
         break;
     case SRN_GET_CMD:
-        device_status.info.srn = value;
+        //device_status.info.srn = value;
         xEventGroupSetBits(Info_EventHandler,EVENT_INFO_SRN_GET);
         break;
     case NET_GET_CMD:

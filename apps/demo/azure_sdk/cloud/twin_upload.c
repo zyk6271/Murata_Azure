@@ -8,10 +8,8 @@
 #include "uart_core.h"
 #include "twin_parse.h"
 
-uint8_t mac_value[18];
-uint8_t srn_value[10];
-uint8_t ver_value[10];
 wiced_mac_t mac_info;
+uint8_t mac_value[18];
 
 extern syr_status device_status;
 extern az_iot_hub_client hub_client;
@@ -266,18 +264,6 @@ void info_get(void)
     {
         IOT_SAMPLE_LOG_SUCCESS("GET SUP %d\r\n",device_status.info.sup);
     }
-    wifi_uart_write_command_value(VER_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_VER_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_INFO_VER_GET)
-    {
-        IOT_SAMPLE_LOG_SUCCESS("GET VER %d\r\n",device_status.info.ver);
-    }
-    wifi_uart_write_command_value(SRN_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_SRN_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_INFO_SRN_GET)
-    {
-        IOT_SAMPLE_LOG_SUCCESS("GET SRN %d\r\n",device_status.info.srn);
-    }
 }
 void twin_upload(void)
 {
@@ -337,11 +323,9 @@ void twin_upload(void)
     az_json_writer_append_property_name(&jw, coe_name);
     az_json_writer_append_int32(&jw, device_status.info.coe);
     az_json_writer_append_property_name(&jw, srn_name);
-    sprintf(srn_value,"%09d",device_status.info.srn);
-    az_json_writer_append_string(&jw, az_span_create_from_str(srn_value));
+    az_json_writer_append_string(&jw, az_span_create_from_str(device_status.info.srn));
     az_json_writer_append_property_name(&jw, ver_name);
-    sprintf(ver_value,"%01d.%01d.%01d",device_status.info.ver/100%10,device_status.info.ver/10%10,device_status.info.ver%10);
-    az_json_writer_append_string(&jw, az_span_create_from_str(ver_value));
+    az_json_writer_append_string(&jw, az_span_create_from_str(device_status.info.ver));
     az_json_writer_append_property_name(&jw, mac_name);
     if ( wwd_wifi_get_mac_address( &mac_info, WWD_STA_INTERFACE ) == WWD_SUCCESS )
     {

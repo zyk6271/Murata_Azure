@@ -26,8 +26,8 @@ typedef struct _syr_info
     uint32_t cod;
     uint32_t coe;
     uint32_t sup;
-    uint32_t ver;
-    uint32_t srn;
+    char ver[6];
+    char srn[20];
     uint32_t cnd;
 }syr_info;
 typedef struct _syr_tem

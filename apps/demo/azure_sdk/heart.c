@@ -97,7 +97,7 @@ void wifi_restart_release(void)
 }
 void mqtt_watch_callback( uint32_t arg )
 {
-    printf("mqtt_watch created\n");
+    printf("mqtt_watch created\r\n");
     while ( 1 )
     {
         wiced_rtos_get_semaphore( &mqtt_reconnect_sem, WICED_WAIT_FOREVER );
@@ -111,7 +111,7 @@ void mqtt_watch_init(void)
 }
 void wifi_watch_callback( uint32_t arg )
 {
-    printf("wifi_watch created\n");
+    printf("wifi_watch created\r\n");
     while ( 1 )
     {
         wiced_rtos_get_semaphore( &wifi_restart_sem, WICED_WAIT_FOREVER );

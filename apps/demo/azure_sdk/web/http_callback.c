@@ -30,9 +30,9 @@ int32_t http_rst_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_rst_callback value %d,size %d\r\n",value,size);
+    printf("http_rst_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(RST_SET_CMD,1);
     EventValue = xEventGroupWaitBits(C2D_EventHandler,EVENT_C2D_RST_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_C2D_RST_SET)
@@ -51,9 +51,9 @@ int32_t http_def_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_def_set_callback value %d,size %d\r\n",value,size);
+    printf("http_def_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(DEF_SET_CMD,1);
     EventValue = xEventGroupWaitBits(C2D_EventHandler,EVENT_C2D_DEF_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_C2D_DEF_SET)
@@ -71,9 +71,9 @@ int32_t http_ras_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_def_set_callback value %d,size %d\r\n",value,size);
+    printf("http_def_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(RAS_SET_CMD,1);
     EventValue = xEventGroupWaitBits(C2D_EventHandler,EVENT_C2D_RAS_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_C2D_RAS_SET)
@@ -129,11 +129,11 @@ int32_t http_bat_get_callback(const char* url_path, const char* url_parameters, 
     EventValue = xEventGroupWaitBits(TEM_EventHandler,EVENT_TEM_BAT_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_TEM_BAT_GET)
     {
-        http_flush_value("getBAT",6,device_status.tem.bat);
+        http_get_flush_value("getBAT",6,device_status.tem.bat);
     }
     else
     {
-        http_flush_value("getBAT",6,0);
+        http_get_flush_value("getBAT",6,0);
     }
     return 0;
 }
@@ -210,9 +210,9 @@ int32_t http_rse_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_rse_set_callback value %d,size %d\r\n",value,size);
+    printf("http_rse_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(RSE_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSE_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_RSE_SET)
@@ -247,9 +247,9 @@ int32_t http_rsa_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_rsa_set_callback value %d,size %d\r\n",value,size);
+    printf("http_rsa_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(RSA_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSA_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_RSA_SET)
@@ -284,9 +284,9 @@ int32_t http_rsi_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_rsi_set_callback value %d,size %d\r\n",value,size);
+    printf("http_rsi_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(RSI_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSI_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_RSI_SET)
@@ -321,9 +321,9 @@ int32_t http_rsd_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_rsd_set_callback value %d,size %d\r\n",value,size);
+    printf("http_rsd_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(RSD_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSD_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_RSD_SET)
@@ -345,11 +345,11 @@ int32_t http_cnf_get_callback(const char* url_path, const char* url_parameters, 
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_CNF_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_CNF_GET)
     {
-        http_get_flush_value("getcnf",6,device_status.config.cnf);
+        http_get_flush_value("getCNF",6,device_status.config.cnf);
     }
     else
     {
-        http_get_flush_value("getcnf",6,0);
+        http_get_flush_value("getCNF",6,0);
     }
     return 0;
 }
@@ -358,9 +358,9 @@ int32_t http_cnf_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_cnf_set_callback value %d,size %d\r\n",value,size);
+    printf("http_cnf_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(CNF_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_CNF_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_CNF_SET)
@@ -395,9 +395,9 @@ int32_t http_cnl_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_cnl_set_callback value %d,size %d\r\n",value,size);
+    printf("http_cnl_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(CNL_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_CNL_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_CNL_SET)
@@ -432,18 +432,18 @@ int32_t http_sse_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_sse_set_callback value %d,size %d\r\n",value,size);
+    printf("http_sse_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(SSE_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSE_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_SSE_SET)
     {
-        http_set_flush_value(SUCCESS_CODE,"setSSE",6,device_status.config.sse);
+        http_set_flush_value(SUCCESS_CODE,"setsse",6,device_status.config.sse);
     }
     else
     {
-        http_set_flush_value(TIMEOUT_CODE,"setSSE",6,device_status.config.sse);
+        http_set_flush_value(TIMEOUT_CODE,"setsse",6,device_status.config.sse);
     }
     return 0;
 }
@@ -469,9 +469,9 @@ int32_t http_ssa_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_ssa_set_callback value %d,size %d\r\n",value,size);
+    printf("http_ssa_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(SSA_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSA_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_SSA_SET)
@@ -506,9 +506,9 @@ int32_t http_ssd_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_ssd_set_callback value %d,size %d\r\n",value,size);
+    printf("http_ssd_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(SSD_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSD_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_SSD_SET)
@@ -543,9 +543,9 @@ int32_t http_lng_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_lng_set_callback value %d,size %d\r\n",value,size);
+    printf("http_lng_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(LNG_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_LNG_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_LNG_SET)
@@ -554,37 +554,24 @@ int32_t http_lng_set_callback(const char* url_path, const char* url_parameters, 
     }
     else
     {
-        http_set_flush_value(TIMEOUT_CODE,"setlngh",6,device_status.config.lng);
+        http_set_flush_value(TIMEOUT_CODE,"setlng",6,device_status.config.lng);
     }
     return 0;
 }
 int32_t http_ver_get_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
 {
-    EventBits_t EventValue;
     now_stream = stream;
     printf("http_ver_callback GET\r\n");
-    wifi_uart_write_frame(VER_GET_CMD,MCU_TX_VER,0);
-    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_VER_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_INFO_VER_GET)
-    {
-        http_get_flush_value("getVER",6,device_status.info.ver);
-    }
-    else
-    {
-        http_get_flush_value("getVER",6,0);
-    }
+    http_get_flush_string("getVER",6,device_status.info.ver,strlen(device_status.info.ver));
     return 0;
 }
 int32_t http_srn_get_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
 {
-    EventBits_t EventValue;
     now_stream = stream;
     printf("http_srn_callback GET\r\n");
-    wifi_uart_write_frame(SRN_GET_CMD,MCU_TX_VER,0);
-    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_SRN_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_INFO_SRN_GET)
+    if(strlen(device_status.info.srn))
     {
-        http_get_flush_value("getSRN",6,device_status.info.srn);
+        http_get_flush_string("getSRN",6,device_status.info.srn,strlen(device_status.info.srn));
     }
     else
     {
@@ -614,9 +601,9 @@ int32_t http_com_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_com_set_callback value %d,size %d\r\n",value,size);
+    printf("http_com_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(COM_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COM_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_INFO_COM_SET)
@@ -651,9 +638,9 @@ int32_t http_coa_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_coa_set_callback value %d,size %d\r\n",value,size);
+    printf("http_coa_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(COA_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COA_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_INFO_COA_SET)
@@ -688,9 +675,9 @@ int32_t http_cod_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_cod_set_callback value %d,size %d\r\n",value,size);
+    printf("http_cod_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(COD_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COD_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_INFO_COD_SET)
@@ -725,9 +712,9 @@ int32_t http_coe_set_callback(const char* url_path, const char* url_parameters, 
     uint32_t size,value;
     EventBits_t EventValue;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
-    printf("http_coe_set_callback value %d,size %d\r\n",value,size);
+    printf("http_coe_set_callback value %ld,size %ld\r\n",value,size);
     wifi_uart_write_command_value(COE_SET_CMD,value);
     EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COE_SET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_INFO_COE_SET)
@@ -746,11 +733,11 @@ int32_t http_wfc_get_callback(const char* url_path, const char* url_parameters, 
     printf("http_wfc_callback GET\r\n");
     if(save_ssid.length)
     {
-        http_get_flush_string(SUCCESS_CODE,"getWFC",save_ssid.value,save_ssid.length);
+        http_get_flush_string("getWFC",6,(char*)save_ssid.value,save_ssid.length);
     }
     else
     {
-        http_get_flush_string(ERRDATA_CODE,"getWFC",0,0);
+        http_get_flush_value("getWFC",6,0);
     }
     return 0;
 }
@@ -758,17 +745,17 @@ int32_t http_wfc_set_callback(const char* url_path, const char* url_parameters, 
 {
     uint32_t size;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
-    printf("http_wfc_callback POST,value %s,len is %d\r\n",value_buf, size);
+    char* value_buf = flite_value(url_path,(void *)&size);
+    printf("http_wfc_callback POST,value %s,len is %ld\r\n",value_buf, size);
     if(size<=32)
     {
         memcpy(&save_ssid.value,value_buf,size);
         save_ssid.length = size;
-        http_set_flush_string(SUCCESS_CODE,"setWFC",6,save_ssid.value,save_ssid.length);
+        http_set_flush_string(SUCCESS_CODE,"setwfc",6,(char*)save_ssid.value,save_ssid.length);
     }
     else
     {
-        http_set_flush_value(TIMEOUT_CODE,"setWFC",6,0);
+        http_set_flush_value(TIMEOUT_CODE,"setwfc",6,0);
     }
     return 0;
 }
@@ -776,25 +763,18 @@ int32_t http_wfs_get_callback(const char* url_path, const char* url_parameters, 
 {
     now_stream = stream;
     printf("http_wfs_callback GET\r\n");
-    if(save_ssid.length)
-    {
-        http_get_flush_value(SUCCESS_CODE,"getWFC",save_security_id);
-    }
-    else
-    {
-        http_get_flush_value(ERRDATA_CODE,"getWFC",0);
-    }
+    http_get_flush_value("getWFS",6,save_security_id);
     return 0;
 }
 int32_t http_wfs_set_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
 {
     uint32_t value,size;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
+    char* value_buf = flite_value(url_path,(void *)&size);
     value = atol(value_buf);
-    printf("http_wfs_callback POST,value %d,len is %d\r\n",value, size);
+    printf("http_wfs_callback POST,value %ld,len is %ld\r\n",value, size);
     save_security_id = value;
-    http_set_flush_value(SUCCESS_CODE,"setWFS",6,save_security_id);
+    http_set_flush_value(SUCCESS_CODE,"setwfs",6,value);
     return 0;
 }
 int32_t http_wfk_get_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
@@ -803,11 +783,11 @@ int32_t http_wfk_get_callback(const char* url_path, const char* url_parameters, 
     printf("http_wfk_callback GET\r\n");
     if(save_password.length)
     {
-        http_get_flush_string(SUCCESS_CODE,"getWFK",save_password.data,save_password.length);
+        http_get_flush_string("getWFK",6,(char*)save_password.data,save_password.length);
     }
     else
     {
-        http_get_flush_value(ERRDATA_CODE,"getWFK",0);
+        http_get_flush_value("getWFK",6,0);
     }
     return 0;
 }
@@ -815,62 +795,53 @@ int32_t http_wfk_set_callback(const char* url_path, const char* url_parameters, 
 {
     uint32_t size;
     now_stream = stream;
-    char* value_buf = flite_value(url_path,&size);
-    printf("http_wfk_callback POST,value %s,len is %d\r\n",value_buf, size);
+    char* value_buf = flite_value(url_path,(void *)&size);
+    printf("http_wfk_callback POST,value %s,len is %ld\r\n",value_buf, size);
     if(size<=32)
     {
         memcpy(&save_password.data,value_buf,size);
         save_password.length = size;
-        http_set_flush_string(SUCCESS_CODE,"setWFK",6,save_password.data,save_password.length);
+        http_set_flush_string(SUCCESS_CODE,"setwfk",6,(char*)save_password.data,save_password.length);
     }
     else
     {
-        http_set_flush_value(TIMEOUT_CODE,"setWFK",6,0);
+        http_set_flush_value(TIMEOUT_CODE,"setwfk",6,0);
     }
     return 0;
 }
 int32_t http_wsr_set_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
 {
-    uint8_t ret;
     now_stream = stream;
-    switch(http_message_body->request_type)
-    {
-    case WICED_HTTP_GET_REQUEST:
-        printf("http_wsr_callback GET\r\n");
-        ret = set_config(save_ssid,save_security_id,save_password);
-        http_flush_value(SUCCESS_CODE,"getWSR",ret);
-        rst_work();
-        break;
-    default:
-        http_flush_value(ERRREQS_CODE,"errWSR",0);
-        break;
-    }
+    printf("http_wsr_callback GET\r\n");
+    set_config(save_ssid,save_security_id,save_password);
+    http_get_flush_value("getWSR",6,0);
+    rst_work();
     return 0;
 }
 int32_t http_azc_get_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
 {
-    uint8_t ret;
     now_stream = stream;
     switch(http_message_body->request_type)
     {
     case WICED_HTTP_GET_REQUEST:
-        printf("azc GET\r\n");
+        printf("http_azc_get_callback\r\n");
         azc_flush();
         break;
+    default:break;
     }
     return 0;
 }
 int32_t http_azc_set_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
 {
-    uint8_t ret;
     now_stream = stream;
     switch(http_message_body->request_type)
     {
     case WICED_HTTP_POST_REQUEST:
-        printf("azc post %s\r\n",http_message_body->data);
+        printf("http_azc_set_callback %s\r\n",http_message_body->data);
         azc_parse(http_message_body->data,http_message_body->message_data_length);
-        printf("http_azc_callback POST\r\n");
+        azc_flush();
         break;
+    default:break;
     }
     return 0;
 }

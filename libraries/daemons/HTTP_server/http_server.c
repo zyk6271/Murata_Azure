@@ -56,7 +56,7 @@
  *                    Constants
  ******************************************************/
 
-#define ENABLE_DEBUG
+//#define ENABLE_DEBUG
 
 #ifdef ENABLE_DEBUG
 #define HTTP_DEBUG( X )     mini_printf X

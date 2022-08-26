@@ -8,11 +8,10 @@
 #include "uart_core.h"
 #include "twin_parse.h"
 #include "dct_read_write_dct.h"
+#include "storage.h"
 
 wiced_timer_t telemetry_timer;
 uint32_t telemetry_value;
-
-static dct_read_write_app_dct_t   app_dct_local;
 
 extern az_iot_hub_client hub_client;
 extern wiced_mqtt_object_t mqtt_object;
@@ -28,13 +27,6 @@ static az_span const net_name = AZ_SPAN_LITERAL_FROM_STR("net");
 static az_span const bat_name = AZ_SPAN_LITERAL_FROM_STR("bat");
 static az_span const ala_name = AZ_SPAN_LITERAL_FROM_STR("ala");
 static az_span const alr_name = AZ_SPAN_LITERAL_FROM_STR("alr");
-
-//DEFINE_APP_DCT(dct_read_write_app_dct_t)
-//{
-//    .uint8_var          = 99,
-//    .uint32_var         = 99999999,
-//    .string_var         = "The DCT says hi!"
-//};
 
 void telemetry_upload(void)
 {
@@ -99,43 +91,20 @@ void telemetry_upload(void)
     wiced_mqtt_publish(mqtt_object,topic_buffer,az_span_ptr(out_payload),az_span_size(out_payload),0);
     printf("telemetry_upload,payload is %s\r\n",az_span_ptr(out_payload));
 }
-
-void telemetry_dct(uint32_t value)
-{
-    dct_read_write_app_dct_t*       app_dct                  = NULL;
-    dct_read_write_app_dct_t*       app_dct_modified         = NULL;
-
-    /* get the App config section for modifying, any memory allocation required would be done inside wiced_dct_read_lock() */
-    wiced_dct_read_lock( (void**) &app_dct, WICED_TRUE, DCT_APP_SECTION, 0, sizeof( *app_dct ) );
-
-    /* save to local structure to restore original values */
-    app_dct_local = *app_dct;
-
-    /* Modify single byte value - test sflash uint32_t on a non-4-byte-boundary writes */
-    app_dct->uint32_var = telemetry_value;
-    wiced_dct_write( (const void*) &(app_dct->uint32_var), DCT_APP_SECTION, OFFSETOF(dct_read_write_app_dct_t, uint32_var), sizeof(uint32_t) );
-    /* release the read lock */
-    wiced_dct_read_unlock( app_dct, WICED_TRUE );
-
-    /* Print modified string_var */
-    wiced_dct_read_lock( (void**) &app_dct_modified, WICED_FALSE, DCT_APP_SECTION, 0, sizeof( *app_dct_modified ) );
-    WPRINT_APP_INFO( ( "telemetry_value read %d\r\n", (unsigned int)app_dct_modified->uint32_var ) );
-
-    /* release the read lock */
-    wiced_dct_read_unlock( app_dct_modified, WICED_FALSE );
-
-    WPRINT_APP_INFO( ( "\r\n\r\n----------------------------------------------------------------\r\n\r\n") );
-}
 void telemetry_init(void)
 {
+    user_app_t *app_t = calloc(sizeof(user_app_t), sizeof(char));
+    dct_app_all_read(&app_t);
+    telemetry_value = app_t->telemetry_period;
     if(telemetry_value == 0 || telemetry_value >= 1440)
     {
         telemetry_value = 10;
-        telemetry_dct(telemetry_value);
+        dct_app_period_write(telemetry_value);
         printf("telemetry default to 10\r\n");
     }
     wiced_rtos_init_timer(&telemetry_timer,telemetry_value * 60 * 1000,telemetry_upload,0);
     wiced_rtos_start_timer(&telemetry_timer);
+    free(app_t);
 }
 
 void telemetry_period_set(uint32_t value)
@@ -144,6 +113,6 @@ void telemetry_period_set(uint32_t value)
     wiced_rtos_deinit_timer(&telemetry_timer);
     wiced_rtos_init_timer(&telemetry_timer,telemetry_value * 60 * 1000,telemetry_upload,0);
     wiced_rtos_start_timer(&telemetry_timer);
-    telemetry_dct(value);
+    dct_app_period_write(value);
     printf("telemetry_period_set,period is %d\r\n",telemetry_value);
 }
