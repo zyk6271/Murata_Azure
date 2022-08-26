@@ -27,6 +27,7 @@ wiced_result_t print_wifi_config_dct( void )
     WPRINT_APP_INFO( ( "    stored_ap_list[0]  (Passphrase) : %s \r\n", dct_wifi_config->stored_ap_list[0].security_key ) );
     WPRINT_APP_INFO( ( "    stored_ap_list[0]  (security)   : %d \r\n",   dct_wifi_config->stored_ap_list[0].details.security ) );
     WPRINT_APP_INFO( ( "    soft_ap_settings   (SSID)       : %s \r\n", dct_wifi_config->soft_ap_settings.SSID.value ) );
+    WPRINT_APP_INFO( ( "    soft_ap_settings   (length)     : %d \r\n", dct_wifi_config->soft_ap_settings.SSID.length ) );
     WPRINT_APP_INFO( ( "    soft_ap_settings   (Passphrase) : %s \r\n", dct_wifi_config->soft_ap_settings.security_key ) );
     WPRINT_APP_INFO( ( "    DCT mac_address                 : ") );
     print_mac_address( (wiced_mac_t*) &dct_wifi_config->mac_address );
@@ -93,6 +94,13 @@ wiced_result_t dct_app_azc_write( user_app_t* app_dct )
     dct_app_init_write();
     wiced_dct_write( (const void*) &app_dct->device_id, DCT_APP_SECTION, OFFSETOF(user_app_t,device_id), sizeof(app_dct->mac1) + sizeof(app_dct->device_id)
                        + sizeof(app_dct->primaryKey) + sizeof(app_dct->endpointAddress) );
+    char ap_ssid[28];
+    strcpy(ap_ssid,"SYR_");
+    strcat(ap_ssid,app_dct->device_id);
+    uint8_t size = strlen(ap_ssid);
+    wiced_dct_write( ap_ssid, DCT_WIFI_CONFIG_SECTION, OFFSETOF(platform_dct_wifi_config_t,soft_ap_settings.SSID.value), size );
+    printf("ssid len is %d\r\n",size);
+    wiced_dct_write(&size, DCT_WIFI_CONFIG_SECTION, OFFSETOF(platform_dct_wifi_config_t,soft_ap_settings.SSID.length), sizeof(uint8_t) );
     return WICED_SUCCESS;
 }
 
