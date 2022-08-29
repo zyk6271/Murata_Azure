@@ -44,7 +44,6 @@ GLOBAL_INCLUDES += \
                    $(AZURE_SDK_DIR) \
                    $(AZURE_SDK_DIR)/iot \
                    $(AZURE_SDK_DIR)/core \
-
                    
 $(NAME)_SOURCES :=  azure_sdk.c \
                     heart.c \

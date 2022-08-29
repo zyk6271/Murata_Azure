@@ -4,6 +4,7 @@
 #include "mqtt_api.h"
 #include "resources.h"
 #include "azure_server.h"
+#include "base64.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_TWIN_SAMPLE

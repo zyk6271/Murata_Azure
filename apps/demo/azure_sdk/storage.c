@@ -6,7 +6,7 @@
 uint8_t ap_flag = 0;
 extern syr_status device_status;
 
-char syr_version[]="1.0.4";
+char syr_version[]="1.0.5";
 
 wiced_result_t print_wifi_config_dct( void )
 {
@@ -95,7 +95,7 @@ wiced_result_t dct_app_azc_write( user_app_t* app_dct )
     wiced_dct_write( (const void*) &app_dct->device_id, DCT_APP_SECTION, OFFSETOF(user_app_t,device_id), sizeof(app_dct->mac1) + sizeof(app_dct->device_id)
                        + sizeof(app_dct->primaryKey) + sizeof(app_dct->endpointAddress) );
     char ap_ssid[28];
-    strcpy(ap_ssid,"SYR_");
+    strcpy(ap_ssid,"SYR");
     strcat(ap_ssid,app_dct->device_id);
     uint8_t size = strlen(ap_ssid);
     wiced_dct_write( ap_ssid, DCT_WIFI_CONFIG_SECTION, OFFSETOF(platform_dct_wifi_config_t,soft_ap_settings.SSID.value), size );

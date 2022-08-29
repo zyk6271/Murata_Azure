@@ -7,6 +7,7 @@
 #include "wiced.h"
 #include "mqtt_handle.h"
 #include "storage.h"
+#include "base64.h"
 
 #include "iot_sample_common.h"
 #include "azure/az_core.h"
@@ -62,7 +63,6 @@ void handle_iot_message(wiced_mqtt_topic_msg_t* msg)
     //Initialize the incoming topic to a span
     az_span incoming_topic = az_span_create(msg->topic, msg->topic_len);
 
-    //The message could be for three features so parse the topic to see which it is for
     az_iot_hub_client_method_request method_request;
     az_iot_hub_client_c2d_request c2d_request;
     az_iot_hub_client_twin_response twin_response;
@@ -118,6 +118,7 @@ wiced_result_t mqtt_connection_event_cb( wiced_mqtt_object_t mqtt_object, wiced_
             break;
         case WICED_MQTT_EVENT_TYPE_DISCONNECTED:
             xEventGroupSetBits(MQTT_EventHandler,MQTT_TYPE_DISCONNECTED_EVENT);
+            WPRINT_APP_INFO(( "WICED_MQTT_EVENT_TYPE_DISCONNECTED\n\n" ));
             break;
         case WICED_MQTT_EVENT_TYPE_PUBLISHED:
             xEventGroupSetBits(MQTT_EventHandler,MQTT_TYPE_PUBLISHED_EVENT);
@@ -279,6 +280,60 @@ void mqtt_disconnect_azure(void)
 {
     wiced_mqtt_deinit(mqtt_object);
 }
+void urlencode(char *dst, char *src, int len) {
+  char *hex = "0123456789abcdef";
+  char *src_p = src;
+  char *dst_p = dst;
+  if (!len) len = (int)strlen(src);
+
+  while( src_p && len-- ){
+    if( ('a' <= *src_p && *src_p <= 'z')
+        || ('A' <= *src_p && *src_p <= 'Z')
+        || ('0' <= *src_p && *src_p <= '9')
+        || ( *src_p == '-' )
+        || ( *src_p == '_' )
+        ){
+      *dst_p++ = *src_p++;
+    } else {
+      *dst_p++ = ('%');
+      *dst_p++ = (hex[*src_p >> 4]);
+      *dst_p++ = (hex[*src_p & 15]);
+      src_p++;
+    }
+  }
+  *dst_p = '\0';
+}
+void signature_generate(char *pass, char*host, char *devname, char *key, char *time_exp)
+{
+    char sign_origin[256];
+    strcpy(sign_origin, host);
+    strcat(sign_origin, "%2Fdevices%2F");
+    strcat(sign_origin, devname);
+    strcat(sign_origin, "\n");
+    strcat(sign_origin, time_exp);
+
+    unsigned char key_decode[100];
+    uint8_t key_decode_size;
+    key_decode_size = base64_decode(key, strlen(key), key_decode,strlen(key), BASE64_STANDARD );
+
+    unsigned char sign_calc[32];
+    sha2_hmac((unsigned char*)key_decode,key_decode_size,(unsigned char*)sign_origin,strlen(sign_origin),&sign_calc,0);
+    char signature_buffer[100];
+    int result = base64_encode(sign_calc, 32, (unsigned char*)signature_buffer, 44, BASE64_STANDARD );
+
+    char sas[128];
+    urlencode(sas, signature_buffer, 44);
+
+    strcpy(pass, "SharedAccessSignature sr=");
+    strcat(pass, host);
+    strcat(pass, "%2Fdevices%2F");
+    strcat(pass, devname);
+    strcat(pass, "&sig=");
+    strcat(pass, sas);
+    strcat(pass, "&se=");
+    strcat(pass, "1693097521");
+    strcat(pass, "&skn=");
+}
 void mqtt_config_read(void)
 {
     user_app_t *app_t = calloc(sizeof(user_app_t), sizeof(char));
@@ -298,7 +353,7 @@ void mqtt_config_read(void)
         strcat(endpoint_user,"/?api-version=2020-09-30");
 
         endpoint_key = calloc(sizeof(app_t->primaryKey), sizeof(char));
-        strncpy(endpoint_key,app_t->primaryKey,strlen(app_t->primaryKey));
+        signature_generate(endpoint_key,endpoint_adress,device_id,app_t->primaryKey,"1693097521");
     }
     else
     {
