@@ -331,7 +331,7 @@ void signature_generate(char *pass, char*host, char *devname, char *key, char *t
     strcat(pass, "&sig=");
     strcat(pass, sas);
     strcat(pass, "&se=");
-    strcat(pass, "1693097521");
+    strcat(pass, time_exp);
     strcat(pass, "&skn=");
 }
 void mqtt_config_read(void)
