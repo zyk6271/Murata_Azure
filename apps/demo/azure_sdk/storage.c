@@ -6,7 +6,7 @@
 uint8_t ap_flag = 0;
 extern syr_status device_status;
 
-char syr_version[]="1.0.5";
+char syr_version[]="1.0.6";
 
 wiced_result_t print_wifi_config_dct( void )
 {
@@ -17,7 +17,8 @@ wiced_result_t print_wifi_config_dct( void )
         return WICED_ERROR;
     }
     /* since we passed ptr_is_writable as WICED_FALSE, we are not allowed to write in to memory pointed by dct_security */
-
+    WPRINT_APP_INFO( ( "\r\n----------------------------------------------------------------\r\n\r\n") );
+    WPRINT_APP_INFO( ( "\r\n\r\n------------------------Version is %s-----------------------\r\n\r\n",syr_version) );
     WPRINT_APP_INFO( ( "\r\n----------------------------------------------------------------\r\n\r\n") );
 
     /* Wi-Fi Config Section */
@@ -25,6 +26,7 @@ wiced_result_t print_wifi_config_dct( void )
     WPRINT_APP_INFO( ( "    device_configured               : %d \r\n", dct_wifi_config->device_configured ) );
     WPRINT_APP_INFO( ( "    stored_ap_list[0]  (SSID)       : %s \r\n", dct_wifi_config->stored_ap_list[0].details.SSID.value ) );
     WPRINT_APP_INFO( ( "    stored_ap_list[0]  (Passphrase) : %s \r\n", dct_wifi_config->stored_ap_list[0].security_key ) );
+    WPRINT_APP_INFO( ( "    stored_ap_list[0]  (Passphrase_length) : %d \r\n", dct_wifi_config->stored_ap_list[0].security_key_length ) );
     WPRINT_APP_INFO( ( "    stored_ap_list[0]  (security)   : %d \r\n",   dct_wifi_config->stored_ap_list[0].details.security ) );
     WPRINT_APP_INFO( ( "    soft_ap_settings   (SSID)       : %s \r\n", dct_wifi_config->soft_ap_settings.SSID.value ) );
     WPRINT_APP_INFO( ( "    soft_ap_settings   (length)     : %d \r\n", dct_wifi_config->soft_ap_settings.SSID.length ) );

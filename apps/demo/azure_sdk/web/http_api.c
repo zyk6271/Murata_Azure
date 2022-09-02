@@ -121,50 +121,38 @@ void rst_work(void)
     wiced_rtos_init_timer(&rst_timer, 200, rst_timer_callback, 0);
     wiced_rtos_start_timer(&rst_timer);
 }
-uint8_t set_config(wiced_ssid_t ssid, char security, wiced_wep_key_t password)
+void set_config(wiced_ssid_t ssid, wiced_wpa_key_t password)
 {
     uint8_t ret = WICED_SUCCESS;
-    save_config temp_config;
+    save_config temp_config = {0};
     if (ssid.length == 0) {
-        ret = WICED_ERROR;
+        return;
     }
-    if (security > 0 && password.length < 8) {
-        ret = WICED_ERROR;
-    }
-    memcpy(temp_config.ap_entry.details.SSID.value, ssid.value, ssid.length);
-    temp_config.ap_entry.details.SSID.length = ssid.length;
-    switch (security) {
-    case 0:
+    if (password.length == 0) {
         temp_config.ap_entry.details.security = WICED_SECURITY_OPEN;
-        break;
-    case 1:
-        temp_config.ap_entry.details.security = WICED_SECURITY_WPA_MIXED_ENT;
-        memcpy(temp_config.ap_entry.security_key, password.data,
-                password.length);
-        temp_config.ap_entry.security_key_length = password.length;
-        break;
-    case 2:
-        temp_config.ap_entry.details.security = WICED_SECURITY_WPA2_MIXED_PSK;
-        memcpy(temp_config.ap_entry.security_key, password.data,
-                password.length);
-        temp_config.ap_entry.security_key_length = password.length;
-        break;
-    case 3:
-        temp_config.ap_entry.details.security = WICED_SECURITY_WEP_SHARED;
-        memcpy(temp_config.ap_entry.security_key, password.data,
-                password.length);
-        temp_config.ap_entry.security_key_length = password.length;
-        break;
     }
+    else if(password.length > 0 && password.length < 8)
+    {
+        printf("password is too short\r\n");
+        return;
+    }
+    else if(password.length >= 8 && password.length <= 64)
+    {
+        temp_config.ap_entry.details.security = WICED_SECURITY_WPA2_MIXED_PSK;
+        strncpy((char*)temp_config.ap_entry.security_key, (const char*)password.data,password.length);
+        temp_config.ap_entry.security_key_length = password.length;
+    }
+    strncpy((char*)temp_config.ap_entry.details.SSID.value, (const char*)ssid.value, ssid.length);
+    temp_config.ap_entry.details.SSID.length = ssid.length;
     temp_config.device_configured = WICED_FALSE;
-    wiced_dct_write(&temp_config, DCT_WIFI_CONFIG_SECTION, 0,
-            sizeof(temp_config));
-    if (ret == WICED_SUCCESS) {
+    ret = wiced_dct_write(&temp_config, DCT_WIFI_CONFIG_SECTION, 0,sizeof(temp_config));
+    if (ret == WICED_SUCCESS)
+    {
         printf("set is ok\r\n");
-        return 1;
-    } else {
+    }
+    else
+    {
         printf("set is fail,code is %d\r\n", ret);
-        return 0;
     }
 }
 uint8_t set_factory(void)

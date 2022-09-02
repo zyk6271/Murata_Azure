@@ -10,8 +10,7 @@
 #include "uart_core.h"
 
 wiced_ssid_t save_ssid;
-uint8_t save_security_id;
-wiced_wep_key_t save_password;
+wiced_wpa_key_t save_password;
 wiced_http_response_stream_t *now_stream;
 
 extern syr_status device_status;
@@ -752,29 +751,13 @@ int32_t http_wfc_set_callback(const char* url_path, const char* url_parameters, 
         memcpy(&save_ssid.value,value_buf,size);
         save_ssid.length = size;
         http_set_flush_string(SUCCESS_CODE,"setwfc",6,(char*)save_ssid.value,save_ssid.length);
+        set_config(save_ssid,save_password);
+        rst_work();
     }
     else
     {
         http_set_flush_value(TIMEOUT_CODE,"setwfc",6,0);
     }
-    return 0;
-}
-int32_t http_wfs_get_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
-{
-    now_stream = stream;
-    printf("http_wfs_callback GET\r\n");
-    http_get_flush_value("getWFS",6,save_security_id);
-    return 0;
-}
-int32_t http_wfs_set_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
-{
-    uint32_t value,size;
-    now_stream = stream;
-    char* value_buf = flite_value(url_path,(void *)&size);
-    value = atol(value_buf);
-    printf("http_wfs_callback POST,value %ld,len is %ld\r\n",value, size);
-    save_security_id = value;
-    http_set_flush_value(SUCCESS_CODE,"setwfs",6,value);
     return 0;
 }
 int32_t http_wfk_get_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
@@ -797,7 +780,7 @@ int32_t http_wfk_set_callback(const char* url_path, const char* url_parameters, 
     now_stream = stream;
     char* value_buf = flite_value(url_path,(void *)&size);
     printf("http_wfk_callback POST,value %s,len is %ld\r\n",value_buf, size);
-    if(size<=32)
+    if(size<=64)
     {
         memcpy(&save_password.data,value_buf,size);
         save_password.length = size;
@@ -807,15 +790,6 @@ int32_t http_wfk_set_callback(const char* url_path, const char* url_parameters, 
     {
         http_set_flush_value(TIMEOUT_CODE,"setwfk",6,0);
     }
-    return 0;
-}
-int32_t http_wsr_set_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
-{
-    now_stream = stream;
-    printf("http_wsr_callback GET\r\n");
-    set_config(save_ssid,save_security_id,save_password);
-    http_get_flush_value("getWSR",6,0);
-    rst_work();
     return 0;
 }
 int32_t http_azc_get_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)

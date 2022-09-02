@@ -246,6 +246,15 @@ typedef struct
     uint8_t data[32]; /**< WEP key as values NOT chars                                     */
 } wiced_wep_key_t;
 
+/**
+ * Structure for storing a WPA2 key
+ */
+typedef struct
+{
+    uint8_t length;   /**< WPA key length. Either 5 bytes (40-bits) or 13-bytes (104-bits) */
+    uint8_t data[64]; /**< WPA key                                                         */
+} wiced_wpa_key_t;
+
 
 /** Structure for storing 802.11 powersave listen interval values \n
  * See @ref wiced_wifi_get_listen_interval for more information

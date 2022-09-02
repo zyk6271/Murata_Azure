@@ -53,11 +53,8 @@ START_OF_HTTP_PAGE_DATABASE(web_pages)
 {    "/rsa/set/coe/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_coe_set_callback, 0 },},
 {    "/rsa/get/wfc",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfc_get_callback, 0 },},
 {    "/rsa/set/wfc/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfc_set_callback, 0 },},
-{    "/rsa/get/wfs",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfs_get_callback, 0 },},
-{    "/rsa/set/wfs/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfs_set_callback, 0 },},
 {    "/rsa/get/wfk",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfk_get_callback, 0 },},
 {    "/rsa/set/wfk/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfk_set_callback, 0 },},
-{    "/rsa/set/wsr/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wsr_set_callback, 0 },},
 {    "/rsa/set/azc",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_azc_set_callback, 0 },},
 {    "/rsa/get/azc",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_azc_get_callback, 0 },},
 END_OF_HTTP_PAGE_DATABASE();
