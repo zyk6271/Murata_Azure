@@ -9,13 +9,6 @@
 #ifndef ACN_SDK_C_NTP_CONFIG_H_
 #define ACN_SDK_C_NTP_CONFIG_H_
 
-/* NTP server settings */
-#define NTP_DEFAULT_SERVER  "time.windows.com"
-#define NTP_DEFAULT_PORT    123
-#define NTP_DEFAULT_TIMEOUT 5000
-
-int ntp_set_time_common(const char *server, uint16_t port, int timeout, int try_times);
-int set_time(int timer);
-int get_time(void);
+wiced_utc_time_t get_time(void);
 
 #endif // ACN_SDK_C_NTP_CONFIG_H_

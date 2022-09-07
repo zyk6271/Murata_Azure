@@ -64,7 +64,7 @@
 #define SNTP_WORKER_THREAD_STACK_SIZE   (4 * 1024)
 #define SNTP_WORKER_THREAD_QUEUE_SIZE   (2)
 #define SNTP_DNS_TIMEOUT_MS             (1 * SECONDS)
-#define SNTP_DNS_RETRIES                (3)
+#define SNTP_DNS_RETRIES                (5)
 
 /******************************************************
  *                   Enumerations

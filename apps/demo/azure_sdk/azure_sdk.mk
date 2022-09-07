@@ -37,7 +37,6 @@ AZURE_SDK_DIR = ../../../apps/demo/azure_sdk/azure
 GLOBAL_INCLUDES += \
                     azure \
                     ntp \
-                    bsd \
                     cloud \
                     web \
                     uart \
@@ -59,8 +58,6 @@ $(NAME)_SOURCES :=  azure_sdk.c \
 					cloud/iot_sample_common.c \
 					cloud/mqtt_handle.c \
 					cloud/twin_parse.c \
-                    bsd/socket.c \
-                    ntp/client.c \
 					ntp/ntp.c \
 					azure/azure_server.c \
 					azure/core/az_base64.c \

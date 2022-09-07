@@ -21,6 +21,7 @@ void azure_serv_callback( uint32_t arg )
     info_get();
     telemetry_init();
     twin_upload();
+
     while ( 1 )
     {
         wiced_rtos_delay_milliseconds(10);
@@ -43,6 +44,5 @@ void azure_env_init(void)
 void azure_start(void)
 {
     azure_env_init();
-    ntp_set_time_cycle();
     wiced_rtos_create_thread( &azure_serv_t, 2, "azure_serv", azure_serv_callback, 8192, 0 );
 }

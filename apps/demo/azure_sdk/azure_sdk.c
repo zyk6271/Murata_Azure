@@ -11,6 +11,7 @@
 #include "azure_server.h"
 #include "dct_read_write_dct.h"
 #include "storage.h"
+#include "sntp.h"
 
 extern uint8_t ap_flag;
 wiced_interface_t interface;
@@ -56,9 +57,10 @@ void application_start( void )
         }
         wifi_watch_init();
         mqtt_watch_init();
-        keep_alive();
+        sntp_start_auto_time_sync_nowait( 1000*60*60 );
         mqtt_init();
         azure_start();
+        keep_alive();
     }
     while(1)
     {
