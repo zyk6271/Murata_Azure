@@ -86,14 +86,14 @@ void mqtt_reconnect_release(void)
     if(link_status)
     {
         printf("mqtt_reconnect_release\n");
-        wiced_rtos_set_semaphore(mqtt_reconnect_sem);
+        wiced_rtos_set_semaphore(&mqtt_reconnect_sem);
     }
 }
 void wifi_restart_release(void)
 {
     printf("wifi_restart_release\n");
     link_status = 0;
-    wiced_rtos_set_semaphore(wifi_restart_sem);
+    wiced_rtos_set_semaphore(&wifi_restart_sem);
 }
 void mqtt_watch_callback( uint32_t arg )
 {

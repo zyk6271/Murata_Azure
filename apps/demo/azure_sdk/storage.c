@@ -6,7 +6,7 @@
 uint8_t ap_flag = 0;
 extern syr_status device_status;
 
-char syr_version[]="1.0.7";
+char syr_version[]="1.0.8";
 
 wiced_result_t print_wifi_config_dct( void )
 {

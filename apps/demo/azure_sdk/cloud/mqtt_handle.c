@@ -13,6 +13,7 @@
 #include "azure/az_core.h"
 #include "azure/az_iot.h"
 #include "twin_upload.h"
+#include "azure_server.h"
 
 #include "mqtt_api.h"
 #include "resources.h"
@@ -42,21 +43,13 @@ static wiced_ip_address_t    broker_address;
 static wiced_mqtt_callback_t callbacks = mqtt_connection_event_cb;
 static wiced_mqtt_security_t security;
 
-//#define MQTT_BROKER_ADDRESS                 "SYRKR.azure-devices.net"
-//#define CLIENT_ID                           "syr_1"
-//#define WICED_MQTT_TIMEOUT                  (8000)
-//#define WICED_MQTT_DELAY_IN_MILLISECONDS    (1000)
-//#define MQTT_MAX_RESOURCE_SIZE              (0x7fffffff)
-//#define USERNAME                           "SYRKR.azure-devices.net/syr_1/?api-version=2020-09-30"
-//#define PASSWORD                           "SharedAccessSignature sr=SYRKR.azure-devices.net%2Fdevices%2Fsyr_1&sig=R%2B6FcDtPHSHo7muafCA3oGWd3iNDquVSXmOcuFoE4Gw%3D&se=36001654129759"
-
-char MQTT_BROKER_ADDRESS[]=                 "iotChinaTest.azure-devices.net";
-char CLIENT_ID[]=                           "rsa22030001";
+char MQTT_BROKER_ADDRESS[]=                 "NULL";
+char CLIENT_ID[]=                           "NULL";
 int WICED_MQTT_TIMEOUT=                     (10000);
 int WICED_MQTT_DELAY_IN_MILLISECONDS=       (1000);
 int MQTT_MAX_RESOURCE_SIZE=                 (0x7fffffff);
-char USERNAME[]=                           "iotChinaTest.azure-devices.net/rsa22030001/?api-version=2020-09-30";
-char PASSWORD[]=                           "SharedAccessSignature sr=iotChinaTest.azure-devices.net%2Fdevices%2Frsa22030001&sig=RSckYK2T1ilb13XrneeUaGG85y71rvu8vVLQyRDeeMk%3D&se=101649317205";
+char USERNAME[]=                            "NULL";
+char PASSWORD[]=                            "NULL";
 
 void handle_iot_message(wiced_mqtt_topic_msg_t* msg)
 {
@@ -269,6 +262,7 @@ void mqtt_connect_azure(void)
         wiced_rtos_delay_milliseconds(500);
     }
     wifi_status_change(4);
+    azure_refresh();
 }
 void mqtt_reconnect_azure(void)
 {
@@ -382,8 +376,6 @@ void mqtt_init(void)
     security.ca_cert_len = size_out;
 
     MQTT_EventHandler = xEventGroupCreate();
-
-    mqtt_config_read();
 
     mqtt_object = (wiced_mqtt_object_t) malloc( WICED_MQTT_OBJECT_MEMORY_SIZE_REQUIREMENT );
     if ( mqtt_object == NULL )

@@ -5,6 +5,7 @@
 #include "resources.h"
 #include "azure_server.h"
 #include "base64.h"
+#include "telemetry.h"
 
 #define SAMPLE_TYPE PAHO_IOT_HUB
 #define SAMPLE_NAME PAHO_IOT_HUB_TWIN_SAMPLE
@@ -13,18 +14,20 @@ iot_sample_environment_variables env_vars;
 az_iot_hub_client hub_client;
 wiced_thread_t azure_serv_t = NULL;
 
+wiced_semaphore_t azure_refresh_sem;
+
+void azure_refresh(void)
+{
+    wiced_rtos_set_semaphore(&azure_refresh_sem);
+}
 void azure_serv_callback( uint32_t arg )
 {
-    printf("azure_serv_thread created\n");
-    //get_device_twin_document();
-    config_get();
-    info_get();
     telemetry_init();
-    twin_upload();
-
     while ( 1 )
     {
-        wiced_rtos_delay_milliseconds(10);
+        wiced_rtos_get_semaphore( &azure_refresh_sem, WICED_WAIT_FOREVER );
+        get_device_twin_document();
+        telemetry_upload();
     }
 }
 void azure_env_init(void)
@@ -43,6 +46,8 @@ void azure_env_init(void)
 }
 void azure_start(void)
 {
+    wiced_rtos_init_semaphore( &azure_refresh_sem );
+    mqtt_config_read();
     azure_env_init();
     wiced_rtos_create_thread( &azure_serv_t, 2, "azure_serv", azure_serv_callback, 8192, 0 );
 }

@@ -53,5 +53,7 @@ typedef struct _syr_status
 
 void get_device_twin_document(void);
 void handle_device_twin_message(wiced_mqtt_topic_msg_t const* message,az_iot_hub_client_twin_response const* twin_response);
+void parse_get_twin(az_span const message_span);
+void parse_desired_twin(az_span const message_span);
 
 #endif

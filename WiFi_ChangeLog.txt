@@ -1,0 +1,9 @@
+/*
+/*	Murata Module Firmware Changelog
+*/
+1.0.8	2022.09.09
+1.Add download device twin and telemetry upload when device connect or reconnect to azure
+2.Convert original ADC value of NET and BAT
+3.Delete default azure config
+4.Fix a bug about heart of mqtt
+5.Create new file about ChangeLog in the root directory

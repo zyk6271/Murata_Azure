@@ -59,7 +59,7 @@ void telemetry_upload(void)
     {
         IOT_SAMPLE_LOG_SUCCESS("GET NET %d\r\n",device_status.tem.net);
         az_json_writer_append_property_name(&jw, net_name);
-        az_json_writer_append_int32(&jw,device_status.tem.net);
+        az_json_writer_append_double(&jw, device_status.tem.net*3.3/4096*2,2);
     }
     wifi_uart_write_command_value(BAT_GET_CMD,0);
     EventValue = xEventGroupWaitBits(TEM_EventHandler,EVENT_TEM_BAT_GET,pdTRUE,pdTRUE,100);
@@ -67,7 +67,7 @@ void telemetry_upload(void)
     {
         IOT_SAMPLE_LOG_SUCCESS("GET BAT %d\r\n",device_status.tem.bat);
         az_json_writer_append_property_name(&jw, bat_name);
-        az_json_writer_append_int32(&jw,device_status.tem.bat);
+        az_json_writer_append_double(&jw, device_status.tem.bat*3.3/4096*2,2);
     }
     wifi_uart_write_command_value(ALA_GET_CMD,0);
     EventValue = xEventGroupWaitBits(TEM_EventHandler,EVENT_TEM_ALA_GET,pdTRUE,pdTRUE,100);

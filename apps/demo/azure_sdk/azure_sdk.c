@@ -58,8 +58,8 @@ void application_start( void )
         wifi_watch_init();
         mqtt_watch_init();
         sntp_start_auto_time_sync_nowait( 1000*60*60 );
-        mqtt_init();
         azure_start();
+        mqtt_init();
         keep_alive();
     }
     while(1)
