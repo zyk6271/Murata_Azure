@@ -38,7 +38,7 @@
 #define configUSE_DAEMON_TASK_STARTUP_HOOK           1
 #define configCPU_CLOCK_HZ                           ( SystemCoreClock )
 #define configTICK_RATE_HZ                           ( ( TickType_t ) 1000 )
-#define configMAX_PRIORITIES                         ( 7 )
+#define configMAX_PRIORITIES                         ( 10 )
 #define configMINIMAL_STACK_SIZE                     ( ( uint16_t ) 90 )
 #define configTOTAL_HEAP_SIZE                        ( ( size_t ) ( 60 * 1024 ) )
 #define configMAX_TASK_NAME_LEN                      ( 16 )

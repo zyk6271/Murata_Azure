@@ -18,8 +18,6 @@ extern wiced_mqtt_object_t mqtt_object;
 extern EventGroupHandle_t Config_EventHandler;
 extern EventGroupHandle_t Info_EventHandler;
 
-extern uint32_t telemetry_value;
-
 static az_span const twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
 static az_span const deviceInfo_name = AZ_SPAN_LITERAL_FROM_STR("deviceInfo");
 static az_span const deviceConfig_name = AZ_SPAN_LITERAL_FROM_STR("deviceConfig");
@@ -27,7 +25,8 @@ static az_span const ras_name = AZ_SPAN_LITERAL_FROM_STR("ras");
 static az_span const mac_name = AZ_SPAN_LITERAL_FROM_STR("mac");
 static az_span const srn_name = AZ_SPAN_LITERAL_FROM_STR("srn");
 static az_span const sup_name = AZ_SPAN_LITERAL_FROM_STR("sup");
-static az_span const ver_name = AZ_SPAN_LITERAL_FROM_STR("ver");
+static az_span const mcu_ver_name = AZ_SPAN_LITERAL_FROM_STR("s_ver");
+static az_span const wifi_ver_name = AZ_SPAN_LITERAL_FROM_STR("m_ver");
 static az_span const wnk_name = AZ_SPAN_LITERAL_FROM_STR("wnk");
 static az_span const wgw_name = AZ_SPAN_LITERAL_FROM_STR("wgw");
 static az_span const wip_name = AZ_SPAN_LITERAL_FROM_STR("wip");
@@ -46,7 +45,8 @@ static az_span const sse_name = AZ_SPAN_LITERAL_FROM_STR("sse");
 static az_span const ssa_name = AZ_SPAN_LITERAL_FROM_STR("ssa");
 static az_span const ssd_name = AZ_SPAN_LITERAL_FROM_STR("ssd");
 static az_span const lng_name = AZ_SPAN_LITERAL_FROM_STR("lng");
-static az_span const tpr_name = AZ_SPAN_LITERAL_FROM_STR("tpr");
+static az_span const rcp_name = AZ_SPAN_LITERAL_FROM_STR("rcp");
+static az_span const emr_name = AZ_SPAN_LITERAL_FROM_STR("emr");
 
 void info_single_upload(uint8_t command,uint32_t value)//主动上传
 {
@@ -230,6 +230,18 @@ void config_get(void)
     {
         IOT_SAMPLE_LOG_SUCCESS("GET LNG %d\r\n",device_status.config.lng);
     }
+    wifi_uart_write_command_value(RCP_GET_CMD,0);
+    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RCP_GET,pdTRUE,pdTRUE,100);
+    if(EventValue & EVENT_CONFIG_RCP_GET)
+    {
+        IOT_SAMPLE_LOG_SUCCESS("GET RCP %d\r\n",device_status.config.rcp);
+    }
+    wifi_uart_write_command_value(EMR_GET_CMD,0);
+    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_EMR_GET,pdTRUE,pdTRUE,100);
+    if(EventValue & EVENT_CONFIG_EMR_GET)
+    {
+        IOT_SAMPLE_LOG_SUCCESS("GET EMR %d\r\n",device_status.config.emr);
+    }
 }
 void info_get(void)
 {
@@ -267,7 +279,8 @@ void info_get(void)
 }
 void twin_upload(void)
 {
-    char payload_buffer[2048];
+    extern char wifi_version[];
+    char payload_buffer[2048] = {0};
     memset(payload_buffer,0,2048);
     az_span payload = AZ_SPAN_FROM_BUFFER(payload_buffer);
     az_span out_payload;
@@ -306,8 +319,10 @@ void twin_upload(void)
     az_json_writer_append_int32(&jw, device_status.config.ssd);
     az_json_writer_append_property_name(&jw, lng_name);
     az_json_writer_append_int32(&jw, device_status.config.lng);
-    az_json_writer_append_property_name(&jw, tpr_name);
-    az_json_writer_append_int32(&jw, telemetry_value);
+    az_json_writer_append_property_name(&jw, rcp_name);
+    az_json_writer_append_int32(&jw, device_status.config.rcp);
+    az_json_writer_append_property_name(&jw, emr_name);
+    az_json_writer_append_int32(&jw, device_status.config.emr);
     az_json_writer_append_end_object(&jw);
 
     az_json_writer_append_property_name(&jw, deviceInfo_name);
@@ -324,8 +339,10 @@ void twin_upload(void)
     az_json_writer_append_int32(&jw, device_status.info.coe);
     az_json_writer_append_property_name(&jw, srn_name);
     az_json_writer_append_string(&jw, az_span_create_from_str(device_status.info.srn));
-    az_json_writer_append_property_name(&jw, ver_name);
+    az_json_writer_append_property_name(&jw, mcu_ver_name);
     az_json_writer_append_string(&jw, az_span_create_from_str(device_status.info.ver));
+    az_json_writer_append_property_name(&jw, wifi_ver_name);
+    az_json_writer_append_string(&jw, az_span_create_from_str(wifi_version));
     az_json_writer_append_property_name(&jw, mac_name);
     if ( wwd_wifi_get_mac_address( &mac_info, WWD_STA_INTERFACE ) == WWD_SUCCESS )
     {

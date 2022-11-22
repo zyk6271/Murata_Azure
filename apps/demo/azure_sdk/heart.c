@@ -8,8 +8,10 @@ static wiced_thread_t mqtt_watch = NULL;
 wiced_semaphore_t wifi_restart_sem;
 wiced_semaphore_t mqtt_reconnect_sem;
 
-uint8_t link_status;
 uint8_t wifi_status;
+
+uint8_t link_status;
+uint8_t mqtt_status;
 
 #define KEEP_ALIVE_ID_NFD          0
 #define KEEP_ALIVE_PERIOD_NFD_MSEC 5000
@@ -40,9 +42,6 @@ void keep_alive(void)
     wiced_result_t            status;
     wiced_keep_alive_packet_t keep_alive_packet_info;
 
-    link_status = 1;
-
-
     /* Setup a Null function data frame keep alive */
     keep_alive_packet_info.keep_alive_id = KEEP_ALIVE_ID_NFD,
     keep_alive_packet_info.period_msec   = KEEP_ALIVE_PERIOD_NFD_MSEC,
@@ -66,10 +65,10 @@ void keep_alive(void)
             WPRINT_APP_INFO( ( "Error[%d]: Adding Null Function Data frame keep alive packet\n", status ) );
             break;
     }
-/* Get Null Function Data Frame keep alive packet info */
-keep_alive_packet_info.keep_alive_id = KEEP_ALIVE_ID_NFD;
-keep_alive_packet_info.packet_length = MAX_KEEP_ALIVE_PACKET_SIZE;
-keep_alive_packet_info.packet        = &keep_alive_packet_buffer[0];
+    /* Get Null Function Data Frame keep alive packet info */
+    keep_alive_packet_info.keep_alive_id = KEEP_ALIVE_ID_NFD;
+    keep_alive_packet_info.packet_length = MAX_KEEP_ALIVE_PACKET_SIZE;
+    keep_alive_packet_info.packet        = &keep_alive_packet_buffer[0];
 
     status = wiced_wifi_get_keep_alive( &keep_alive_packet_info );
     if ( status == WICED_SUCCESS )
@@ -81,19 +80,31 @@ keep_alive_packet_info.packet        = &keep_alive_packet_buffer[0];
         WPRINT_APP_INFO( ( "ERROR[%d]: Get keep alive packet failed for ID:%d\n", status, KEEP_ALIVE_ID_NFD) );
     }
 }
-void mqtt_reconnect_release(void)
+void mqtt_disconnect_callabck(void)
 {
-    if(link_status)
-    {
-        printf("mqtt_reconnect_release\n");
-        wiced_rtos_set_semaphore(&mqtt_reconnect_sem);
-    }
+    printf("mqtt_disconnect_callabck\n");
+    wifi_status_change(2);
+    wiced_rtos_set_semaphore(&mqtt_reconnect_sem);
 }
-void wifi_restart_release(void)
+void mqtt_connect_callabck(void)
 {
-    printf("wifi_restart_release\n");
+    printf("mqtt_connect_callabck\n");
+    mqtt_status = 1;
+    wifi_status_change(3);
+}
+void wifi_disconnect_callback(void)
+{
+    printf("wifi_disconnect_callback\n");
+    mqtt_deinit();
     link_status = 0;
+    wifi_status_change(1);
     wiced_rtos_set_semaphore(&wifi_restart_sem);
+}
+void wifi_connect_callback(void)
+{
+    printf("wifi_connect_callback\n");
+    link_status = 1;
+    link_up_callback();
 }
 void mqtt_watch_callback( uint32_t arg )
 {
@@ -101,41 +112,46 @@ void mqtt_watch_callback( uint32_t arg )
     while ( 1 )
     {
         wiced_rtos_get_semaphore( &mqtt_reconnect_sem, WICED_WAIT_FOREVER );
-        mqtt_reconnect_azure();
+        if(mqtt_status)
+        {
+            printf("mqtt_restart\n");
+            mqtt_deinit();
+        }
+        if(link_status)
+        {
+            printf("mqtt_connect_azure\n");
+            mqtt_connect_azure();
+        }
     }
 }
 void mqtt_watch_init(void)
 {
-    wiced_rtos_init_semaphore( &mqtt_reconnect_sem );
-    wiced_rtos_create_thread( &mqtt_watch, 3, "mqtt_watch", mqtt_watch_callback, 4096, 0 );
+    wiced_rtos_init_binary_semaphore( &mqtt_reconnect_sem );
+    wiced_rtos_create_thread( &mqtt_watch, 8, "mqtt_watch", mqtt_watch_callback, 4096, 0 );
 }
 void wifi_watch_callback( uint32_t arg )
 {
-    printf("wifi_watch created\r\n");
     while ( 1 )
     {
         wiced_rtos_get_semaphore( &wifi_restart_sem, WICED_WAIT_FOREVER );
-        wiced_wifi_disable_keep_alive( KEEP_ALIVE_ID_NFD );
-        while(wiced_network_up( WICED_STA_INTERFACE, WICED_USE_EXTERNAL_DHCP_SERVER, NULL ) != WICED_SUCCESS)
-        {
-            wiced_rtos_delay_milliseconds(1000);
-        }
-        keep_alive();
-        mqtt_reconnect_release();
+        printf("wifi_restart\n");
+        wiced_wifi_disable_keep_alive( 0 );
+        wiced_network_down(WICED_STA_INTERFACE);
+        printf("wiced_network_down\r\n");
+        wiced_network_up( WICED_STA_INTERFACE, WICED_USE_EXTERNAL_DHCP_SERVER, NULL );
     }
 }
 void wifi_watch_init(void)
 {
-    wiced_rtos_init_semaphore( &wifi_restart_sem );
-    wiced_rtos_create_thread( &wifi_watch, 3, "wifi_watch", wifi_watch_callback, 4096, 0 );
+    wiced_rtos_init_binary_semaphore( &wifi_restart_sem );
+    wiced_rtos_create_thread( &wifi_watch, 8, "wifi_watch", wifi_watch_callback, 4096, 0 );
 }
-
 void wifi_status_change(uint8_t value)
 {
     wifi_status = value;
     wifi_uart_write_command_value(WST_SET_CMD,value);
 }
-void wifi_status_get(void)
+uint8_t wifi_status_get(void)
 {
-    wifi_uart_write_command_value(WST_SET_CMD,wifi_status);
+    return wifi_status;
 }

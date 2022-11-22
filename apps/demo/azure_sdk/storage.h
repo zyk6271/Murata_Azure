@@ -4,7 +4,6 @@
 typedef struct
 {
     uint8_t  init_flag ;
-    uint32_t  telemetry_period ;
     char     device_id[20];
     char     primaryKey[200];
     char     endpointAddress[50];

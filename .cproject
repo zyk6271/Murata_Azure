@@ -56,7 +56,7 @@
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1114848172" languageId="org.eclipse.cdt.core.assembly" languageName="Assembly" sourceContentType="org.eclipse.cdt.core.asmSource" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.1264399865" name="GNU C++" superClass="org.eclipse.cdt.build.core.settings.holder.96151715">
-								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1104855715" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths"/>
+								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1104855715" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths"/>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1582286246" languageId="org.eclipse.cdt.core.g++" languageName="GNU C++" sourceContentType="org.eclipse.cdt.core.cxxSource,org.eclipse.cdt.core.cxxHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.26367705" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder.96151715">
@@ -83,7 +83,7 @@
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.262519372" languageId="org.eclipse.cdt.core.assembly" languageName="Assembly" sourceContentType="org.eclipse.cdt.core.asmSource" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.1570311170" name="GNU C++" superClass="org.eclipse.cdt.build.core.settings.holder.96151715">
-								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1152534811" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths"/>
+								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1152534811" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths"/>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.303104877" languageId="org.eclipse.cdt.core.g++" languageName="GNU C++" sourceContentType="org.eclipse.cdt.core.cxxSource,org.eclipse.cdt.core.cxxHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.1255742877" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder.96151715">
@@ -174,7 +174,6 @@
 		<buildTargets>
 			<target name="clean" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>clean</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -182,7 +181,6 @@
 			</target>
 			<target name="snip.scan-CYW943907AEVAL1F" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>snip.scan-CYW943907AEVAL1F</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -190,7 +188,6 @@
 			</target>
 			<target name="snip.scan-CYW943907AEVAL1F download" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>snip.scan-CYW943907AEVAL1F download</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -198,7 +195,6 @@
 			</target>
 			<target name="snip.scan-CYW943907AEVAL1F download run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>snip.scan-CYW943907AEVAL1F download run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -206,7 +202,6 @@
 			</target>
 			<target name="snip.scan-CYW943907AEVAL1F-SPI download run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>snip.scan-CYW943907AEVAL1F-SPI download run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -214,7 +209,6 @@
 			</target>
 			<target name="snip.scan-CYW943907AEVAL1F-ThreadX-NetX-SPI download run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>snip.scan-CYW943907AEVAL1F-ThreadX-NetX-SPI download run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -222,7 +216,6 @@
 			</target>
 			<target name="snip.scan-CYW943907AEVAL1F-ThreadX-NetX_Duo-SDIO download run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>snip.scan-CYW943907AEVAL1F-ThreadX-NetX_Duo-SDIO download run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -230,7 +223,6 @@
 			</target>
 			<target name="snip.scan-CYW943907AEVAL1F-FreeRTOS-LwIP-SDIO download run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>snip.scan-CYW943907AEVAL1F-FreeRTOS-LwIP-SDIO download run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -238,7 +230,6 @@
 			</target>
 			<target name="demo.azure_iot_hub-MurataType1LD-FreeRTOS-LwIP download download_apps run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>demo.azure_iot_hub-MurataType1LD-FreeRTOS-LwIP download download_apps run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -246,6 +237,7 @@
 			</target>
 			<target name="demo.aws.iot.pub_sub.publisher-MurataType1LD download download_apps run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
+				<buildArguments/>
 				<buildTarget>demo.aws.iot.pub_sub.publisher-MurataType1LD download download_apps run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -253,7 +245,6 @@
 			</target>
 			<target name="test.console-CYW943907AEVAL1F download run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>test.console-CYW943907AEVAL1F download run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -261,7 +252,6 @@
 			</target>
 			<target name="snip.scan-CYW943907AEVAL1F-debug download" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>snip.scan-CYW943907AEVAL1F-debug download</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -269,7 +259,6 @@
 			</target>
 			<target name="snip.secure_mqtt-MurataType1LD-FreeRTOS-LwIP download download_apps run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>snip.secure_mqtt-MurataType1LD-FreeRTOS-LwIP download download_apps run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -277,6 +266,7 @@
 			</target>
 			<target name="demo.sentient-MurataType1LD download download_apps run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
+				<buildArguments/>
 				<buildTarget>demo.sentient-MurataType1LD download download_apps run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -284,6 +274,7 @@
 			</target>
 			<target name="snip.config_mode-MurataType1LD download download_apps run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
+				<buildArguments/>
 				<buildTarget>snip.config_mode-MurataType1LD download download_apps run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -291,7 +282,6 @@
 			</target>
 			<target name="snip.keep_alive-MurataType1LD download download_apps run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>snip.keep_alive-MurataType1LD download download_apps run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -299,7 +289,6 @@
 			</target>
 			<target name="snip.link_status-MurataType1LD download download_apps run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>snip.link_status-MurataType1LD download download_apps run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -307,7 +296,6 @@
 			</target>
 			<target name="snip.uart-MurataType1LD download download_apps run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>snip.uart-MurataType1LD download download_apps run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -315,6 +303,7 @@
 			</target>
 			<target name="demo.azure_mqtt-MurataType1LD download download_apps run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
+				<buildArguments/>
 				<buildTarget>demo.azure_mqtt-MurataType1LD download download_apps run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -330,6 +319,7 @@
 			</target>
 			<target name="demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
+				<buildArguments/>
 				<buildTarget>demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -337,7 +327,6 @@
 			</target>
 			<target name="demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP JTAG=jlink download download_apps run" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>${ProjDirPath}/make.exe</buildCommand>
-				<buildArguments/>
 				<buildTarget>demo.azure_sdk-MurataType1LD-FreeRTOS-LwIP JTAG=jlink download download_apps run</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>

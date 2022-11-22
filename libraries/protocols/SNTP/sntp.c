@@ -52,18 +52,18 @@
 #define WICED_NTP_REPLY_TIMEOUT         (300)
 #endif
 
-#define MAX_NTP_ATTEMPTS                (3)
-#define TIME_BTW_ATTEMPTS               (5000)
+#define MAX_NTP_ATTEMPTS                (5)
+#define TIME_BTW_ATTEMPTS               (2000)
 /* RFC4330 recommends min 15s between polls */
 #define MIN_POLL_INTERVAL               (15 * 1000)
 
 #define NTP_NUM_SERVERS                 (2)
-#define NTP_SERVER_HOSTNAME             "pool.ntp.org"
+#define NTP_SERVER_HOSTNAME             "ntp.aliyun.com"
 
-#define SNTP_WORKER_THREAD_PRIORITY     (WICED_DEFAULT_WORKER_PRIORITY)
+#define SNTP_WORKER_THREAD_PRIORITY     (4)
 #define SNTP_WORKER_THREAD_STACK_SIZE   (4 * 1024)
 #define SNTP_WORKER_THREAD_QUEUE_SIZE   (2)
-#define SNTP_DNS_TIMEOUT_MS             (1 * SECONDS)
+#define SNTP_DNS_TIMEOUT_MS             (3 * SECONDS)
 #define SNTP_DNS_RETRIES                (5)
 
 /******************************************************
@@ -91,7 +91,7 @@ static wiced_result_t sync_ntp_time( void* arg );
 static wiced_timed_event_t sync_ntp_time_event;
 
 /* Only support primary and secondary servers */
-static wiced_ip_address_t ntp_server[NTP_NUM_SERVERS];
+static wiced_ip_address_t ntp_server[4];
 
 static wiced_worker_thread_t sntp_worker_thread;
 
@@ -317,21 +317,22 @@ static wiced_result_t sync_ntp_time( void* arg )
     for ( a = 0; a < MAX_NTP_ATTEMPTS; ++a )
     {
         wiced_result_t result = WICED_ERROR;
+//        sntp_get_time ( &ntp_server[0], &current_time );
 
-        /* First check if there are local servers to use */
-        if (ntp_server[0].version != 0)
-        {
-            WPRINT_LIB_DEBUG( ( "Sending request primary ...") );
-            result = sntp_get_time ( &ntp_server[0], &current_time );
-        }
-        if (result != WICED_SUCCESS && (ntp_server[1].version != 0))
-        {
-            WPRINT_LIB_DEBUG( ( "Sending request secondary ...") );
-            result = sntp_get_time ( &ntp_server[1], &current_time );
-        }
-        /* only fall back to global servers if we can't get local */
-        if ( (result != WICED_SUCCESS) && (sntp_local_only == WICED_FALSE) )
-        {
+//        /* First check if there are local servers to use */
+//        if (ntp_server[0].version != 0)
+//        {
+//            WPRINT_LIB_DEBUG( ( "Sending request primary ...") );
+//            result = sntp_get_time ( &ntp_server[0], &current_time );
+//        }
+//        if (result != WICED_SUCCESS && (ntp_server[1].version != 0))
+//        {
+//            WPRINT_LIB_DEBUG( ( "Sending request secondary ...") );
+//            result = sntp_get_time ( &ntp_server[1], &current_time );
+//        }
+//        /* only fall back to global servers if we can't get local */
+//        if ( (result != WICED_SUCCESS) && (sntp_local_only == WICED_FALSE) )
+//        {
             connect_dns_retries = 0;
             do
             {
@@ -343,7 +344,7 @@ static wiced_result_t sync_ntp_time( void* arg )
                 WPRINT_LIB_DEBUG( ( "Sending global request ... ") );
                 result = sntp_get_time( &ntp_server_ip, &current_time );
             }
-        }
+//        }
 
         if ( result == WICED_SUCCESS )
         {

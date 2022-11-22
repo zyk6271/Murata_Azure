@@ -9,58 +9,39 @@
 #include <mqtt_api.h>
 #include "wiced.h"
 #include "azure_server.h"
-#include "dct_read_write_dct.h"
 #include "storage.h"
 #include "sntp.h"
 
-extern uint8_t ap_flag;
+extern uint8_t azure_flag;
 wiced_interface_t interface;
 
-const wiced_ip_setting_t ip_settings =
+void link_up_callback(void)
 {
-    INITIALISER_IPV4_ADDRESS( .ip_address, MAKE_IPV4_ADDRESS(192,168, 4 ,1) ),
-    INITIALISER_IPV4_ADDRESS( .netmask,    MAKE_IPV4_ADDRESS(255,255,255,0) ),
-    INITIALISER_IPV4_ADDRESS( .gateway,    MAKE_IPV4_ADDRESS(192,168, 4 ,1) ),
-};
-static void link_up( void *arg)
-{
-    UNUSED_PARAMETER(arg);
-    WPRINT_APP_INFO( ("Network connection is up\n") );
+    wifi_status_change(2);
+    sntp_start_auto_time_sync_nowait( 1000*60*60 );
+    keep_alive();
+    mqtt_connect_azure();
 }
 static void link_down( void *arg)
 {
-    UNUSED_PARAMETER(arg);
-    WPRINT_APP_INFO( ("Network connection is down\n") );
-
-    wiced_network_down(WICED_STA_INTERFACE);
-    wifi_restart_release();
+    wifi_status_change(1);
+    wifi_disconnect_callback();
 }
 void application_start( void )
 {
     wiced_init();
-    uart_init();
-    wifi_status_change(0);
     dct_app_load();
     print_wifi_config_dct();
-    if(ap_flag)
+    uart_init();
+    wifi_status_change(0);
+    http_ota_init();
+    wifi_watch_init();
+    if(!azure_flag)
     {
-        wiced_network_up(WICED_AP_INTERFACE, WICED_USE_INTERNAL_DHCP_SERVER, &ip_settings);
-        http_start();
-    }
-    else
-    {
-        wiced_network_register_link_callback( link_up, NULL, link_down, NULL, WICED_STA_INTERFACE );
-        while(wiced_network_up( WICED_STA_INTERFACE, WICED_USE_EXTERNAL_DHCP_SERVER, NULL ) != WICED_SUCCESS)
-        {
-            WPRINT_APP_INFO( ("wiced_network_up retry\n") );
-            wiced_rtos_delay_milliseconds(1000);
-        }
-        wifi_watch_init();
         mqtt_watch_init();
-        sntp_start_auto_time_sync_nowait( 1000*60*60 );
         azure_start();
-        mqtt_init();
-        keep_alive();
+        wiced_network_register_link_callback( NULL, NULL, link_down, NULL, WICED_STA_INTERFACE );
+        wiced_network_up( WICED_STA_INTERFACE, WICED_USE_EXTERNAL_DHCP_SERVER, NULL );
     }
     while(1)
     {

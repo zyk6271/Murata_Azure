@@ -136,7 +136,7 @@ static void read_configuration_entry(
 
   if (env_value != NULL)
   {
-    (void)printf("%s = %s\n", env_name, show_value ? env_value : "***");
+    //(void)printf("%s = %s\n", env_name, show_value ? env_value : "***");
     az_span env_span = az_span_create_from_str(env_value);
 
     // Check the buffer is large enough to store the environment variable.

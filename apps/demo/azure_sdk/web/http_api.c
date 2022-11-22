@@ -118,7 +118,7 @@ void rst_timer_callback(void* arg)
 }
 void rst_work(void)
 {
-    wiced_rtos_init_timer(&rst_timer, 200, rst_timer_callback, 0);
+    wiced_rtos_init_timer(&rst_timer, 1000, rst_timer_callback, 0);
     wiced_rtos_start_timer(&rst_timer);
 }
 void set_config(wiced_ssid_t ssid, wiced_wpa_key_t password)
@@ -184,11 +184,6 @@ void azc_parse(const uint8_t*pMsg, uint32_t size)
     root = cJSON_Parse((char*)pMsg);
     if (NULL == root) {
         return;
-    }
-    item = cJSON_GetObjectItem(root, "period");
-    if (NULL != item) {
-        printf("period is %d\r\n", item->valueint);
-        dct_app_period_write(item->valueint);
     }
     item = cJSON_GetObjectItem(root, "deviceID");
     if (NULL != item) {

@@ -90,7 +90,7 @@ int32_t http_cnd_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_cnd_callback GET\r\n");
-    wifi_uart_write_frame(CND_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(CND_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_CND_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_INFO_CND_GET)
     {
@@ -107,7 +107,7 @@ int32_t http_net_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_net_callback GET\r\n");
-    wifi_uart_write_frame(NET_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(NET_GET_CMD,0);
     EventValue = xEventGroupWaitBits(TEM_EventHandler,EVENT_TEM_NET_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_TEM_NET_GET)
     {
@@ -124,7 +124,7 @@ int32_t http_bat_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_bat_callback GET\r\n");
-    wifi_uart_write_frame(BAT_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(BAT_GET_CMD,0);
     EventValue = xEventGroupWaitBits(TEM_EventHandler,EVENT_TEM_BAT_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_TEM_BAT_GET)
     {
@@ -141,7 +141,7 @@ int32_t http_ala_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_ala_callback GET\r\n");
-    wifi_uart_write_frame(ALA_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(ALA_GET_CMD,0);
     EventValue = xEventGroupWaitBits(TEM_EventHandler,EVENT_TEM_ALA_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_TEM_ALA_GET)
     {
@@ -158,7 +158,7 @@ int32_t http_alr_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_alr_callback GET\r\n");
-    wifi_uart_write_frame(ALR_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(ALR_GET_CMD,0);
     EventValue = xEventGroupWaitBits(TEM_EventHandler,EVENT_TEM_ALR_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_TEM_ALR_GET)
     {
@@ -175,7 +175,7 @@ int32_t http_sup_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_sup_callback GET\r\n");
-    wifi_uart_write_frame(SUP_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(SUP_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_SUP_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_INFO_SUP_GET)
     {
@@ -192,7 +192,7 @@ int32_t http_rse_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_rse_callback GET\r\n");
-    wifi_uart_write_frame(RSE_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(RSE_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSE_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_RSE_GET)
     {
@@ -229,7 +229,7 @@ int32_t http_rsa_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_rsa_callback GET\r\n");
-    wifi_uart_write_frame(RSA_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(RSA_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSA_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_RSA_GET)
     {
@@ -266,7 +266,7 @@ int32_t http_rsi_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_rsi_callback GET\r\n");
-    wifi_uart_write_frame(RSI_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(RSI_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSI_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_RSI_GET)
     {
@@ -303,7 +303,7 @@ int32_t http_rsd_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_rsd_callback GET\r\n");
-    wifi_uart_write_frame(RSD_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(RSD_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSD_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_RSD_GET)
     {
@@ -340,7 +340,7 @@ int32_t http_cnf_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_cnf_callback GET\r\n");
-    wifi_uart_write_frame(CNF_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(CNF_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_CNF_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_CNF_GET)
     {
@@ -377,7 +377,7 @@ int32_t http_cnl_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_cnl_callback GET\r\n");
-    wifi_uart_write_frame(CNL_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(CNL_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_CNL_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_CNL_GET)
     {
@@ -414,7 +414,7 @@ int32_t http_sse_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_sse_callback GET\r\n");
-    wifi_uart_write_frame(SSE_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(SSE_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSE_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_SSE_GET)
     {
@@ -451,7 +451,7 @@ int32_t http_ssa_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_ssa_callback GET\r\n");
-    wifi_uart_write_frame(SSA_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(SSA_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSA_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_SSA_GET)
     {
@@ -488,7 +488,7 @@ int32_t http_ssd_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_ssd_callback GET\r\n");
-    wifi_uart_write_frame(SSD_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(SSD_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSD_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_SSD_GET)
     {
@@ -525,7 +525,7 @@ int32_t http_lng_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_lng_callback GET\r\n");
-    wifi_uart_write_frame(LNG_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(LNG_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_LNG_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_CONFIG_LNG_GET)
     {
@@ -583,7 +583,7 @@ int32_t http_com_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_com_callback GET\r\n");
-    wifi_uart_write_frame(COM_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(COM_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COM_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_INFO_COM_GET)
     {
@@ -620,7 +620,7 @@ int32_t http_coa_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_coa_callback GET\r\n");
-    wifi_uart_write_frame(COA_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(COA_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COA_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_INFO_COA_GET)
     {
@@ -657,7 +657,7 @@ int32_t http_cod_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_cod_callback GET\r\n");
-    wifi_uart_write_frame(COD_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(COD_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COD_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_INFO_COD_GET)
     {
@@ -694,7 +694,7 @@ int32_t http_coe_get_callback(const char* url_path, const char* url_parameters, 
     EventBits_t EventValue;
     now_stream = stream;
     printf("http_coe_callback GET\r\n");
-    wifi_uart_write_frame(COE_GET_CMD,MCU_TX_VER,0);
+    wifi_uart_write_command_value(COE_GET_CMD,0);
     EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COE_GET,pdTRUE,pdTRUE,100);
     if(EventValue & EVENT_INFO_COE_GET)
     {
@@ -790,6 +790,13 @@ int32_t http_wfk_set_callback(const char* url_path, const char* url_parameters, 
     {
         http_set_flush_value(TIMEOUT_CODE,"setwfk",6,0);
     }
+    return 0;
+}
+int32_t http_wfs_get_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
+{
+    now_stream = stream;
+    printf("http_wfs_callback GET\r\n");
+    http_set_flush_value(SUCCESS_CODE,"getwfs",6,wifi_status_get());
     return 0;
 }
 int32_t http_azc_get_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)

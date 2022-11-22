@@ -14,7 +14,6 @@ extern wiced_mqtt_object_t mqtt_object;
 extern EventGroupHandle_t Config_EventHandler;
 extern EventGroupHandle_t Info_EventHandler;
 extern EventGroupHandle_t C2D_EventHandler;
-extern uint32_t telemetry_value;
 
 static az_span const twin_document_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static az_span const rse_name = AZ_SPAN_LITERAL_FROM_STR("rse");
@@ -27,7 +26,8 @@ static az_span const lng_name = AZ_SPAN_LITERAL_FROM_STR("lng");
 static az_span const sse_name = AZ_SPAN_LITERAL_FROM_STR("sse");
 static az_span const ssa_name = AZ_SPAN_LITERAL_FROM_STR("ssa");
 static az_span const ssd_name = AZ_SPAN_LITERAL_FROM_STR("ssd");
-static az_span const tpr_name = AZ_SPAN_LITERAL_FROM_STR("tpr");
+static az_span const emr_name = AZ_SPAN_LITERAL_FROM_STR("emr");
+static az_span const rcp_name = AZ_SPAN_LITERAL_FROM_STR("rcp");
 
 static az_span const com_name = AZ_SPAN_LITERAL_FROM_STR("com");
 static az_span const coa_name = AZ_SPAN_LITERAL_FROM_STR("coa");
@@ -35,7 +35,6 @@ static az_span const cod_name = AZ_SPAN_LITERAL_FROM_STR("cod");
 static az_span const coe_name = AZ_SPAN_LITERAL_FROM_STR("coe");
 static az_span const config_span = AZ_SPAN_LITERAL_FROM_STR("deviceConfig");
 static az_span const info_span = AZ_SPAN_LITERAL_FROM_STR("deviceInfo");
-static az_span const desired_span = AZ_SPAN_LITERAL_FROM_STR("desired");
 
 int parse_device_twin_message(
     char* topic,
@@ -255,15 +254,34 @@ void parse_get_twin(az_span const message_span)
                     }
                 }
             }
-            else if (az_json_token_is_text_equal(&jr.token, tpr_name))
+            else if (az_json_token_is_text_equal(&jr.token, emr_name))
             {
                 az_json_reader_next_token(&jr);
                 az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse tpr ok,value is %d",value);
-                if(value != telemetry_value)
+                IOT_SAMPLE_LOG_SUCCESS("parse emr ok,value is %d",value);
+                if(device_status.config.emr != value)
                 {
-                    telemetry_value = value;
-                    telemetry_period_set(value);
+                    wifi_uart_write_command_value(EMR_SET_CMD,value);
+                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_EMR_SET,pdTRUE,pdTRUE,100);
+                    if(EventValue & EVENT_CONFIG_EMR_SET)
+                    {
+                        IOT_SAMPLE_LOG_SUCCESS("SET EMR OK\r\n");
+                    }
+                }
+            }
+            else if (az_json_token_is_text_equal(&jr.token, rcp_name))
+            {
+                az_json_reader_next_token(&jr);
+                az_json_token_get_uint32(&jr,&value);
+                IOT_SAMPLE_LOG_SUCCESS("parse rcp ok,value is %d",value);
+                if(device_status.config.rcp != value)
+                {
+                    wifi_uart_write_command_value(RCP_SET_CMD,value);
+                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RCP_SET,pdTRUE,pdTRUE,100);
+                    if(EventValue & EVENT_CONFIG_RCP_SET)
+                    {
+                        IOT_SAMPLE_LOG_SUCCESS("SET RCP OK\r\n");
+                    }
                 }
             }
             az_json_reader_next_token(&jr);
@@ -352,8 +370,9 @@ void parse_desired_twin(az_span const message_span)
     {
         IOT_SAMPLE_LOG("parse_twin_message valid");
     }
-    else
-      return;
+    else{
+        return;
+    }
     az_json_reader_next_token(&jr);
     if(az_json_token_is_text_equal(&jr.token, config_span))
     {
@@ -509,15 +528,64 @@ void parse_desired_twin(az_span const message_span)
                     }
                 }
             }
-            else if (az_json_token_is_text_equal(&jr.token, tpr_name))
+            else if (az_json_token_is_text_equal(&jr.token, cod_name))
             {
                 az_json_reader_next_token(&jr);
                 az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse tpr ok,value is %d",value);
-                if(value != telemetry_value)
+                IOT_SAMPLE_LOG_SUCCESS("parse cod ok,value is %d",value);
+                if(device_status.info.cod != value)
                 {
-                    telemetry_value = value;
-                    telemetry_period_set(value);
+                    wifi_uart_write_command_value(COD_SET_CMD,value);
+                    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COD_GET,pdTRUE,pdTRUE,100);
+                    if(EventValue & EVENT_INFO_COD_GET)
+                    {
+                        IOT_SAMPLE_LOG_SUCCESS("SET COD OK\r\n");
+                    }
+                }
+            }
+            else if (az_json_token_is_text_equal(&jr.token, coe_name))
+            {
+                az_json_reader_next_token(&jr);
+                az_json_token_get_uint32(&jr,&value);
+                IOT_SAMPLE_LOG_SUCCESS("parse coe ok,value is %d",value);
+                if(device_status.info.coe != value)
+                {
+                    wifi_uart_write_command_value(COE_SET_CMD,value);
+                    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COE_GET,pdTRUE,pdTRUE,100);
+                    if(EventValue & EVENT_INFO_COE_GET)
+                    {
+                        IOT_SAMPLE_LOG_SUCCESS("SET COE OK\r\n");
+                    }
+                }
+            }
+            else if (az_json_token_is_text_equal(&jr.token, emr_name))
+            {
+                az_json_reader_next_token(&jr);
+                az_json_token_get_uint32(&jr,&value);
+                IOT_SAMPLE_LOG_SUCCESS("parse emr ok,value is %d",value);
+                if(device_status.config.emr != value)
+                {
+                    wifi_uart_write_command_value(EMR_SET_CMD,value);
+                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_EMR_SET,pdTRUE,pdTRUE,100);
+                    if(EventValue & EVENT_CONFIG_EMR_SET)
+                    {
+                        IOT_SAMPLE_LOG_SUCCESS("SET EMR OK\r\n");
+                    }
+                }
+            }
+            else if (az_json_token_is_text_equal(&jr.token, rcp_name))
+            {
+                az_json_reader_next_token(&jr);
+                az_json_token_get_uint32(&jr,&value);
+                IOT_SAMPLE_LOG_SUCCESS("parse rcp ok,value is %d",value);
+                if(device_status.config.rcp != value)
+                {
+                    wifi_uart_write_command_value(RCP_SET_CMD,value);
+                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RCP_SET,pdTRUE,pdTRUE,100);
+                    if(EventValue & EVENT_CONFIG_RCP_SET)
+                    {
+                        IOT_SAMPLE_LOG_SUCCESS("SET RCP OK\r\n");
+                    }
                 }
             }
             az_json_reader_next_token(&jr);

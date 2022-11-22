@@ -7,11 +7,7 @@
 #include "telemetry.h"
 #include "uart_core.h"
 #include "twin_parse.h"
-#include "dct_read_write_dct.h"
 #include "storage.h"
-
-wiced_timer_t telemetry_timer;
-uint32_t telemetry_value;
 
 extern az_iot_hub_client hub_client;
 extern wiced_mqtt_object_t mqtt_object;
@@ -31,7 +27,7 @@ static az_span const alr_name = AZ_SPAN_LITERAL_FROM_STR("alr");
 void telemetry_upload(void)
 {
     EventBits_t EventValue;
-    char payload_buffer[2048];
+    char payload_buffer[2048] = {0};
     az_span payload = AZ_SPAN_FROM_BUFFER(payload_buffer);
     az_span out_payload;
     az_json_writer jw;
@@ -90,29 +86,5 @@ void telemetry_upload(void)
     out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
     wiced_mqtt_publish(mqtt_object,topic_buffer,az_span_ptr(out_payload),az_span_size(out_payload),0);
     printf("telemetry_upload,payload is %s\r\n",az_span_ptr(out_payload));
-}
-void telemetry_init(void)
-{
-    user_app_t *app_t = calloc(sizeof(user_app_t), sizeof(char));
-    dct_app_all_read(&app_t);
-    telemetry_value = app_t->telemetry_period;
-    if(telemetry_value == 0 || telemetry_value >= 1440)
-    {
-        telemetry_value = 10;
-        dct_app_period_write(telemetry_value);
-        printf("telemetry default to 10\r\n");
-    }
-    wiced_rtos_init_timer(&telemetry_timer,telemetry_value * 60 * 1000,telemetry_upload,0);
-    wiced_rtos_start_timer(&telemetry_timer);
-    free(app_t);
-}
-
-void telemetry_period_set(uint32_t value)
-{
-    if(value==0)return;
-    wiced_rtos_deinit_timer(&telemetry_timer);
-    wiced_rtos_init_timer(&telemetry_timer,telemetry_value * 60 * 1000,telemetry_upload,0);
-    wiced_rtos_start_timer(&telemetry_timer);
-    dct_app_period_write(value);
-    printf("telemetry_period_set,period is %d\r\n",telemetry_value);
+    wifi_uart_write_frame(TELEMETRY_CONTROL_CMD, MCU_TX_VER, 0);
 }

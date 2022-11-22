@@ -75,6 +75,7 @@ void parse_c2d_message(
     if (az_json_token_is_text_equal(&jr.token, rst_name))
     {
         az_json_reader_next_token(&jr);
+        c2d_reponse(0,1);
         command_found = 1;
         IOT_SAMPLE_LOG_SUCCESS("parse rst ok");
         wifi_uart_write_command_value(RST_SET_CMD,1);
@@ -82,7 +83,6 @@ void parse_c2d_message(
         if(EventValue & EVENT_C2D_RST_SET)
         {
             IOT_SAMPLE_LOG_SUCCESS("SET RST OK\r\n");
-            c2d_reponse(0,1);
         }
     }
     else if (az_json_token_is_text_equal(&jr.token, def_name))
@@ -120,7 +120,7 @@ void parse_c2d_message(
 }
 void c2d_reponse(uint8_t type,uint8_t source)
 {
-    char payload_buffer[1024];
+    char payload_buffer[1024] = {0};;
     az_span payload = AZ_SPAN_FROM_BUFFER(payload_buffer);
     az_span out_payload;
     az_json_writer jw;

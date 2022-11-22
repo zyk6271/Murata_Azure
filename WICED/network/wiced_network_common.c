@@ -223,7 +223,6 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
     wiced_result_t result = WICED_SUCCESS;
 
     WICED_POWER_LOGGER( EVENT_PROC_ID_WIFI, EVENT_ID_WIFI_DATA, EVENT_DESC_WIFI_JOIN_TIME );
-
     if ( wiced_network_is_up( interface ) == WICED_FALSE )
     {
         if ( interface == WICED_CONFIG_INTERFACE )
@@ -287,8 +286,8 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
 #ifdef WICED_USE_WIFI_TWO_STA_INTERFACE
             result = wiced_join_ap( WICED_STA_INTERFACE );
 #else
-            wifi_status_change(2);
-            wiced_join_ap( );
+            wifi_status_change(1);
+            result = wiced_join_ap( );
 #endif
         }
 #ifdef WICED_USE_ETHERNET_INTERFACE
@@ -305,7 +304,9 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
 
     if ( result != WICED_SUCCESS )
     {
-        WICED_POWER_LOGGER( EVENT_PROC_ID_WIFI, EVENT_ID_WIFI_DATA, EVENT_DESC_WIFI_IDLE );
+        extern void wifi_disconnect_callback(void);
+        wifi_disconnect_callback();
+        WPRINT_APP_INFO(( "wiced_join_ap failed,restart\n" ));
         return result;
     }
     result = wiced_ip_up( interface, config, ip_settings );
@@ -314,6 +315,8 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
         if ( interface == WICED_STA_INTERFACE )
         {
             wiced_leave_ap( interface );
+            wifi_disconnect_callback();
+            return result;
         }
         else if ( interface != WICED_ETHERNET_INTERFACE )
         {
@@ -330,6 +333,14 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
             platform_ethernet_deinit( );
         }
 #endif
+    }
+    else
+    {
+        if ( interface == WICED_STA_INTERFACE )
+        {
+            extern void wifi_connect_callback(void);
+            wifi_connect_callback();
+        }
     }
     WICED_POWER_LOGGER( EVENT_PROC_ID_WIFI, EVENT_ID_WIFI_DATA, EVENT_DESC_WIFI_IDLE );
 
@@ -368,13 +379,15 @@ wiced_result_t wiced_network_resume_after_deep_sleep( wiced_interface_t interfac
  */
 wiced_result_t wiced_network_down( wiced_interface_t interface )
 {
-    wiced_result_t result;
-    result = wiced_ip_down( interface );
+//    wiced_result_t result;
+//    result = wiced_ip_down( interface );
+//
+//    if ( result != WICED_SUCCESS )
+//    {
+//        return result;
+//    }
 
-    if ( result != WICED_SUCCESS )
-    {
-        return result;
-    }
+    wiced_ip_down( interface );
 
     if ( interface == WICED_STA_INTERFACE )
     {
@@ -413,8 +426,6 @@ wiced_result_t wiced_network_down( wiced_interface_t interface )
 
     return WICED_SUCCESS;
 }
-
-
 
 wiced_result_t wiced_network_register_link_callback( wiced_network_link_callback_t link_up_callback, void *link_up_user_data, wiced_network_link_callback_t link_down_callback, void *link_down_user_data, wiced_interface_t interface )
 {

@@ -23,9 +23,6 @@ extern az_iot_hub_client hub_client;
 
 EventGroupHandle_t MQTT_EventHandler;
 
-uint8_t MQTT_Resolving = WICED_NOT_CONNECTED;
-uint8_t MQTT_Connected = WICED_NOT_CONNECTED;
-
 char* endpoint_adress = NULL;
 char* device_id = NULL;
 char* endpoint_user = NULL;
@@ -45,8 +42,8 @@ static wiced_mqtt_security_t security;
 
 char MQTT_BROKER_ADDRESS[]=                 "NULL";
 char CLIENT_ID[]=                           "NULL";
-int WICED_MQTT_TIMEOUT=                     (10000);
-int WICED_MQTT_DELAY_IN_MILLISECONDS=       (1000);
+int WICED_MQTT_TIMEOUT=                     (5000);
+int WICED_MQTT_RETRY_COUNT=                 (3);
 int MQTT_MAX_RESOURCE_SIZE=                 (0x7fffffff);
 char USERNAME[]=                            "NULL";
 char PASSWORD[]=                            "NULL";
@@ -145,9 +142,9 @@ wiced_result_t mqtt_conn_open( wiced_mqtt_object_t mqtt_obj, wiced_ip_address_t 
 
     conninfo.port_number = 0;                   /* set to 0 indicates library to use default settings */
     conninfo.mqtt_version = WICED_MQTT_PROTOCOL_VER4;
-    conninfo.clean_session = 1;
+    conninfo.clean_session = 0;
     conninfo.client_id = (uint8_t*) device_id;
-    conninfo.keep_alive = 60;
+    conninfo.keep_alive = 240;
     conninfo.username = (uint8_t*)endpoint_user;
     conninfo.password = (uint8_t*)endpoint_key;
     conninfo.peer_cn = NULL;
@@ -211,16 +208,13 @@ wiced_result_t mqtt_app_publish( wiced_mqtt_object_t mqtt_obj, uint8_t qos, char
         return WICED_ERROR;
     }
 }
-void mqtt_connect_azure(void)
+uint8_t mqtt_resolve(void)
 {
-    wifi_status_change(3);
     wiced_result_t ret = WICED_SUCCESS;
-    MQTT_Resolving = WICED_NOT_CONNECTED;
-    MQTT_Connected = WICED_NOT_CONNECTED;
-    while(MQTT_Resolving == WICED_NOT_CONNECTED)
+    for(uint8_t i=0;i<WICED_MQTT_RETRY_COUNT;i++)
     {
         WPRINT_APP_INFO( ( "Resolving IP address of MQTT broker...\n" ) );
-        ret = wiced_hostname_lookup( endpoint_adress, &broker_address, 10000, WICED_STA_INTERFACE );
+        ret = wiced_hostname_lookup( endpoint_adress, &broker_address, WICED_MQTT_TIMEOUT, WICED_STA_INTERFACE );
         WPRINT_APP_INFO(("Resolved Broker IP: %u.%u.%u.%u\n\n", (uint8_t)(GET_IPV4_ADDRESS(broker_address) >> 24),
                          (uint8_t)(GET_IPV4_ADDRESS(broker_address) >> 16),
                          (uint8_t)(GET_IPV4_ADDRESS(broker_address) >> 8),
@@ -231,12 +225,16 @@ void mqtt_connect_azure(void)
         }
         else
         {
-            MQTT_Resolving = WICED_SUCCESS;
+            return WICED_SUCCESS;
         }
-        wiced_rtos_delay_milliseconds(500);
+        wiced_rtos_delay_milliseconds(2000);
     }
-
-    while(MQTT_Connected == WICED_NOT_CONNECTED)
+    return WICED_ERROR;
+}
+uint8_t mqtt_start_connect(void)
+{
+    wiced_result_t ret = WICED_SUCCESS;
+    for(uint8_t i=0;i<WICED_MQTT_RETRY_COUNT;i++)
     {
         ret = mqtt_conn_open( mqtt_object,&broker_address, WICED_STA_INTERFACE, callbacks, &security );
         if ( ret == WICED_ERROR )
@@ -245,34 +243,94 @@ void mqtt_connect_azure(void)
         }
         else
         {
-            WPRINT_APP_INFO(("[MQTT] Subscribing..."));
+            return WICED_SUCCESS;
+        }
+        wiced_rtos_delay_milliseconds(2000);
+    }
+    return WICED_ERROR;
+}
+uint8_t mqtt_start_subsribe(void)
+{
+    wiced_result_t ret = WICED_SUCCESS;
+    wiced_result_t subs_pos = 0;
+    for(uint8_t count=0;count<WICED_MQTT_RETRY_COUNT;count++)
+    {
+        switch(subs_pos)
+        {
+        case 0:
+            WPRINT_APP_INFO(("[MQTT] Subscribing : %d...",subs_pos));
             ret = mqtt_app_subscribe( mqtt_object, AZ_IOT_HUB_CLIENT_TWIN_PATCH_SUBSCRIBE_TOPIC , WICED_MQTT_QOS_DELIVER_AT_LEAST_ONCE );
             mqtt_print_status( ret, NULL, "[MQTT]Subscribing Fail\r" );
-            WPRINT_APP_INFO(("[MQTT] Subscribing..."));
+            if(ret != WICED_SUCCESS)break;
+            subs_pos++;
+            count = 0;
+        case 1:
+            WPRINT_APP_INFO(("[MQTT] Subscribing : %d...",subs_pos));
             ret = mqtt_app_subscribe( mqtt_object, AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_SUBSCRIBE_TOPIC , WICED_MQTT_QOS_DELIVER_AT_LEAST_ONCE );
             mqtt_print_status( ret, NULL, "[MQTT]Subscribing Fail\r" );
-            WPRINT_APP_INFO(("[MQTT] Subscribing..."));
+            if(ret != WICED_SUCCESS)break;
+            subs_pos++;
+            count = 0;
+        case 2:
+            WPRINT_APP_INFO(("[MQTT] Subscribing : %d...",subs_pos));
             ret = mqtt_app_subscribe( mqtt_object, AZ_IOT_HUB_CLIENT_C2D_SUBSCRIBE_TOPIC , WICED_MQTT_QOS_DELIVER_AT_LEAST_ONCE );//C2D
             mqtt_print_status( ret, NULL, "[MQTT]Subscribing Fail\r" );
-            WPRINT_APP_INFO(("[MQTT] Subscribing..."));
+            if(ret != WICED_SUCCESS)break;
+            subs_pos++;
+            count = 0;
+        case 3:
+            WPRINT_APP_INFO(("[MQTT] Subscribing : %d...",subs_pos));
             ret = mqtt_app_subscribe( mqtt_object, AZ_IOT_HUB_CLIENT_METHODS_SUBSCRIBE_TOPIC , WICED_MQTT_QOS_DELIVER_AT_LEAST_ONCE );
             mqtt_print_status( ret, NULL, "[MQTT]Subscribing Fail\r" );
-            MQTT_Connected = WICED_SUCCESS;
+            if(ret != WICED_SUCCESS)break;
+            goto __success;
+        default:break;
         }
-        wiced_rtos_delay_milliseconds(500);
+        wiced_rtos_delay_milliseconds(1000);
     }
-    wifi_status_change(4);
-    azure_refresh();
+    return WICED_ERROR;
+__success:
+    return WICED_SUCCESS;
 }
-void mqtt_reconnect_azure(void)
+void mqtt_deinit(void)
 {
-    wiced_mqtt_deinit(mqtt_object);
+    extern uint8_t mqtt_status;
+    if(mqtt_status)
+    {
+        mqtt_status = 0;
+        wiced_mqtt_deinit(mqtt_object);
+    }
+}
+void mqtt_connect_azure(void)
+{
+    wiced_result_t ret = WICED_SUCCESS;
+
     wiced_mqtt_init( mqtt_object );
-    mqtt_connect_azure();
-}
-void mqtt_disconnect_azure(void)
-{
-    wiced_mqtt_deinit(mqtt_object);
+
+    ret = mqtt_resolve();
+    if(ret != WICED_SUCCESS)
+    {
+        goto __net_err;
+    }
+    ret = mqtt_start_connect();
+    if(ret != WICED_SUCCESS)
+    {
+        goto __net_err;
+    }
+    ret = mqtt_start_subsribe();
+    if(ret != WICED_SUCCESS)
+    {
+        goto __mqtt_err;
+    }
+    azure_refresh();
+    return;
+__net_err:
+    wifi_disconnect_callback();
+    return;
+__mqtt_err:
+    mqtt_disconnect_callabck();
+    return;
+
 }
 void urlencode(char *dst, char *src, int len) {
   char *hex = "0123456789abcdef";
@@ -364,10 +422,6 @@ void mqtt_config_read(void)
         strncpy(endpoint_key,PASSWORD,strlen(PASSWORD));
     }
     free(app_t);
-    printf("endpoint_adress is %s\r\n",endpoint_adress);
-    printf("device_id is %s\r\n",device_id);
-    printf("endpoint_user is %s\r\n",endpoint_user);
-    printf("endpoint_key is %s\r\n",endpoint_key);
 }
 void mqtt_init(void)
 {
@@ -383,5 +437,4 @@ void mqtt_init(void)
         WPRINT_APP_ERROR(("Dont have memory to allocate for mqtt object...\n"));
     }
     wiced_mqtt_init( mqtt_object );
-    mqtt_connect_azure();
 }

@@ -184,6 +184,7 @@ wiced_result_t wiced_init( void )
     wwd_time_t elapsed_time;
 
     WPRINT_WICED_INFO( ("\nStarting WICED " WICED_VERSION "\n") );
+    wiced_rtos_delay_milliseconds(2000);
 
     CHECK_RETURN( wiced_core_init( ) );
 
@@ -689,7 +690,6 @@ wiced_result_t wiced_join_ap( void )
 #else
     wiced_interface_t interface = WICED_STA_INTERFACE;
 #endif
-
     if (wwd_wifi_is_mesh_enabled() && (interface == WICED_STA_INTERFACE)) {
         result = WICED_SUCCESS;
         goto exit;
@@ -697,6 +697,7 @@ wiced_result_t wiced_join_ap( void )
 
     for ( retries = WICED_JOIN_RETRY_ATTEMPTS; retries != 0; --retries )
     {
+        WPRINT_APP_INFO(("wiced_join_ap count:%d \n",WICED_JOIN_RETRY_ATTEMPTS - retries));
         /* Try all stored APs */
         for ( a = start; a < CONFIG_AP_LIST_SIZE; ++a )
         {
@@ -797,7 +798,6 @@ wiced_result_t wiced_join_ap_specific( wiced_ap_info_t* details, uint8_t securit
         wiced_sta_link_up       = WICED_TRUE;
         wiced_sta_security_type = details->security;
 #endif
-
         wwd_management_set_event_handler( link_events, wiced_link_events_handler, NULL, WICED_TO_WWD_INTERFACE(interface) );
         return WICED_SUCCESS;
     }
