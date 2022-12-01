@@ -11,9 +11,9 @@ syr_status device_status;
 
 extern az_iot_hub_client hub_client;
 extern wiced_mqtt_object_t mqtt_object;
-extern EventGroupHandle_t Config_EventHandler;
-extern EventGroupHandle_t Info_EventHandler;
-extern EventGroupHandle_t C2D_EventHandler;
+extern wiced_event_flags_t Config_EventHandler;
+extern wiced_event_flags_t Info_EventHandler;
+extern wiced_event_flags_t C2D_EventHandler;
 
 static az_span const twin_document_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static az_span const rse_name = AZ_SPAN_LITERAL_FROM_STR("rse");
@@ -85,7 +85,7 @@ void get_device_twin_document(void)
 }
 void parse_get_twin(az_span const message_span)
 {
-    EventBits_t EventValue;
+    uint32_t ret,events;
     uint32_t value;
 
     az_json_reader jr;
@@ -112,8 +112,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.config.rse != value)
                 {
                     wifi_uart_write_command_value(RSE_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSE_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_RSE_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSE_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_RSE_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET RSE OK\r\n");
                     }
@@ -127,8 +127,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.config.rsa != value)
                 {
                     wifi_uart_write_command_value(RSA_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSA_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_RSA_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSA_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_RSA_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET RSA OK\r\n");
                     }
@@ -142,8 +142,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.config.rsi != value)
                 {
                     wifi_uart_write_command_value(RSI_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSI_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_RSI_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSI_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_RSI_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET RSI OK\r\n");
                     }
@@ -157,8 +157,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.config.rsd != value)
                 {
                     wifi_uart_write_command_value(RSD_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSD_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_RSD_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSD_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_RSD_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET RSD OK\r\n");
                     }
@@ -172,8 +172,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.config.cnf != value)
                 {
                     wifi_uart_write_command_value(CNF_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_CNF_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_CNF_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_CNF_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_CNF_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET CNF OK\r\n");
                     }
@@ -187,8 +187,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.config.cnl != value)
                 {
                     wifi_uart_write_command_value(CNL_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_CNL_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_CNL_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_CNL_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_CNL_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET CNL OK\r\n");
                     }
@@ -202,8 +202,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.config.lng != value)
                 {
                     wifi_uart_write_command_value(LNG_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_LNG_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_LNG_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_LNG_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_LNG_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET LNG OK\r\n");
                     }
@@ -217,8 +217,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.config.sse != value)
                 {
                     wifi_uart_write_command_value(SSE_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSE_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_SSE_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSE_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_SSE_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET SSE OK\r\n");
                     }
@@ -232,8 +232,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.config.ssa != value)
                 {
                     wifi_uart_write_command_value(SSA_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSA_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_SSA_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSA_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_SSA_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET SSA OK\r\n");
                     }
@@ -247,8 +247,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.config.ssd != value)
                 {
                     wifi_uart_write_command_value(SSD_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSD_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_SSD_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSD_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_SSD_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET SSD OK\r\n");
                     }
@@ -262,8 +262,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.config.emr != value)
                 {
                     wifi_uart_write_command_value(EMR_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_EMR_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_EMR_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_EMR_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_EMR_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET EMR OK\r\n");
                     }
@@ -277,8 +277,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.config.rcp != value)
                 {
                     wifi_uart_write_command_value(RCP_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RCP_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_RCP_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RCP_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_RCP_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET RCP OK\r\n");
                     }
@@ -301,8 +301,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.info.com != value)
                 {
                     wifi_uart_write_command_value(COM_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COM_GET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_INFO_COM_GET)
+                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COM_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_INFO_COM_GET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET COM OK\r\n");
                     }
@@ -316,8 +316,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.info.coa != value)
                 {
                     wifi_uart_write_command_value(COA_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COA_GET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_INFO_COA_GET)
+                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COA_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_INFO_COA_GET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET COA OK\r\n");
                     }
@@ -331,8 +331,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.info.cod != value)
                 {
                     wifi_uart_write_command_value(COD_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COD_GET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_INFO_COD_GET)
+                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COD_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_INFO_COD_GET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET COD OK\r\n");
                     }
@@ -346,8 +346,8 @@ void parse_get_twin(az_span const message_span)
                 if(device_status.info.coe != value)
                 {
                     wifi_uart_write_command_value(COE_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COE_GET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_INFO_COE_GET)
+                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COE_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_INFO_COE_GET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET COE OK\r\n");
                     }
@@ -360,7 +360,7 @@ void parse_get_twin(az_span const message_span)
 }
 void parse_desired_twin(az_span const message_span)
 {
-    EventBits_t EventValue;
+    uint32_t ret,events;
     uint32_t value;
 
     az_json_reader jr;
@@ -386,8 +386,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.config.rse != value)
                 {
                     wifi_uart_write_command_value(RSE_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSE_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_RSE_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSE_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_RSE_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET RSE OK\r\n");
                     }
@@ -401,8 +401,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.config.rsa != value)
                 {
                     wifi_uart_write_command_value(RSA_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSA_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_RSA_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSA_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_RSA_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET RSA OK\r\n");
                     }
@@ -416,8 +416,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.config.rsi != value)
                 {
                     wifi_uart_write_command_value(RSI_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSI_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_RSI_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSI_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_RSI_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET RSI OK\r\n");
                     }
@@ -431,8 +431,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.config.rsd != value)
                 {
                     wifi_uart_write_command_value(RSD_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSD_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_RSD_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSD_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_RSD_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET RSD OK\r\n");
                     }
@@ -446,8 +446,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.config.cnf != value)
                 {
                     wifi_uart_write_command_value(CNF_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_CNF_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_CNF_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_CNF_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_CNF_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET CNF OK\r\n");
                     }
@@ -461,8 +461,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.config.cnl != value)
                 {
                     wifi_uart_write_command_value(CNL_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_CNL_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_CNL_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_CNL_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_CNL_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET CNL OK\r\n");
                     }
@@ -476,8 +476,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.config.lng != value)
                 {
                     wifi_uart_write_command_value(LNG_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_LNG_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_LNG_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_LNG_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_LNG_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET LNG OK\r\n");
                     }
@@ -491,8 +491,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.config.sse != value)
                 {
                     wifi_uart_write_command_value(SSE_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSE_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_SSE_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSE_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_SSE_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET SSE OK\r\n");
                     }
@@ -506,8 +506,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.config.ssa != value)
                 {
                     wifi_uart_write_command_value(SSA_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSA_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_SSA_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSA_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_SSA_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET SSA OK\r\n");
                     }
@@ -521,8 +521,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.config.ssd != value)
                 {
                     wifi_uart_write_command_value(SSD_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSD_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_SSD_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSD_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_SSD_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET SSD OK\r\n");
                     }
@@ -536,8 +536,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.info.cod != value)
                 {
                     wifi_uart_write_command_value(COD_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COD_GET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_INFO_COD_GET)
+                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COD_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_INFO_COD_GET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET COD OK\r\n");
                     }
@@ -551,8 +551,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.info.coe != value)
                 {
                     wifi_uart_write_command_value(COE_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COE_GET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_INFO_COE_GET)
+                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COE_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_INFO_COE_GET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET COE OK\r\n");
                     }
@@ -566,8 +566,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.config.emr != value)
                 {
                     wifi_uart_write_command_value(EMR_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_EMR_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_EMR_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_EMR_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_EMR_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET EMR OK\r\n");
                     }
@@ -581,8 +581,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.config.rcp != value)
                 {
                     wifi_uart_write_command_value(RCP_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RCP_SET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_CONFIG_RCP_SET)
+                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RCP_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_CONFIG_RCP_SET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET RCP OK\r\n");
                     }
@@ -605,8 +605,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.info.com != value)
                 {
                     wifi_uart_write_command_value(COM_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COM_GET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_INFO_COM_GET)
+                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COM_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_INFO_COM_GET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET COM OK\r\n");
                     }
@@ -620,8 +620,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.info.coa != value)
                 {
                     wifi_uart_write_command_value(COA_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COA_GET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_INFO_COA_GET)
+                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COA_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_INFO_COA_GET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET COA OK\r\n");
                     }
@@ -635,8 +635,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.info.cod != value)
                 {
                     wifi_uart_write_command_value(COD_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COD_GET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_INFO_COD_GET)
+                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COD_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_INFO_COD_GET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET COD OK\r\n");
                     }
@@ -650,8 +650,8 @@ void parse_desired_twin(az_span const message_span)
                 if(device_status.info.coe != value)
                 {
                     wifi_uart_write_command_value(COE_SET_CMD,value);
-                    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COE_GET,pdTRUE,pdTRUE,100);
-                    if(EventValue & EVENT_INFO_COE_GET)
+                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COE_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                    if(events & EVENT_INFO_COE_GET)
                     {
                         IOT_SAMPLE_LOG_SUCCESS("SET COE OK\r\n");
                     }

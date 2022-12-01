@@ -9,9 +9,9 @@
 #include "uart_core.h"
 #include "twin_parse.h"
 
-wiced_thread_t http_ota_t = NULL;
-wiced_semaphore_t uart_ack_sem = NULL;
-EventGroupHandle_t OTA_EventHandler;
+wiced_thread_t http_ota_t;
+wiced_semaphore_t uart_ack_sem;
+wiced_event_flags_t OTA_EventHandler;
 
 uint32_t now_offset = 0;
 uint32_t file_size = 0;
@@ -29,21 +29,21 @@ void ota_event_send(uint32_t value)
     switch(value)
     {
     case 0x1:
-        xEventGroupSetBits(OTA_EventHandler,EVENT_OTA_MURATA_START);
+        wiced_rtos_set_event_flags(&OTA_EventHandler,EVENT_OTA_MURATA_START);
     break;
     case 0x2:
-        xEventGroupSetBits(OTA_EventHandler,EVENT_OTA_ST_START);
+        wiced_rtos_set_event_flags(&OTA_EventHandler,EVENT_OTA_ST_START);
     break;
     default:break;
     }
 }
 void http_ota_callback( uint32_t arg )
 {
-    EventBits_t EventValue;
+    uint32_t ret,events;
     while(1)
     {
-        EventValue = xEventGroupWaitBits(OTA_EventHandler,EVENT_OTA_ST_START|EVENT_OTA_MURATA_START,pdTRUE,pdFALSE,WICED_WAIT_FOREVER);
-        if(EventValue & EVENT_OTA_MURATA_START)
+        ret = wiced_rtos_wait_for_event_flags(&OTA_EventHandler,EVENT_OTA_ST_START|EVENT_OTA_MURATA_START, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,WICED_WAIT_FOREVER);
+        if(events & EVENT_OTA_MURATA_START)
         {
             murata_ota_start();
         }
@@ -54,13 +54,13 @@ void http_ota_callback( uint32_t arg )
     }
 }
 
-int http_ota_init(void)
+void http_ota_init(void)
 {
-    OTA_EventHandler = xEventGroupCreate();
+    wiced_rtos_init_event_flags(&OTA_EventHandler);
     wiced_rtos_init_semaphore( &uart_ack_sem );
     wiced_rtos_create_thread( &http_ota_t, 6, "http_ota", http_ota_callback, 4096, 0 );
 }
-static int st_version_callback(char *buffer, int length)
+static void st_version_callback(char *buffer, int length)
 {
     printf("st_version_callback get version %s,now version %s\r\n",buffer,device_status.info.ver);
     if(my_strcmp(buffer,device_status.info.ver))
@@ -233,7 +233,7 @@ __exit:
     }
     return ret;
 }
-static int murata_version_callback(char *buffer, int length)
+static void murata_version_callback(char *buffer, int length)
 {
     printf("murata_version_callback get version %s,now version %s\r\n",buffer,wifi_version);
     if(my_strcmp(buffer,wifi_version))

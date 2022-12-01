@@ -210,7 +210,9 @@ extern "C" {
                                             *  added 8-byte field at end of platform_dct_data_t to for a size of a multiple of 8 bytes
                                             *  this allows app_dct to be at 8-byte alignment, and no "fill" by the linker if the app_dct has an 8-byte field
                                             */
-#define DCT_BOOTLOADER_SDK_CURRENT    DCT_BOOTLOADER_SDK_5_1_0
+#define DCT_BOOTLOADER_SDK_5_2_0     0x0520 /* Changes from SDK-5.1.0 to SDK-5.2.0
+                                            */                                       
+#define DCT_BOOTLOADER_SDK_CURRENT    DCT_BOOTLOADER_SDK_5_2_0
 
 typedef uint16_t wiced_dct_sdk_ver_t;
 
@@ -826,6 +828,14 @@ typedef struct
 
 typedef dct_header_to_use           platform_dct_header_t;
 
+typedef struct
+{
+    uint8_t  init_flag ;
+    char     device_id[20];
+    char     primaryKey[200];
+    char     endpointAddress[50];
+    char     mac1[30];
+} platform_dct_azure_config_t;
 /* The structure for the complete system DCT layout.
  * The application DCT data follows this structure in the DCT section of FLASH.
  */
@@ -845,6 +855,7 @@ typedef struct
 
     /* If you need to add anything to the DCT, add it to dct_misc, or in a new structure */
     platform_dct_misc_config_t          dct_misc;
+    platform_dct_azure_config_t         azure_config;
 
     /* THIS MUST BE THE LAST ENTRY in the dct_data structure
      * use 8-byte field that compiler will align to 8-byte boundary to force struct size to multiple of 8-bytes
@@ -914,7 +925,7 @@ typedef struct
 #ifndef BOOTLOADER_NO_MISC_CONFIG
     bootloader_dct_misc_config_to_use   dct_misc;               /* struct added 4.0.1 modified in SDK-5.0.1                                 */
 #endif
-
+    platform_dct_azure_config_t         azure_config;
 #ifndef DCT_NO_BOOTLOADER_FORCE_8_BYTE_SIZE
     uint64_t                            force_to_8_byte[];
 #endif

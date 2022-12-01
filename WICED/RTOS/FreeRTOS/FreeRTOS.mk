@@ -54,7 +54,7 @@ $(NAME)_SOURCES :=  ver$(VERSION)/Source/croutine.c \
                     ver$(VERSION)/Source/queue.c \
                     ver$(VERSION)/Source/tasks.c \
                     ver$(VERSION)/Source/timers.c \
-                    ver$(VERSION)/Source/portable/MemMang/heap_3.c
+                    ver$(VERSION)/Source/portable/MemMang/heap_4.c
 
 # Win32_x86 specific sources and includes
 $(NAME)_Win32_x86_SOURCES  := ver$(VERSION)/Source/portable/MSVC-MingW/port.c

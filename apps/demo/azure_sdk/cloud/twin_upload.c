@@ -9,24 +9,30 @@
 #include "twin_parse.h"
 
 wiced_mac_t mac_info;
-uint8_t mac_value[18];
+static uint8_t mac_buf[18];
+static uint8_t ipv4_buf[18];
+static uint8_t mask_buf[18];
+static uint8_t gw_ip_buf[18];
 
 extern syr_status device_status;
 extern az_iot_hub_client hub_client;
 extern wiced_mqtt_object_t mqtt_object;
 
-extern EventGroupHandle_t Config_EventHandler;
-extern EventGroupHandle_t Info_EventHandler;
+extern wiced_event_flags_t Config_EventHandler;
+extern wiced_event_flags_t Info_EventHandler;
+
+#define LOG_D
 
 static az_span const twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
 static az_span const deviceInfo_name = AZ_SPAN_LITERAL_FROM_STR("deviceInfo");
 static az_span const deviceConfig_name = AZ_SPAN_LITERAL_FROM_STR("deviceConfig");
 static az_span const ras_name = AZ_SPAN_LITERAL_FROM_STR("ras");
 static az_span const mac_name = AZ_SPAN_LITERAL_FROM_STR("mac");
-static az_span const srn_name = AZ_SPAN_LITERAL_FROM_STR("srn");
+static az_span const mcu_srn_name = AZ_SPAN_LITERAL_FROM_STR("srn");
+static az_span const wifi_srn_name = AZ_SPAN_LITERAL_FROM_STR("srn2");
 static az_span const sup_name = AZ_SPAN_LITERAL_FROM_STR("sup");
-static az_span const mcu_ver_name = AZ_SPAN_LITERAL_FROM_STR("s_ver");
-static az_span const wifi_ver_name = AZ_SPAN_LITERAL_FROM_STR("m_ver");
+static az_span const mcu_ver_name = AZ_SPAN_LITERAL_FROM_STR("ver");
+static az_span const wifi_ver_name = AZ_SPAN_LITERAL_FROM_STR("ver2");
 static az_span const wnk_name = AZ_SPAN_LITERAL_FROM_STR("wnk");
 static az_span const wgw_name = AZ_SPAN_LITERAL_FROM_STR("wgw");
 static az_span const wip_name = AZ_SPAN_LITERAL_FROM_STR("wip");
@@ -168,113 +174,113 @@ void config_single_upload(uint8_t command,uint32_t value)//主动上传
 
 void config_get(void)
 {
-    EventBits_t EventValue;
+    uint32_t result,events;
     wifi_uart_write_command_value(RSE_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSE_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_CONFIG_RSE_GET)
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSE_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_RSE_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET RSE %d\r\n",device_status.config.rse);
+        LOG_D("GET RSE %d\r\n",device_status.config.rse);
     }
     wifi_uart_write_command_value(RSA_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSA_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_CONFIG_RSA_GET)
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSA_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_RSA_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET RSA %d\r\n",device_status.config.rsa);
+        LOG_D("GET RSA %d\r\n",device_status.config.rsa);
     }
     wifi_uart_write_command_value(RSI_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSI_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_CONFIG_RSI_GET)
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSI_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_RSI_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET RSI %d\r\n",device_status.config.rsi);
+        LOG_D("GET RSI %d\r\n",device_status.config.rsi);
     }
     wifi_uart_write_command_value(RSD_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RSD_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_CONFIG_RSD_GET)
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSD_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_RSD_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET RSD %d\r\n",device_status.config.rsd);
+        LOG_D("GET RSD %d\r\n",device_status.config.rsd);
     }
     wifi_uart_write_command_value(CNF_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_CNF_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_CONFIG_CNF_GET)
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_CNF_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_CNF_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET CNF %d\r\n",device_status.config.cnf);
+        LOG_D("GET CNF %d\r\n",device_status.config.cnf);
     }
     wifi_uart_write_command_value(CNL_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_CNL_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_CONFIG_CNL_GET)
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_CNL_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_CNL_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET CNL %d\r\n",device_status.config.cnl);
+        LOG_D("GET CNL %d\r\n",device_status.config.cnl);
     }
 
     wifi_uart_write_command_value(SSE_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSE_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_CONFIG_SSE_GET)
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSE_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_SSE_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET SSE %d\r\n",device_status.config.sse);
+        LOG_D("GET SSE %d\r\n",device_status.config.sse);
     }
     wifi_uart_write_command_value(SSA_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSA_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_CONFIG_SSA_GET)
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSA_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_SSA_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET SSA %d\r\n",device_status.config.ssa);
+        LOG_D("GET SSA %d\r\n",device_status.config.ssa);
     }
     wifi_uart_write_command_value(SSD_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_SSD_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_CONFIG_SSD_GET)
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSD_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_SSD_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET SSD %d\r\n",device_status.config.ssd);
+        LOG_D("GET SSD %d\r\n",device_status.config.ssd);
     }
     wifi_uart_write_command_value(LNG_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_LNG_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_CONFIG_LNG_GET)
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_LNG_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_LNG_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET LNG %d\r\n",device_status.config.lng);
+        LOG_D("GET LNG %d\r\n",device_status.config.lng);
     }
     wifi_uart_write_command_value(RCP_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_RCP_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_CONFIG_RCP_GET)
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RCP_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_RCP_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET RCP %d\r\n",device_status.config.rcp);
+        LOG_D("GET RCP %d\r\n",device_status.config.rcp);
     }
     wifi_uart_write_command_value(EMR_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Config_EventHandler,EVENT_CONFIG_EMR_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_CONFIG_EMR_GET)
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_EMR_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_EMR_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET EMR %d\r\n",device_status.config.emr);
+        LOG_D("GET EMR %d\r\n",device_status.config.emr);
     }
 }
 void info_get(void)
 {
-    EventBits_t EventValue;
+    uint32_t result,events;
     wifi_uart_write_command_value(COM_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COM_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_INFO_COM_GET)
+    result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COM_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_INFO_COM_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET COM %d\r\n",device_status.info.com);
+        LOG_D("GET COM %d\r\n",device_status.info.com);
     }
     wifi_uart_write_command_value(COA_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COA_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_INFO_COA_GET)
+    result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COA_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_INFO_COA_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET COA %d\r\n",device_status.info.coa);
+        LOG_D("GET COA %d\r\n",device_status.info.coa);
     }
     wifi_uart_write_command_value(COD_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COD_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_INFO_COD_GET)
+    result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COD_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_INFO_COD_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET COD %d\r\n",device_status.info.cod);
+        LOG_D("GET COD %d\r\n",device_status.info.cod);
     }
     wifi_uart_write_command_value(COE_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_COE_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_INFO_COE_GET)
+    result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COE_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_INFO_COE_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET COE %d\r\n",device_status.info.coe);
+        LOG_D("GET COE %d\r\n",device_status.info.coe);
     }
     wifi_uart_write_command_value(SUP_GET_CMD,0);
-    EventValue = xEventGroupWaitBits(Info_EventHandler,EVENT_INFO_SUP_GET,pdTRUE,pdTRUE,100);
-    if(EventValue & EVENT_INFO_SUP_GET)
+    result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_SUP_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_INFO_SUP_GET)
     {
-        IOT_SAMPLE_LOG_SUCCESS("GET SUP %d\r\n",device_status.info.sup);
+        LOG_D("GET SUP %d\r\n",device_status.info.sup);
     }
 }
 void twin_upload(void)
@@ -285,6 +291,7 @@ void twin_upload(void)
     az_span payload = AZ_SPAN_FROM_BUFFER(payload_buffer);
     az_span out_payload;
     az_json_writer jw;
+    ULONG ip_address, network_mask,gateway_ip;
 
     char twin_patch_topic_buffer[128];
     az_iot_hub_client_twin_patch_get_publish_topic(
@@ -337,8 +344,10 @@ void twin_upload(void)
     az_json_writer_append_int32(&jw, device_status.info.cod);
     az_json_writer_append_property_name(&jw, coe_name);
     az_json_writer_append_int32(&jw, device_status.info.coe);
-    az_json_writer_append_property_name(&jw, srn_name);
+    az_json_writer_append_property_name(&jw, mcu_srn_name);
     az_json_writer_append_string(&jw, az_span_create_from_str(device_status.info.srn));
+    az_json_writer_append_property_name(&jw, wifi_srn_name);
+    az_json_writer_append_string(&jw, az_span_create_from_str(murata_id_read()));
     az_json_writer_append_property_name(&jw, mcu_ver_name);
     az_json_writer_append_string(&jw, az_span_create_from_str(device_status.info.ver));
     az_json_writer_append_property_name(&jw, wifi_ver_name);
@@ -346,19 +355,24 @@ void twin_upload(void)
     az_json_writer_append_property_name(&jw, mac_name);
     if ( wwd_wifi_get_mac_address( &mac_info, WWD_STA_INTERFACE ) == WWD_SUCCESS )
     {
-        sprintf(mac_value,"%02X:%02X:%02X:%02X:%02X:%02X",mac_info.octet[0],mac_info.octet[1],mac_info.octet[2],mac_info.octet[3],mac_info.octet[4],mac_info.octet[5]);
+        sprintf(mac_buf,"%02X:%02X:%02X:%02X:%02X:%02X",mac_info.octet[0],mac_info.octet[1],mac_info.octet[2],mac_info.octet[3],mac_info.octet[4],mac_info.octet[5]);
     }
-    az_json_writer_append_string(&jw,az_span_create_from_str(mac_value));
+    az_json_writer_append_string(&jw,az_span_create_from_str(mac_buf));
+    nx_ip_address_get( &IP_HANDLE(WICED_STA_INTERFACE), &ip_address, &network_mask );
+    nx_ip_gateway_address_get(&IP_HANDLE(WICED_STA_INTERFACE),&gateway_ip);
+    sprintf(ipv4_buf,"%d.%d.%d.%d",(unsigned char)( ( ip_address >> 24 ) & 0xff ),(unsigned char)( ( ip_address >> 16 ) & 0xff ),(unsigned char)( ( ip_address >> 8 ) & 0xff ), (unsigned char)( ( ip_address >> 0 ) & 0xff ));
+    sprintf(mask_buf,"%d.%d.%d.%d",(unsigned char) ( ( network_mask >> 24 ) & 0xff ), (unsigned char) ( ( network_mask >> 16 ) & 0xff ), (unsigned char) ( ( network_mask >> 8 ) & 0xff ), (unsigned char) ( ( network_mask >> 0 ) & 0xff ));
+    sprintf(gw_ip_buf,"%d.%d.%d.%d",(unsigned char) ( ( gateway_ip >> 24 ) & 0xff ), (unsigned char) ( ( gateway_ip >> 16 ) & 0xff ), (unsigned char) ( ( gateway_ip >> 8 ) & 0xff ), (unsigned char) ( ( gateway_ip >> 0 ) & 0xff ) );
     az_json_writer_append_property_name(&jw, wip_name);
-    az_json_writer_append_string(&jw, az_span_create_from_str(ip4addr_ntoa(netif_ip4_addr(&IP_HANDLE(WICED_STA_INTERFACE)))));
+    az_json_writer_append_string(&jw, az_span_create_from_str(ipv4_buf));
     az_json_writer_append_property_name(&jw, wnk_name);
-    az_json_writer_append_string(&jw, az_span_create_from_str(ip4addr_ntoa(netif_ip4_netmask(&IP_HANDLE(WICED_STA_INTERFACE)))));
+    az_json_writer_append_string(&jw, az_span_create_from_str(mask_buf));
     az_json_writer_append_property_name(&jw, wgw_name);
-    az_json_writer_append_string(&jw, az_span_create_from_str(ip4addr_ntoa(netif_ip4_gw(&IP_HANDLE(WICED_STA_INTERFACE)))));
+    az_json_writer_append_string(&jw, az_span_create_from_str(gw_ip_buf));
     az_json_writer_append_end_object(&jw);
 
     az_json_writer_append_end_object(&jw);
     out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
     wiced_mqtt_publish(mqtt_object,twin_patch_topic_buffer,az_span_ptr(out_payload),az_span_size(out_payload),0);
-    printf("info_upload,size is %d,payload is %s\r\n",az_span_size(out_payload),az_span_ptr(out_payload));
+    LOG_D("info_upload,size is %d,payload is %s\r\n",az_span_size(out_payload),az_span_ptr(out_payload));
 }

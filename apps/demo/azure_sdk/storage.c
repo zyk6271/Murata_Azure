@@ -3,6 +3,12 @@
 #include "wiced_framework.h"
 #include "twin_parse.h"
 
+#include "platform_config.h"
+#include "platform_dct.h"
+#include "wiced_defaults.h"
+#include "wiced_result.h"
+#include "wiced_apps_common.h"
+
 uint8_t azure_flag = 0;
 extern syr_status device_status;
 
@@ -41,9 +47,9 @@ wiced_result_t print_wifi_config_dct( void )
 }
 wiced_result_t dct_app_load( void )
 {
-    user_app_t*       app_dct                  = NULL;
+    platform_dct_azure_config_t*       app_dct                  = NULL;
 
-    wiced_dct_read_lock( (void**) &app_dct, WICED_FALSE, DCT_APP_SECTION, 0, sizeof( *app_dct ) );
+    wiced_dct_read_lock( (void**) &app_dct, WICED_FALSE, DCT_AZURE_SECTION, 0, sizeof( platform_dct_azure_config_t ) );
     if(app_dct->init_flag==1)
     {
         WPRINT_APP_INFO( ( "device_id : %s\r\n", app_dct->device_id ) );
@@ -54,32 +60,27 @@ wiced_result_t dct_app_load( void )
     wiced_dct_read_unlock( app_dct, WICED_FALSE );
     return WICED_SUCCESS;
 }
-wiced_result_t dct_app_all_read( user_app_t** app_dct )
+wiced_result_t dct_app_all_read( platform_dct_azure_config_t** app_dct )
 {
-    user_app_t*       app_dct_origin                  = NULL;
-    wiced_dct_read_lock( (void **)&app_dct_origin, WICED_TRUE, DCT_APP_SECTION, 0, sizeof( *app_dct_origin ) );
-    memcpy(*app_dct,app_dct_origin,sizeof(user_app_t));
+    platform_dct_azure_config_t*       app_dct_origin                  = NULL;
+    wiced_dct_read_lock( (void **)&app_dct_origin, WICED_TRUE, DCT_AZURE_SECTION, 0, sizeof( platform_dct_azure_config_t ) );
+    memcpy(*app_dct,app_dct_origin,sizeof(platform_dct_azure_config_t));
     wiced_dct_read_unlock( app_dct_origin, WICED_TRUE );
     return WICED_SUCCESS;
 }
-wiced_result_t dct_app_init_write(void)
+wiced_result_t dct_app_azc_write( platform_dct_azure_config_t* app_dct )
 {
-    user_app_t       app_dct;
-    app_dct.init_flag = 1;
-    wiced_dct_write( &app_dct.init_flag, DCT_APP_SECTION, OFFSETOF(user_app_t,init_flag), sizeof(app_dct.init_flag) );
-    return WICED_SUCCESS;
-}
-wiced_result_t dct_app_azc_write( user_app_t* app_dct )
-{
-    dct_app_init_write();
-    wiced_dct_write( (const void*) &app_dct->device_id, DCT_APP_SECTION, OFFSETOF(user_app_t,device_id), sizeof(app_dct->device_id)
-                       + sizeof(app_dct->primaryKey) + sizeof(app_dct->endpointAddress)+ sizeof(app_dct->mac1) );
     char ap_ssid[28];
+    wiced_dct_write( (const void*) &app_dct->init_flag, DCT_AZURE_SECTION, OFFSETOF(platform_dct_azure_config_t,init_flag), sizeof(app_dct->init_flag));
+    wiced_dct_write( (const void*) &app_dct->device_id, DCT_AZURE_SECTION, OFFSETOF(platform_dct_azure_config_t,device_id), sizeof(app_dct->device_id));
+    wiced_dct_write( (const void*) &app_dct->endpointAddress, DCT_AZURE_SECTION, OFFSETOF(platform_dct_azure_config_t,endpointAddress), sizeof(app_dct->endpointAddress));
+    wiced_dct_write( (const void*) &app_dct->primaryKey, DCT_AZURE_SECTION, OFFSETOF(platform_dct_azure_config_t,primaryKey), sizeof(app_dct->primaryKey));
+    wiced_dct_write( (const void*) &app_dct->mac1, DCT_AZURE_SECTION, OFFSETOF(platform_dct_azure_config_t,mac1), sizeof(app_dct->mac1));
     strcpy(ap_ssid,"SYR");
     strcat(ap_ssid,app_dct->device_id);
     uint8_t size = strlen(ap_ssid);
-    wiced_dct_write( ap_ssid, DCT_WIFI_CONFIG_SECTION, OFFSETOF(platform_dct_wifi_config_t,soft_ap_settings.SSID.value), size );
-    wiced_dct_write(&size, DCT_WIFI_CONFIG_SECTION, OFFSETOF(platform_dct_wifi_config_t,soft_ap_settings.SSID.length), sizeof(uint8_t) );
+    wiced_dct_write( ap_ssid, DCT_WIFI_CONFIG_SECTION, OFFSETOF(platform_dct_wifi_config_t,soft_ap_settings.SSID.value), 32 );
+    wiced_dct_write(&size, DCT_WIFI_CONFIG_SECTION, OFFSETOF(platform_dct_wifi_config_t,soft_ap_settings.SSID.length), 1 );
     wiced_mac_t mac_read;
     int values[6];
     if(6 == sscanf(app_dct->mac1, "%x:%x:%x:%x:%x:%x%*c",
@@ -92,4 +93,3 @@ wiced_result_t dct_app_azc_write( user_app_t* app_dct )
     wiced_dct_write( &mac_read, DCT_WIFI_CONFIG_SECTION, OFFSETOF(platform_dct_wifi_config_t,mac_address), sizeof(wiced_mac_t) );
     return WICED_SUCCESS;
 }
-

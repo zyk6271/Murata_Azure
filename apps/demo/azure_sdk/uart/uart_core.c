@@ -613,7 +613,7 @@ void data_handle(unsigned short offset)
         break;
         case TELEMETRY_CONTROL_CMD:                           //¿ªÆôÒ£²â
             total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
-            telemetry_upload();
+            telemetry_upload((unsigned char *)wifi_data_process_buf + offset + DATA_START,total_len);
         break;
         case DATA_ISSUED_CMD:                                 //ÃüÁîÏÂ·¢
             total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];

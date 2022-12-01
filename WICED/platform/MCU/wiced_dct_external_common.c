@@ -188,6 +188,7 @@ static const uint32_t DCT_section_offsets[] =
 
     [DCT_VERSION_SECTION]         = OFFSETOF( platform_dct_data_t, dct_version ),
     [DCT_MISC_SECTION]            = OFFSETOF( platform_dct_data_t, dct_misc ),
+    [DCT_AZURE_SECTION]           = OFFSETOF( platform_dct_data_t, azure_config ),
     [DCT_INTERNAL_SECTION]        = 0,
 };
 
@@ -969,7 +970,18 @@ static wiced_result_t wiced_dct_external_dct_update(uint32_t dct_destination, ui
         }
     }
 #endif
-
+    /* azure config */
+    memset( dst_dct_buffer, 0x00, LARGEST_DCT_SUB_STRUCTURE_SIZE);
+    if (sflash_read_func( &sflash_handle, (dct_source + OFFSETOF(bootloader_dct_data_t, azure_config)), src_dct_buffer, sizeof(platform_dct_azure_config_t)) == WICED_SUCCESS)
+    {
+        if (wiced_dct_update_azure_config_to_current((platform_dct_azure_config_t*)dst_dct_buffer, (platform_dct_azure_config_t*)src_dct_buffer) == WICED_SUCCESS)
+        {
+            if ( sflash_write_func( &sflash_handle, dct_destination + OFFSETOF(platform_dct_data_t, azure_config), dst_dct_buffer, sizeof(platform_dct_azure_config_t) ) != PLATFORM_SUCCESS)
+            {
+                goto _update_fail;
+            }
+        }
+    }
     /* We need both dct_header and dct_version in RAM for wiced_dct_finish_new_dct,
      * We'll use partial positioning in the allocated RAM to put the header and version
      */

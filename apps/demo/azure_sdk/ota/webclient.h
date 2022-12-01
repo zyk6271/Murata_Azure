@@ -32,9 +32,9 @@ extern "C" {
 
 #define RT_NULL                         (0)
 
-#define LOG_I printf
+#define LOG_I       printf
 #define LOG_D
-#define LOG_E printf
+#define LOG_E       printf
 
 /* RT-Thread error code definitions */
 #define RT_EOK                          0               /**< There is no error */

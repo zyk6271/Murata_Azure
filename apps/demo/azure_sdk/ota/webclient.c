@@ -26,8 +26,7 @@
 #include <sys/errno.h>
 #include <sys/time.h>
 
-#include <lwip/netdb.h>
-#include <lwip/sockets.h>
+#include "nxd_bsd.h"
 
 /* default receive or send timeout */
 #define WEBCLIENT_DEFAULT_TIMEO        6
@@ -483,7 +482,7 @@ static int webclient_connect(struct webclient_session *session, const char *URI)
         {
             /* connect failed, close socket */
             LOG_E("connect failed, connect socket(%d) error.", socket_handle);
-            closesocket(socket_handle);
+            soc_close(socket_handle);
             rc = -WEBCLIENT_CONNECT_FAILED;
             goto __exit;
         }
@@ -1263,7 +1262,7 @@ static int webclient_next_chunk(struct webclient_session *session)
             length = webclient_read_line(session, line, sizeof(line));
             if (length <= 0)
             {
-                closesocket(session->socket);
+                soc_close(session->socket);
                 session->socket = -1;
                 return length;
             }
@@ -1271,7 +1270,7 @@ static int webclient_next_chunk(struct webclient_session *session)
     }
     else
     {
-        closesocket(session->socket);
+        soc_close(session->socket);
         session->socket = -1;
 
         return length;
@@ -1283,7 +1282,7 @@ static int webclient_next_chunk(struct webclient_session *session)
     if (session->chunk_sz == 0)
     {
         /* end of chunks */
-        closesocket(session->socket);
+        soc_close(session->socket);
         session->socket = -1;
         session->chunk_sz = -1;
     }
@@ -1344,7 +1343,7 @@ int webclient_read(struct webclient_session *session, void *buffer, size_t lengt
             }
             else
             {
-                closesocket(session->socket);
+                soc_close(session->socket);
                 session->socket = -1;
                 return 0;
             }
@@ -1406,7 +1405,7 @@ int webclient_read(struct webclient_session *session, void *buffer, size_t lengt
                 }
                 else
                 {
-                    closesocket(session->socket);
+                    soc_close(session->socket);
                     session->socket = -1;
                     return 0;
                 }
@@ -1481,7 +1480,7 @@ int webclient_write(struct webclient_session *session, const void *buffer, size_
             }
             else
             {
-                closesocket(session->socket);
+                soc_close(session->socket);
                 session->socket = -1;
 
                 if (total_write == 0)
@@ -1512,14 +1511,14 @@ static int webclient_clean(struct webclient_session *session)
     {
         if (session->socket >= 0)
         {
-            closesocket(session->socket);
+            soc_close(session->socket);
             session->socket = -1;
         }
     }
 #else
     if (session->socket >= 0)
     {
-        closesocket(session->socket);
+        soc_close(session->socket);
         session->socket = -1;
     }
 #endif

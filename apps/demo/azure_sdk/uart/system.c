@@ -7,10 +7,10 @@
 
 extern uint8_t azure_flag;
 extern syr_status device_status;
-extern EventGroupHandle_t Config_EventHandler;
-extern EventGroupHandle_t Info_EventHandler;
-extern EventGroupHandle_t TEM_EventHandler;
-extern EventGroupHandle_t C2D_EventHandler;
+extern wiced_event_flags_t Config_EventHandler;
+extern wiced_event_flags_t Info_EventHandler;
+extern wiced_event_flags_t TEM_EventHandler;
+extern wiced_event_flags_t C2D_EventHandler;
 
 void dp_download_handle(unsigned char dpid,const unsigned char value[], unsigned short length)
 {
@@ -24,207 +24,207 @@ void dp_download_handle(unsigned char dpid,const unsigned char value[], unsigned
         case RSE_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.rse = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSE_GET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_RSE_GET);
             break;
         case RSE_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.rse = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSE_SET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_RSE_SET);
             break;
         case RSA_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.rsa = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSA_GET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_RSA_GET);
             break;
         case RSA_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.rsa = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSA_SET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_RSA_SET);
             break;
         case RSI_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.rsi = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSI_GET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_RSI_GET);
             break;
         case RSI_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.rsi = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSI_SET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_RSI_SET);
             break;
         case RSD_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.rsd = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSD_GET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_RSD_GET);
             break;
         case RSD_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.rsd = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSD_SET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_RSD_SET);
             break;
         case CNF_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.cnf = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_CNF_GET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_CNF_GET);
             break;
         case CNF_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.cnf = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_CNF_SET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_CNF_SET);
             break;
         case CNL_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.cnl = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_CNL_GET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_CNL_GET);
             break;
         case CNL_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.cnl = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_CNL_SET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_CNL_SET);
             break;
         case SSE_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.sse = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_SSE_GET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_SSE_GET);
             break;
         case SSE_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.sse = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_SSE_SET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_SSE_SET);
             break;
         case SSA_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.ssa = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_SSA_GET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_SSA_GET);
             break;
         case SSA_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.ssa = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_SSA_SET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_SSA_SET);
             break;
         case SSD_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.ssd = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_SSD_GET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_SSD_GET);
             break;
         case SSD_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.ssd = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_SSD_SET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_SSD_SET);
             break;
         case LNG_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.lng = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_LNG_GET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_LNG_GET);
             break;
         case LNG_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.lng = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_LNG_SET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_LNG_SET);
             break;
         case COM_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.info.com = update_value;
-            xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COM_GET);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_COM_GET);
             break;
         case COM_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.info.com = update_value;
-            xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COM_SET);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_COM_SET);
             break;
         case COA_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.info.coa = update_value;
-            xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COA_GET);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_COA_GET);
             break;
         case COA_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.info.coa = update_value;
-            xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COA_SET);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_COA_SET);
             break;
         case COD_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.info.cod = update_value;
-            xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COD_GET);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_COD_GET);
             break;
         case COD_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.info.cod = update_value;
-            xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COD_SET);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_COD_SET);
             break;
         case COE_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.info.coe = update_value;
-            xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COE_GET);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_COE_GET);
             break;
         case COE_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.info.coe = update_value;
-            xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COE_SET);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_COE_SET);
             break;
         case CND_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.info.cnd = update_value;
-            xEventGroupSetBits(Info_EventHandler,EVENT_INFO_CND_GET);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_CND_GET);
             break;
         case SUP_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.info.sup = update_value;
-            xEventGroupSetBits(Info_EventHandler,EVENT_INFO_SUP_GET);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_SUP_GET);
             break;
         case NET_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.tem.net = update_value;
-            xEventGroupSetBits(TEM_EventHandler,EVENT_TEM_NET_GET);
+            wiced_rtos_set_event_flags(&TEM_EventHandler,EVENT_TEM_NET_GET);
             break;
         case BAT_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.tem.bat = update_value;
-            xEventGroupSetBits(TEM_EventHandler,EVENT_TEM_BAT_GET);
+            wiced_rtos_set_event_flags(&TEM_EventHandler,EVENT_TEM_BAT_GET);
             break;
         case ALA_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.tem.ala = update_value;
-            xEventGroupSetBits(TEM_EventHandler,EVENT_TEM_ALA_GET);
+            wiced_rtos_set_event_flags(&TEM_EventHandler,EVENT_TEM_ALA_GET);
             break;
         case ALR_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.tem.alr = update_value;
-            xEventGroupSetBits(TEM_EventHandler,EVENT_TEM_ALR_GET);
+            wiced_rtos_set_event_flags(&TEM_EventHandler,EVENT_TEM_ALR_GET);
             break;
         case RST_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.c2d.rst = update_value;
-            xEventGroupSetBits(C2D_EventHandler,EVENT_C2D_RST_SET);
+            wiced_rtos_set_event_flags(&C2D_EventHandler,EVENT_C2D_RST_SET);
             break;
         case DEF_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.c2d.def = update_value;
-            xEventGroupSetBits(C2D_EventHandler,EVENT_C2D_DEF_SET);
+            wiced_rtos_set_event_flags(&C2D_EventHandler,EVENT_C2D_DEF_SET);
             break;
         case RAS_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.c2d.ras = update_value;
-            xEventGroupSetBits(C2D_EventHandler,EVENT_C2D_RAS_SET);
+            wiced_rtos_set_event_flags(&C2D_EventHandler,EVENT_C2D_RAS_SET);
             break;
         case EMR_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.emr = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_EMR_SET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_EMR_SET);
             break;
         case EMR_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.emr = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_EMR_GET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_EMR_GET);
             break;
         case RCP_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.rcp = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RCP_SET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_RCP_SET);
             break;
         case RCP_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.config.rcp = update_value;
-            xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RCP_GET);
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_RCP_GET);
             break;
         default:
             break;
@@ -364,7 +364,6 @@ void ota_control_send(uint16_t value)
 }
 void ota_control_parse(unsigned char data)
 {
-    //printf("ota_control_parse:%d\r\n",data);
     ota_event_send(data);
 }
 void wifi_ap_enable_control(unsigned char data)

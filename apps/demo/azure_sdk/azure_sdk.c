@@ -11,15 +11,16 @@
 #include "azure_server.h"
 #include "storage.h"
 #include "sntp.h"
+#include "netx_applications/dns/nxd_dns.h"
 
 extern uint8_t azure_flag;
-wiced_interface_t interface;
 
 void link_up_callback(void)
 {
+    wiced_dns_init(WICED_STA_INTERFACE);
     wifi_status_change(2);
-    sntp_start_auto_time_sync_nowait( 1000*60*60 );
     keep_alive();
+    sntp_start_auto_time_sync_nowait( 1000*60*30 );
     mqtt_connect_azure();
 }
 static void link_down( void *arg)
@@ -31,6 +32,7 @@ void application_start( void )
 {
     wiced_init();
     dct_app_load();
+    mqtt_config_read();
     print_wifi_config_dct();
     uart_init();
     wifi_status_change(0);

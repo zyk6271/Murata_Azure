@@ -12,7 +12,7 @@
 
 iot_sample_environment_variables env_vars;
 az_iot_hub_client hub_client;
-wiced_thread_t azure_serv_t = NULL;
+wiced_thread_t azure_serv_t;
 
 wiced_semaphore_t azure_refresh_sem;
 
@@ -26,12 +26,12 @@ void azure_serv_callback( uint32_t arg )
     while ( 1 )
     {
         wiced_rtos_get_semaphore( &azure_refresh_sem, WICED_WAIT_FOREVER );
-        config_get();
-        info_get();
-        twin_upload();
-//        get_device_twin_document();
-        telemetry_upload();
+//        config_get();
+//        info_get();
+//        twin_upload();
+        get_device_twin_document();
         wifi_status_change(3);
+        telemetry_request();
     }
 }
 void azure_env_init(void)
@@ -51,7 +51,6 @@ void azure_env_init(void)
 void azure_start(void)
 {
     wiced_rtos_init_semaphore( &azure_refresh_sem );
-    mqtt_config_read();
     azure_env_init();
-    wiced_rtos_create_thread( &azure_serv_t, 8, "azure_serv", azure_serv_callback, 8192, 0 );
+    wiced_rtos_create_thread( &azure_serv_t, 7, "azure_serv", azure_serv_callback, 8192, 0 );
 }

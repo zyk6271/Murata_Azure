@@ -21,7 +21,7 @@
 wiced_mqtt_object_t mqtt_object;
 extern az_iot_hub_client hub_client;
 
-EventGroupHandle_t MQTT_EventHandler;
+wiced_event_flags_t MQTT_EventHandler;
 
 char* endpoint_adress = NULL;
 char* device_id = NULL;
@@ -36,7 +36,7 @@ char* endpoint_key = NULL;
 #define MQTT_TYPE_PUBLISH_MSG_EVENT         1<<5
 #define MQTT_TYPE_RECEIVED_MSG_EVENT        1<<6
 
-static wiced_ip_address_t    broker_address;
+static wiced_ip_address_t broker_address = {0};
 static wiced_mqtt_callback_t callbacks = mqtt_connection_event_cb;
 static wiced_mqtt_security_t security;
 
@@ -47,6 +47,13 @@ int WICED_MQTT_RETRY_COUNT=                 (3);
 int MQTT_MAX_RESOURCE_SIZE=                 (0x7fffffff);
 char USERNAME[]=                            "NULL";
 char PASSWORD[]=                            "NULL";
+
+//#define MQTT_BROKER_ADDRESS                 "SYRKR.azure-devices.net"
+//#define CLIENT_ID                           "syr_1"
+//#define WICED_MQTT_TIMEOUT                  (3000)
+//#define MQTT_MAX_RESOURCE_SIZE              (0x7fffffff)
+//#define USERNAME                           "SYRKR.azure-devices.net/syr_1/?api-version=2020-09-30"
+//#define PASSWORD                           "SharedAccessSignature sr=SYRKR.azure-devices.net%2Fdevices%2Fsyr_1&sig=R%2B6FcDtPHSHo7muafCA3oGWd3iNDquVSXmOcuFoE4Gw%3D&se=36001654129759"
 
 void handle_iot_message(wiced_mqtt_topic_msg_t* msg)
 {
@@ -104,26 +111,24 @@ wiced_result_t mqtt_connection_event_cb( wiced_mqtt_object_t mqtt_object, wiced_
     {
 
         case WICED_MQTT_EVENT_TYPE_CONNECT_REQ_STATUS:
-            xEventGroupSetBits(MQTT_EventHandler,MQTT_TYPE_CONNECT_REQ_EVENT);
+            wiced_rtos_set_event_flags(&MQTT_EventHandler,MQTT_TYPE_CONNECT_REQ_EVENT);
             break;
         case WICED_MQTT_EVENT_TYPE_DISCONNECTED:
-            xEventGroupSetBits(MQTT_EventHandler,MQTT_TYPE_DISCONNECTED_EVENT);
-            WPRINT_APP_INFO(( "WICED_MQTT_EVENT_TYPE_DISCONNECTED\n\n" ));
+            wiced_rtos_set_event_flags(&MQTT_EventHandler,MQTT_TYPE_DISCONNECTED_EVENT);
             break;
         case WICED_MQTT_EVENT_TYPE_PUBLISHED:
-            xEventGroupSetBits(MQTT_EventHandler,MQTT_TYPE_PUBLISHED_EVENT);
+            wiced_rtos_set_event_flags(&MQTT_EventHandler,MQTT_TYPE_PUBLISHED_EVENT);
             break;
         case WICED_MQTT_EVENT_TYPE_SUBSCRIBED:
-            xEventGroupSetBits(MQTT_EventHandler,MQTT_TYPE_SUBSCRIBED_EVENT);
+            wiced_rtos_set_event_flags(&MQTT_EventHandler,MQTT_TYPE_SUBSCRIBED_EVENT);
             break;
         case WICED_MQTT_EVENT_TYPE_UNSUBSCRIBED:
-            xEventGroupSetBits(MQTT_EventHandler,MQTT_TYPE_UNSUBSCRIBED_EVENT);
+            wiced_rtos_set_event_flags(&MQTT_EventHandler,MQTT_TYPE_UNSUBSCRIBED_EVENT);
             break;
         case WICED_MQTT_EVENT_TYPE_PUBLISH_MSG_RECEIVED:
         {
-            xEventGroupSetBits(MQTT_EventHandler,MQTT_TYPE_RECEIVED_MSG_EVENT);
+            wiced_rtos_set_event_flags(&MQTT_EventHandler,MQTT_TYPE_RECEIVED_MSG_EVENT);
             wiced_mqtt_topic_msg_t msg = event->data.pub_recvd;
-//            WPRINT_APP_INFO(( "[MQTT] Received %.*s  for TOPIC : %.*s\n\n", (int) msg.data_len, msg.data, (int) msg.topic_len, msg.topic ));
             handle_iot_message(&msg);
         }
             break;
@@ -134,9 +139,8 @@ wiced_result_t mqtt_connection_event_cb( wiced_mqtt_object_t mqtt_object, wiced_
 }
 wiced_result_t mqtt_conn_open( wiced_mqtt_object_t mqtt_obj, wiced_ip_address_t *address, wiced_interface_t interface, wiced_mqtt_callback_t callback, wiced_mqtt_security_t *security )
 {
-    EventBits_t EventValue;
+    uint32_t ret,events;
     wiced_mqtt_pkt_connect_t conninfo;
-    wiced_result_t ret = WICED_SUCCESS;
 
     memset( &conninfo, 0, sizeof( conninfo ) );
 
@@ -144,10 +148,11 @@ wiced_result_t mqtt_conn_open( wiced_mqtt_object_t mqtt_obj, wiced_ip_address_t 
     conninfo.mqtt_version = WICED_MQTT_PROTOCOL_VER4;
     conninfo.clean_session = 0;
     conninfo.client_id = (uint8_t*) device_id;
-    conninfo.keep_alive = 240;
+    conninfo.keep_alive = 60;
     conninfo.username = (uint8_t*)endpoint_user;
     conninfo.password = (uint8_t*)endpoint_key;
     conninfo.peer_cn = NULL;
+
 
     ret = wiced_mqtt_connect( mqtt_obj, address, interface, callback, security, &conninfo );
     if ( ret != WICED_SUCCESS )
@@ -155,8 +160,8 @@ wiced_result_t mqtt_conn_open( wiced_mqtt_object_t mqtt_obj, wiced_ip_address_t 
         return WICED_ERROR;
     }
 
-    EventValue = xEventGroupWaitBits(MQTT_EventHandler,MQTT_TYPE_CONNECT_REQ_EVENT,pdTRUE,pdTRUE,WICED_MQTT_TIMEOUT);
-    if(EventValue & MQTT_TYPE_CONNECT_REQ_EVENT)
+    ret = wiced_rtos_wait_for_event_flags(&MQTT_EventHandler,MQTT_TYPE_CONNECT_REQ_EVENT, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,WICED_MQTT_TIMEOUT);
+    if(events & MQTT_TYPE_CONNECT_REQ_EVENT)
     {
         return WICED_SUCCESS;
     }
@@ -168,7 +173,7 @@ wiced_result_t mqtt_conn_open( wiced_mqtt_object_t mqtt_obj, wiced_ip_address_t 
 
 wiced_result_t mqtt_app_subscribe( wiced_mqtt_object_t mqtt_obj, char *topic, uint8_t qos )
 {
-    EventBits_t EventValue;
+    uint32_t ret,events;
     wiced_mqtt_msgid_t pktid;
     pktid = wiced_mqtt_subscribe( mqtt_obj, topic, qos );
     if ( pktid == 0 )
@@ -176,8 +181,8 @@ wiced_result_t mqtt_app_subscribe( wiced_mqtt_object_t mqtt_obj, char *topic, ui
         return WICED_ERROR;
     }
 
-    EventValue = xEventGroupWaitBits(MQTT_EventHandler,MQTT_TYPE_SUBSCRIBED_EVENT,pdTRUE,pdTRUE,WICED_MQTT_TIMEOUT);
-    if(EventValue & MQTT_TYPE_SUBSCRIBED_EVENT)
+    ret = wiced_rtos_wait_for_event_flags(&MQTT_EventHandler,MQTT_TYPE_SUBSCRIBED_EVENT, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,WICED_MQTT_TIMEOUT);
+    if(events & MQTT_TYPE_SUBSCRIBED_EVENT)
     {
         return WICED_SUCCESS;
     }
@@ -189,7 +194,7 @@ wiced_result_t mqtt_app_subscribe( wiced_mqtt_object_t mqtt_obj, char *topic, ui
 
 wiced_result_t mqtt_app_publish( wiced_mqtt_object_t mqtt_obj, uint8_t qos, char *topic, uint8_t *data, uint32_t data_len )
 {
-    EventBits_t EventValue;
+    uint32_t ret,events;
     wiced_mqtt_msgid_t pktid;
     pktid = wiced_mqtt_publish( mqtt_obj, topic, data, data_len, qos );
 
@@ -198,8 +203,8 @@ wiced_result_t mqtt_app_publish( wiced_mqtt_object_t mqtt_obj, uint8_t qos, char
         return WICED_ERROR;
     }
 
-    EventValue = xEventGroupWaitBits(MQTT_EventHandler,MQTT_TYPE_PUBLISH_MSG_EVENT,pdTRUE,pdTRUE,WICED_MQTT_TIMEOUT);
-    if(EventValue & MQTT_TYPE_PUBLISH_MSG_EVENT)
+    ret = wiced_rtos_wait_for_event_flags(&MQTT_EventHandler,MQTT_TYPE_PUBLISH_MSG_EVENT, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,WICED_MQTT_TIMEOUT);
+    if(events & MQTT_TYPE_PUBLISH_MSG_EVENT)
     {
         return WICED_SUCCESS;
     }
@@ -213,18 +218,20 @@ uint8_t mqtt_resolve(void)
     wiced_result_t ret = WICED_SUCCESS;
     for(uint8_t i=0;i<WICED_MQTT_RETRY_COUNT;i++)
     {
-        WPRINT_APP_INFO( ( "Resolving IP address of MQTT broker...\n" ) );
-        ret = wiced_hostname_lookup( endpoint_adress, &broker_address, WICED_MQTT_TIMEOUT, WICED_STA_INTERFACE );
-        WPRINT_APP_INFO(("Resolved Broker IP: %u.%u.%u.%u\n\n", (uint8_t)(GET_IPV4_ADDRESS(broker_address) >> 24),
-                         (uint8_t)(GET_IPV4_ADDRESS(broker_address) >> 16),
-                         (uint8_t)(GET_IPV4_ADDRESS(broker_address) >> 8),
-                         (uint8_t)(GET_IPV4_ADDRESS(broker_address) >> 0)));
-        if ( ret == WICED_ERROR || broker_address.ip.v4 == 0 )
+        wiced_ip_address_t reslove_address = {0};
+        WPRINT_APP_INFO( ( "Resolving IP address of MQTT broker of %s...\n",endpoint_adress ) );
+        ret = wiced_hostname_lookup( endpoint_adress, &reslove_address, WICED_MQTT_TIMEOUT, WICED_STA_INTERFACE );
+        WPRINT_APP_INFO(("Resolved Broker IP: %u.%u.%u.%u\n\n", (uint8_t)(GET_IPV4_ADDRESS(reslove_address) >> 24),
+                         (uint8_t)(GET_IPV4_ADDRESS(reslove_address) >> 16),
+                         (uint8_t)(GET_IPV4_ADDRESS(reslove_address) >> 8),
+                         (uint8_t)(GET_IPV4_ADDRESS(reslove_address) >> 0)));
+        if ( ret == WICED_ERROR || reslove_address.ip.v4 == 0 )
         {
             WPRINT_APP_INFO(("Error in resolving DNS\n"));
         }
         else
         {
+            memcpy(&broker_address,&reslove_address,sizeof(wiced_ip_address_t));
             return WICED_SUCCESS;
         }
         wiced_rtos_delay_milliseconds(2000);
@@ -292,20 +299,33 @@ uint8_t mqtt_start_subsribe(void)
 __success:
     return WICED_SUCCESS;
 }
-void mqtt_deinit(void)
+extern uint8_t mqtt_status;
+void mqtt_stop(void)
 {
-    extern uint8_t mqtt_status;
+    mqtt_connection_t *conn = (mqtt_connection_t*) mqtt_object;
     if(mqtt_status)
     {
         mqtt_status = 0;
-        wiced_mqtt_deinit(mqtt_object);
+        mqtt_backend_connection_close( conn );
     }
+}
+static void mqtt_start(void)
+{
+    if(mqtt_status == 0)
+    {
+        mqtt_status = 1;
+    }
+}
+static void mqtt_restart(void)
+{
+    mqtt_stop();
+    mqtt_start();
 }
 void mqtt_connect_azure(void)
 {
     wiced_result_t ret = WICED_SUCCESS;
 
-    wiced_mqtt_init( mqtt_object );
+    mqtt_restart();
 
     ret = mqtt_resolve();
     if(ret != WICED_SUCCESS)
@@ -386,9 +406,13 @@ void signature_generate(char *pass, char*host, char *devname, char *key, char *t
     strcat(pass, time_exp);
     strcat(pass, "&skn=");
 }
+char *murata_id_read(void)
+{
+    return device_id;
+}
 void mqtt_config_read(void)
 {
-    user_app_t *app_t = calloc(sizeof(user_app_t), sizeof(char));
+    platform_dct_azure_config_t *app_t = calloc(sizeof(platform_dct_azure_config_t), sizeof(char));
     dct_app_all_read(&app_t);
     if(app_t->init_flag==1)
     {
@@ -429,12 +453,8 @@ void mqtt_init(void)
     resource_get_readonly_buffer( &resources_apps_DIR_azure_iot_hub_DIR_rootca_cer, 0, MQTT_MAX_RESOURCE_SIZE, &size_out, (const void **) &security.ca_cert );
     security.ca_cert_len = size_out;
 
-    MQTT_EventHandler = xEventGroupCreate();
+    wiced_rtos_init_event_flags(&MQTT_EventHandler);
 
     mqtt_object = (wiced_mqtt_object_t) malloc( WICED_MQTT_OBJECT_MEMORY_SIZE_REQUIREMENT );
-    if ( mqtt_object == NULL )
-    {
-        WPRINT_APP_ERROR(("Dont have memory to allocate for mqtt object...\n"));
-    }
     wiced_mqtt_init( mqtt_object );
 }

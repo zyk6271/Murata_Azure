@@ -184,7 +184,7 @@ wiced_result_t wiced_init( void )
     wwd_time_t elapsed_time;
 
     WPRINT_WICED_INFO( ("\nStarting WICED " WICED_VERSION "\n") );
-    wiced_rtos_delay_milliseconds(2000);
+    //wiced_rtos_delay_milliseconds(2000);
 
     CHECK_RETURN( wiced_core_init( ) );
 
@@ -250,7 +250,6 @@ wiced_result_t wiced_wlan_connectivity_init( void )
 {
     wiced_result_t              result;
     platform_dct_wifi_config_t* wifi_config;
-    platform_dct_misc_config_t* dct_misc;
     uint32_t                    wlan_rand;
     wiced_bool_t                random_seed_needed = WICED_TRUE;
 
@@ -269,14 +268,12 @@ wiced_result_t wiced_wlan_connectivity_init( void )
 
     /* Initialise Wiced */
     CHECK_RETURN( wiced_dct_read_lock( (void**) &wifi_config, WICED_FALSE, DCT_WIFI_CONFIG_SECTION, 0, sizeof(platform_dct_wifi_config_t) ) );
-    CHECK_RETURN( wiced_dct_read_lock( (void**) &dct_misc, WICED_FALSE, DCT_MISC_SECTION, 0, sizeof(platform_dct_misc_config_t) ) );
 
     if (wifi_config->device_configured == WICED_TRUE)
     {
         country_code = wifi_config->country_code;
     }
     wiced_dct_read_unlock( wifi_config, WICED_FALSE );
-    wiced_dct_read_unlock( dct_misc, WICED_FALSE );
     WPRINT_NETWORK_DEBUG( ( "WWD " BUS " interface initializing with %c%c/%d\n",
          ((country_code) >>  0) & 0xff, ((country_code) >>  8) & 0xff, ((country_code) >> 16) & 0xffff) );
 

@@ -1,7 +1,7 @@
 /*
- * Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of 
+ * Copyright 2020, Cypress Semiconductor Corporation or a subsidiary of
  * Cypress Semiconductor Corporation. All Rights Reserved.
- * 
+ *
  * This software, associated documentation and materials ("Software"),
  * is owned by Cypress Semiconductor Corporation
  * or one of its subsidiaries ("Cypress") and is protected by and subject to
@@ -66,7 +66,7 @@ extern "C" {
  *----------------------------------------------------------*/
 
 #define configNO_MALLOC                             ( 0 )
-#define configUSE_NEWLIB_MALLOC_LOCK                ( 1 )
+#define configUSE_NEWLIB_MALLOC_LOCK                ( 0 )
 #define configUSE_TIMERS                            ( 1 )
 #define configTIMER_TASK_PRIORITY                   ( 7 )
 #define configTIMER_QUEUE_LENGTH                    ( 5 )
@@ -74,6 +74,7 @@ extern "C" {
 #define configUSE_PREEMPTION                        ( 1 )
 #define configUSE_IDLE_HOOK                         ( 0 )
 #define configUSE_TICK_HOOK                         ( 0 )
+#define configTOTAL_HEAP_SIZE                        ( ( size_t ) ( 128 * 1024 ) )
 #define configCPU_CLOCK_HZ                          ( ( unsigned long ) CPU_CLOCK_HZ )
 #define configTICK_RATE_HZ                          ( ( TickType_t ) SYSTICK_FREQUENCY )
 #define configMAX_PRIORITIES                        ( 10 )

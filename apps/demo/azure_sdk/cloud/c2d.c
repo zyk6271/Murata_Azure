@@ -11,7 +11,7 @@
 
 extern az_iot_hub_client hub_client;
 extern wiced_mqtt_object_t mqtt_object;
-extern EventGroupHandle_t C2D_EventHandler;
+extern wiced_event_flags_t C2D_EventHandler;
 
 static az_span const type_name = AZ_SPAN_LITERAL_FROM_STR("type");
 static az_span const rst_name = AZ_SPAN_LITERAL_FROM_STR("rstStart");
@@ -34,7 +34,7 @@ void parse_c2d_message(
     az_iot_hub_client_c2d_request* out_c2d_request)
 {
    char string_temp[32];
-   EventBits_t EventValue;
+   uint32_t result,events;
    uint32_t real_size;
    uint8_t type_found=0;
    uint8_t command_found=0;
@@ -79,8 +79,8 @@ void parse_c2d_message(
         command_found = 1;
         IOT_SAMPLE_LOG_SUCCESS("parse rst ok");
         wifi_uart_write_command_value(RST_SET_CMD,1);
-        EventValue = xEventGroupWaitBits(C2D_EventHandler,EVENT_C2D_RST_SET,pdTRUE,pdTRUE,100);
-        if(EventValue & EVENT_C2D_RST_SET)
+        result = wiced_rtos_wait_for_event_flags(&C2D_EventHandler,EVENT_C2D_RST_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+        if(events & EVENT_C2D_RST_SET)
         {
             IOT_SAMPLE_LOG_SUCCESS("SET RST OK\r\n");
         }
@@ -91,8 +91,8 @@ void parse_c2d_message(
         command_found = 1;
         IOT_SAMPLE_LOG_SUCCESS("parse def ok");
         wifi_uart_write_command_value(DEF_SET_CMD,1);
-        EventValue = xEventGroupWaitBits(C2D_EventHandler,EVENT_C2D_DEF_SET,pdTRUE,pdTRUE,100);
-        if(EventValue & EVENT_C2D_DEF_SET)
+        result = wiced_rtos_wait_for_event_flags(&C2D_EventHandler,EVENT_C2D_DEF_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+        if(events & EVENT_C2D_DEF_SET)
         {
             IOT_SAMPLE_LOG_SUCCESS("SET DEF OK\r\n");
             c2d_reponse(1,1);
@@ -104,8 +104,8 @@ void parse_c2d_message(
         command_found = 1;
         IOT_SAMPLE_LOG_SUCCESS("parse ras ok");
         wifi_uart_write_command_value(RAS_SET_CMD,1);
-        EventValue = xEventGroupWaitBits(C2D_EventHandler,EVENT_C2D_RAS_SET,pdTRUE,pdTRUE,100);
-        if(EventValue & EVENT_C2D_RAS_SET)
+        result = wiced_rtos_wait_for_event_flags(&C2D_EventHandler,EVENT_C2D_RAS_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+        if(events & EVENT_C2D_RAS_SET)
         {
             IOT_SAMPLE_LOG_SUCCESS("SET RAS OK\r\n");
             c2d_reponse(2,1);
@@ -142,15 +142,15 @@ void c2d_reponse(uint8_t type,uint8_t source)
     az_json_writer_append_property_name(&jw, event_span);
     switch(type)
     {
-    case 0:az_json_writer_append_string(&jw,event_rst_span);break;
-    case 1:az_json_writer_append_string(&jw,event_def_span);break;
-    case 2:az_json_writer_append_string(&jw,event_ras_span);break;
+        case 0:az_json_writer_append_string(&jw,event_rst_span);break;
+        case 1:az_json_writer_append_string(&jw,event_def_span);break;
+        case 2:az_json_writer_append_string(&jw,event_ras_span);break;
     }
     az_json_writer_append_property_name(&jw, triggered_span);
     switch(source)
     {
-    case 0:az_json_writer_append_string(&jw,device_span);break;
-    case 1:az_json_writer_append_string(&jw,cloud_span);break;
+        case 0:az_json_writer_append_string(&jw,device_span);break;
+        case 1:az_json_writer_append_string(&jw,cloud_span);break;
     }
     az_json_writer_append_end_object(&jw);
     out_payload = az_json_writer_get_bytes_used_in_destination(&jw);

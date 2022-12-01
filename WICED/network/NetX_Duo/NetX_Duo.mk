@@ -52,6 +52,14 @@ GLOBAL_DEFINES += $(NAME)_VERSION=$$(SLASH_QUOTE_START)v$(NETX_DUO_VERSION)$$(SL
 # prevent sending reset for non-blocking disconnect
 GLOBAL_DEFINES += NX_INCLUDE_USER_DEFINE_FILE
 
+GLOBAL_DEFINES += NX_ENABLE_IP_RAW_PACKET_FILTER
+GLOBAL_DEFINES += NX_BSD_ENABLE_DNS
+GLOBAL_DEFINES += ENABLE_NXD_BSD_SOCKET
+
+
+$(NAME)_SOURCES += ver$(NETX_DUO_VERSION)/netx_bsd_layer/nxd_bsd.c
+$(NAME)_SOURCES += ver$(NETX_DUO_VERSION)/netx_applications/dns/nxd_dns.c
+
 ifneq ($(WICED_NETTYPE),ROM)
 GLOBAL_INCLUDES := ver$(NETX_DUO_VERSION) \
                    ver$(NETX_DUO_VERSION)/netx_bsd_layer \
