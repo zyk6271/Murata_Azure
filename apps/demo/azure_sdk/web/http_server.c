@@ -77,11 +77,13 @@ void http_start( uint8_t value )
         http_status = value;
         if(value)
         {
+            wifi_status_change(5);
             wiced_network_up(WICED_AP_INTERFACE, WICED_USE_INTERNAL_DHCP_SERVER, &ip_settings);
             wiced_http_server_start( &syr_server, 5333, MAX_SOCKETS, web_pages, WICED_AP_INTERFACE, DEFAULT_URL_PROCESSOR_STACK_SIZE );
         }
         else
         {
+            wifi_status_change(4);
             wiced_http_server_stop(&syr_server);
             wiced_network_down(WICED_AP_INTERFACE);
         }
