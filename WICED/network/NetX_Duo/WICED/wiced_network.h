@@ -68,9 +68,9 @@ extern "C"
 #define SIZE_OF_ARP_ENTRY                   sizeof(NX_ARP)
 
 #ifdef DEBUG
-#define IP_STACK_SIZE                       (3*1024)
+#define IP_STACK_SIZE                       (4*1024)
 #else
-#define IP_STACK_SIZE                       (2*1024)
+#define IP_STACK_SIZE                       (4*1024)
 #endif
 #define ARP_CACHE_SIZE                      (6 * SIZE_OF_ARP_ENTRY)
 #define DHCP_STACK_SIZE                     (1280)
@@ -86,7 +86,7 @@ extern "C"
 
 #define WICED_MAXIMUM_SEGMENT_SIZE(socket)  (socket->socket.nx_tcp_socket_connect_mss)
 
-#define WICED_NUM_PACKET_POOLS 2
+#define WICED_NUM_PACKET_POOLS 3
 /******************************************************
  *                   Enumerations
  ******************************************************/
@@ -188,6 +188,7 @@ extern NX_PACKET_POOL wiced_packet_pools[WICED_NUM_PACKET_POOLS];
 
 extern wiced_bool_t wiced_network_interface_is_up( NX_IP* ip_handle );
 extern wiced_result_t wiced_init_autoipv6( wiced_interface_t interface );
+extern wiced_result_t wiced_dns_init( wiced_interface_t interface );
 
 #ifdef __cplusplus
 } /*extern "C" */

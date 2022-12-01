@@ -62,6 +62,11 @@ wiced_result_t mqtt_core_init( mqtt_connection_t *conn )
     wiced_result_t result = WICED_SUCCESS;
     mqtt_socket_t *mqtt_socket = &conn->socket;
 
+    if(conn->core_init == WICED_TRUE)
+    {
+        return WICED_TRUE;
+    }
+
     if ( ( result = wiced_rtos_init_queue( &mqtt_socket->queue, "Mqtt library queue", sizeof(mqtt_event_message_t), WICED_MQTT_QUEUE_SIZE ) ) != WICED_SUCCESS )
     {
         WPRINT_LIB_INFO(("[MQTT LIB] Initializing queue failed\n"));
@@ -707,7 +712,7 @@ exit:
     }
     wiced_rtos_unlock_mutex( &conn->lock );
 }
-extern void mqtt_reconnect_release(void);
+extern void mqtt_disconnect_callabck(void);
 static void mqtt_thread_main( uint32_t arg )
 {
     mqtt_connection_t *conn = (mqtt_connection_t*)arg;
@@ -736,7 +741,7 @@ static void mqtt_thread_main( uint32_t arg )
                 break;
 
             case MQTT_DISCONNECT_EVENT:
-                mqtt_reconnect_release();
+                mqtt_disconnect_callabck();
                 break;
 
             default:

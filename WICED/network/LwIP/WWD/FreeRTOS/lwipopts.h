@@ -76,6 +76,8 @@
 extern "C" {
 #endif
 
+
+
 /**
  * MEM_ALIGNMENT: should be set to the alignment of the CPU
  *    4 byte alignment -> #define MEM_ALIGNMENT 4
@@ -94,6 +96,19 @@ extern "C" {
  * already use it.
  */
 #define MEM_LIBC_MALLOC                (1)
+
+
+#define MEMP_MEM_MALLOC                (0)
+
+
+#define MEM_USE_POOLS                  (0)
+
+
+#define MEMP_USE_CUSTOM_POOLS          (0)
+
+#define MEMP_NUM_PBUF                   64
+
+
 
 /**
  * MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
@@ -312,7 +327,7 @@ extern "C" {
 /**
  * TCP_LISTEN_BACKLOG: Enable the backlog option for tcp listen pcb.
  */
-#define TCP_LISTEN_BACKLOG     (1)
+#define TCP_LISTEN_BACKLOG             (1)
 
 /**
  * LWIP_DHCP==1: Enable DHCP module.

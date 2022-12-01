@@ -556,7 +556,8 @@ typedef struct TX_THREAD_STRUCT
        to white space, but some ports of ThreadX may need to have 
        additional fields in the thread control block.  This is 
        defined in the file tx_port.h.  */
-    TX_THREAD_USER_EXTENSION
+    //TX_THREAD_USER_EXTENSION  
+    int thread_errno;  
 
 } TX_THREAD;
 

@@ -44,7 +44,7 @@ inline static void mqtt_manager_heartbeat_send_reset( mqtt_heartbeat_t *heartbea
 inline static void mqtt_manager_heartbeat_recv_reset( mqtt_heartbeat_t *heartbeat );
 inline static wiced_result_t mqtt_manager_heartbeat_send_step( mqtt_heartbeat_t *heartbeat );
 inline static wiced_result_t mqtt_manager_heartbeat_recv_step( mqtt_heartbeat_t *heartbeat );
-static void mqtt_manager_heartbeat_deinit( mqtt_heartbeat_t *heartbeat );
+void mqtt_manager_heartbeat_deinit( mqtt_heartbeat_t *heartbeat );
 
 /******************************************************
  *               Variable Definitions
@@ -109,7 +109,7 @@ inline static wiced_result_t mqtt_manager_heartbeat_recv_step( mqtt_heartbeat_t 
     return ( heartbeat->recv_counter == 0 ) ? WICED_ERROR : WICED_SUCCESS;
 }
 
-static void mqtt_manager_heartbeat_deinit( mqtt_heartbeat_t *heartbeat )
+void mqtt_manager_heartbeat_deinit( mqtt_heartbeat_t *heartbeat )
 {
     wiced_rtos_deregister_timed_event( &heartbeat->timer );
 }

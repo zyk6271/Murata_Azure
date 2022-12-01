@@ -2,6 +2,7 @@
 #include "uart_core.h"
 #include "twin_upload.h"
 #include "twin_parse.h"
+#include "system.h"
 
 volatile unsigned char wifi_data_process_buf[PROTOCOL_HEAD + WIFI_DATA_PROCESS_LMT];      //串口数据处理缓存
 volatile unsigned char wifi_uart_rx_buf[PROTOCOL_HEAD + WIFI_UART_RECV_BUF_LMT];          //串口接收缓存
@@ -10,13 +11,79 @@ volatile unsigned char wifi_uart_tx_buf[PROTOCOL_HEAD + WIFIR_UART_SEND_BUF_LMT]
 volatile unsigned char *queue_in = NULL;
 volatile unsigned char *queue_out = NULL;
 
-extern uint8_t ap_flag;
-extern syr_status device_status;
-extern EventGroupHandle_t Config_EventHandler;
-extern EventGroupHandle_t Info_EventHandler;
-extern EventGroupHandle_t TEM_EventHandler;
-extern EventGroupHandle_t C2D_EventHandler;
+extern unsigned char stop_update_flag;
 
+typedef struct {
+    unsigned char dp_id;
+    unsigned char dp_type;
+} DOWNLOAD_CMD_S;
+
+const DOWNLOAD_CMD_S download_cmd[] =
+{
+    {RST_SET_CMD , DP_TYPE_VALUE},
+    {DEF_SET_CMD , DP_TYPE_VALUE},
+    {RAS_SET_CMD , DP_TYPE_VALUE},
+    {RAS_GET_CMD , DP_TYPE_VALUE},
+    {RAS_PUT_CMD , DP_TYPE_VALUE},
+    {CND_GET_CMD , DP_TYPE_VALUE},
+    {NET_GET_CMD , DP_TYPE_VALUE},
+    {BAT_GET_CMD , DP_TYPE_VALUE},
+    {ALA_GET_CMD , DP_TYPE_VALUE},
+    {ALA_SET_CMD , DP_TYPE_VALUE},
+    {ALR_GET_CMD , DP_TYPE_VALUE},
+    {ALR_SET_CMD , DP_TYPE_VALUE},
+    {RSE_SET_CMD , DP_TYPE_VALUE},
+    {RSE_GET_CMD , DP_TYPE_VALUE},
+    {RSE_PUT_CMD , DP_TYPE_VALUE},
+    {RSA_SET_CMD , DP_TYPE_VALUE},
+    {RSA_GET_CMD , DP_TYPE_VALUE},
+    {RSA_PUT_CMD , DP_TYPE_VALUE},
+    {RSI_SET_CMD , DP_TYPE_VALUE},
+    {RSI_GET_CMD , DP_TYPE_VALUE},
+    {RSI_PUT_CMD , DP_TYPE_VALUE},
+    {RSD_SET_CMD , DP_TYPE_VALUE},
+    {RSD_GET_CMD , DP_TYPE_VALUE},
+    {RSD_PUT_CMD , DP_TYPE_VALUE},
+    {CNF_SET_CMD , DP_TYPE_VALUE},
+    {CNF_GET_CMD , DP_TYPE_VALUE},
+    {CNF_PUT_CMD , DP_TYPE_VALUE},
+    {CNL_SET_CMD , DP_TYPE_VALUE},
+    {CNL_GET_CMD , DP_TYPE_VALUE},
+    {CNL_PUT_CMD , DP_TYPE_VALUE},
+    {SSE_SET_CMD , DP_TYPE_VALUE},
+    {SSE_GET_CMD , DP_TYPE_VALUE},
+    {SSE_PUT_CMD , DP_TYPE_VALUE},
+    {SSA_SET_CMD , DP_TYPE_VALUE},
+    {SSA_GET_CMD , DP_TYPE_VALUE},
+    {SSA_PUT_CMD , DP_TYPE_VALUE},
+    {SSD_SET_CMD , DP_TYPE_VALUE},
+    {SSD_GET_CMD , DP_TYPE_VALUE},
+    {SSD_PUT_CMD , DP_TYPE_VALUE},
+    {LNG_SET_CMD , DP_TYPE_VALUE},
+    {LNG_GET_CMD , DP_TYPE_VALUE},
+    {LNG_PUT_CMD , DP_TYPE_VALUE},
+    {SUP_GET_CMD , DP_TYPE_VALUE},
+    {SUP_PUT_CMD , DP_TYPE_VALUE},
+    {COM_SET_CMD , DP_TYPE_VALUE},
+    {COM_GET_CMD , DP_TYPE_VALUE},
+    {COM_PUT_CMD , DP_TYPE_VALUE},
+    {COA_SET_CMD , DP_TYPE_VALUE},
+    {COA_GET_CMD , DP_TYPE_VALUE},
+    {COA_PUT_CMD , DP_TYPE_VALUE},
+    {COD_SET_CMD , DP_TYPE_VALUE},
+    {COD_GET_CMD , DP_TYPE_VALUE},
+    {COD_PUT_CMD , DP_TYPE_VALUE},
+    {COE_SET_CMD , DP_TYPE_VALUE},
+    {COE_GET_CMD , DP_TYPE_VALUE},
+    {COE_PUT_CMD , DP_TYPE_VALUE},
+    {CND_PUT_CMD , DP_TYPE_VALUE},
+    {WST_GET_CMD , DP_TYPE_VALUE},
+    {WST_SET_CMD , DP_TYPE_VALUE},
+    {EMR_SET_CMD , DP_TYPE_VALUE},
+    {EMR_GET_CMD , DP_TYPE_VALUE},
+    {RCP_SET_CMD , DP_TYPE_VALUE},
+    {RCP_GET_CMD , DP_TYPE_VALUE},
+};
 unsigned long my_strlen(unsigned char *str)
 {
     unsigned long len = 0;
@@ -117,6 +184,61 @@ int my_strcmp(char *s1 , char *s2)
     }
     return *s1 - *s2;
 }
+
+/**
+ * @brief  将int类型拆分四个字节
+ * @param[in] {number} 4字节原数据
+ * @param[out] {value} 处理完成后4字节数据
+ * @return Null
+ */
+void int_to_byte(unsigned long number,unsigned char value[4])
+{
+    value[0] = number >> 24;
+    value[1] = number >> 16;
+    value[2] = number >> 8;
+    value[3] = number & 0xff;
+}
+/**
+ * @brief  将4字节合并为1个32bit变量
+ * @param[in] {value} 4字节数组
+ * @return 合并完成后的32bit变量
+ */
+unsigned long byte_to_int(const unsigned char value[4])
+{
+    unsigned long nubmer = 0;
+
+    nubmer = (unsigned long)value[0];
+    nubmer <<= 8;
+    nubmer |= (unsigned long)value[1];
+    nubmer <<= 8;
+    nubmer |= (unsigned long)value[2];
+    nubmer <<= 8;
+    nubmer |= (unsigned long)value[3];
+
+    return nubmer;
+}
+/**
+ * @brief  mcu获取bool型下发dp值
+ * @param[in] {value} dp数据缓冲区地址
+ * @param[in] {len} dp数据长度
+ * @return 当前dp值
+ * @note   Null
+ */
+unsigned char mcu_get_dp_download_bool(const unsigned char value[],unsigned short len)
+{
+    return(value[0]);
+}
+/**
+ * @brief  mcu获取value型下发dp值
+ * @param[in] {value} dp数据缓冲区地址
+ * @param[in] {len} dp数据长度
+ * @return 当前dp值
+ * @note   Null
+ */
+unsigned long mcu_get_dp_download_value(const unsigned char value[],unsigned short len)
+{
+    return(byte_to_int(value));
+}
 /**
  * @brief  写wifi_uart字节
  * @param[in] {dest} 缓存区地址偏移
@@ -198,6 +320,66 @@ void wifi_uart_write_data(unsigned char *in, unsigned short len)
     }
 }
 /**
+ * @brief  value型dp数据上传
+ * @param[in] {dpid} dpid号
+ * @param[in] {value} 当前dp值
+ * @param[in] {sub_id_buf} 存放子设备id的首地址
+ * @param[in] {sub_id_len} 子设备id长度
+ * @return Null
+ * @note   Null
+ */
+unsigned char mcu_dp_value_update(unsigned char dpid,unsigned long value)
+{
+    unsigned short send_len = 0;
+
+//    if(stop_update_flag == ENABLE)
+//        return SUCCESS;
+
+    send_len = set_wifi_uart_byte(send_len,dpid);
+    send_len = set_wifi_uart_byte(send_len,DP_TYPE_VALUE);
+    //
+    send_len = set_wifi_uart_byte(send_len,0);
+    send_len = set_wifi_uart_byte(send_len,4);
+    //
+    send_len = set_wifi_uart_byte(send_len,value >> 24);
+    send_len = set_wifi_uart_byte(send_len,value >> 16);
+    send_len = set_wifi_uart_byte(send_len,value >> 8);
+    send_len = set_wifi_uart_byte(send_len,value & 0xff);
+
+    wifi_uart_write_frame(DATA_ISSUED_CMD, MCU_TX_VER, send_len);
+
+    return SUCCESS;
+}
+/**
+ * @brief  string型dp数据上传
+ * @param[in] {dpid} dpid号
+ * @param[in] {value} 当前dp值指针
+ * @param[in] {len} 数据长度
+ * @param[in] {sub_id_buf} 存放子设备id的首地址
+ * @param[in] {sub_id_len} 子设备id长度
+ * @return Null
+ * @note   Null
+ */
+unsigned char mcu_dp_string_update(unsigned char dpid,const unsigned char value[],unsigned short len)
+{
+    unsigned short send_len = 0;
+
+//    if(stop_update_flag == ENABLE)
+//        return SUCCESS;
+    //
+    send_len = set_wifi_uart_byte(send_len,dpid);
+    send_len = set_wifi_uart_byte(send_len,DP_TYPE_STRING);
+    //
+    send_len = set_wifi_uart_byte(send_len,len / 0x100);
+    send_len = set_wifi_uart_byte(send_len,len % 0x100);
+    //
+    send_len = set_wifi_uart_buffer(send_len,(unsigned char *)value,len);
+
+    wifi_uart_write_frame(STATE_UPLOAD_CMD, MCU_TX_VER, send_len);
+
+    return SUCCESS;
+}
+/**
  * @brief  向wifi串口发送指定数据
  * @param[in] {fr_type} 帧类型
  * @param[in] {len} 数据长度
@@ -205,24 +387,7 @@ void wifi_uart_write_data(unsigned char *in, unsigned short len)
  */
 void wifi_uart_write_command_value(unsigned char command, unsigned int data)
 {
-    unsigned char check_sum = 0;
-
-    wifi_uart_tx_buf[HEAD_FIRST] = 0x55;
-    wifi_uart_tx_buf[HEAD_SECOND] = 0xaa;
-    wifi_uart_tx_buf[PROTOCOL_VERSION] = 0;
-    wifi_uart_tx_buf[FRAME_TYPE] = command;
-    wifi_uart_tx_buf[LENGTH_HIGH] = 0x00;
-    wifi_uart_tx_buf[LENGTH_LOW] = 0x04;
-    wifi_uart_tx_buf[DATA_START] = (data >> 24) & 0xFF;
-    wifi_uart_tx_buf[DATA_START+1] = (data >> 16) & 0xFF;
-    wifi_uart_tx_buf[DATA_START+2] = (data >> 8) & 0xFF;
-    wifi_uart_tx_buf[DATA_START+3] = data & 0xff;
-
-    uint8_t len = PROTOCOL_HEAD + 4;
-    check_sum = get_check_sum((unsigned char *)wifi_uart_tx_buf, len - 1);
-    wifi_uart_tx_buf[len - 1] = check_sum;
-    //
-    wifi_uart_write_data((unsigned char *)wifi_uart_tx_buf, len);
+    mcu_dp_value_update(command,data);
 }
 /**
  * @brief  向wifi串口发送一帧数据
@@ -245,7 +410,7 @@ void wifi_uart_write_frame(unsigned char fr_type, unsigned char fr_ver, unsigned
     len += PROTOCOL_HEAD;
     check_sum = get_check_sum((unsigned char *)wifi_uart_tx_buf, len - 1);
     wifi_uart_tx_buf[len - 1] = check_sum;
-    //
+
     wifi_uart_write_data((unsigned char *)wifi_uart_tx_buf, len);
 }
 
@@ -345,10 +510,10 @@ void wifi_uart_service(void)
             continue;
         }
 
-        if(wifi_data_process_buf[offset + PROTOCOL_VERSION] != MCU_RX_VER) {
-            offset += 2;
-            continue;
-        }
+//        if(wifi_data_process_buf[offset + PROTOCOL_VERSION] != MCU_RX_VER) {
+//            offset += 2;
+//            continue;
+//        }
 
         rx_value_len = wifi_data_process_buf[offset + LENGTH_HIGH] * 0x100;
         rx_value_len += (wifi_data_process_buf[offset + LENGTH_LOW] + PROTOCOL_HEAD);
@@ -368,278 +533,118 @@ void wifi_uart_service(void)
             offset += 3;
             continue;
         }
-        if(rx_value_len - PROTOCOL_HEAD)
-        {
-            printf("Command is %02X,Len is %d,Data is ",wifi_data_process_buf[offset + FRAME_TYPE],rx_value_len - PROTOCOL_HEAD);
-            for(uint8_t i=0;i<rx_value_len - PROTOCOL_HEAD;i++)
-            {
-                printf("%02X ",wifi_data_process_buf[offset + DATA_START + i]);
-            }
-            printf("\r\n");
-        }
-        else
-        {
-            printf("Command is %02X,Len is 0\r\n",wifi_data_process_buf[offset + FRAME_TYPE]);
-        }
-
-        data_handle(offset,rx_value_len - PROTOCOL_HEAD);
+//        printf("Recv:====> ");
+//        for(uint8_t i=0;i < rx_value_len;i++)
+//        {
+//            printf("%02X ",wifi_data_process_buf[offset+i]);
+//        }
+//        printf(" <====\r\n");
+        data_handle(offset);
         offset += rx_value_len;
-    }//end while
+    }
 
     rx_in -= offset;
     if(rx_in > 0) {
         my_memcpy((char *)wifi_data_process_buf,(const char *)wifi_data_process_buf + offset,rx_in);
     }
 }
-void data_handle(unsigned short offset,uint32_t value_len)
+/**
+ * @brief  获取所有dp命令总和
+ * @param[in] Null
+ * @return 下发命令总和
+ * @note   该函数用户不能修改
+ */
+unsigned char get_download_cmd_total(void)
 {
-    uint32_t value = 0;
-    unsigned char cmd_type = wifi_data_process_buf[offset + FRAME_TYPE];
-    if(value_len)
-    {
-        value = wifi_data_process_buf[offset + DATA_START] * 0x1000000;
-        value += wifi_data_process_buf[offset + DATA_START + 1] * 0x10000;
-        value += wifi_data_process_buf[offset + DATA_START + 2] * 0x100;
-        value += wifi_data_process_buf[offset + DATA_START + 3];
-    }
-    switch(cmd_type)
-    {
-    case RSE_GET_CMD:
-        device_status.config.rse = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSE_GET);
-        break;
-    case RSE_SET_CMD:
-        device_status.config.rse = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSE_SET);
-        break;
-    case RSA_GET_CMD:
-        device_status.config.rsa = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSA_GET);
-        break;
-    case RSA_SET_CMD:
-        device_status.config.rsa = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSA_SET);
-        break;
-    case RSI_GET_CMD:
-        device_status.config.rsi = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSI_GET);
-        break;
-    case RSI_SET_CMD:
-        device_status.config.rsi = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSI_SET);
-        break;
-    case RSD_GET_CMD:
-        device_status.config.rsd = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSD_GET);
-        break;
-    case RSD_SET_CMD:
-        device_status.config.rsd = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_RSD_SET);
-        break;
-    case CNF_GET_CMD:
-        device_status.config.cnf = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_CNF_GET);
-        break;
-    case CNF_SET_CMD:
-        device_status.config.cnf = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_CNF_SET);
-        break;
-    case CNL_GET_CMD:
-        device_status.config.cnl = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_CNL_GET);
-        break;
-    case CNL_SET_CMD:
-        device_status.config.cnl = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_CNL_SET);
-        break;
-    case SSE_GET_CMD:
-        device_status.config.sse = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_SSE_GET);
-        break;
-    case SSE_SET_CMD:
-        device_status.config.sse = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_SSE_SET);
-        break;
-    case SSA_GET_CMD:
-        device_status.config.ssa = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_SSA_GET);
-        break;
-    case SSA_SET_CMD:
-        device_status.config.ssa = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_SSA_SET);
-        break;
-    case SSD_GET_CMD:
-        device_status.config.ssd = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_SSD_GET);
-        break;
-    case SSD_SET_CMD:
-        device_status.config.ssd = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_SSD_SET);
-        break;
-    case LNG_GET_CMD:
-        device_status.config.lng = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_LNG_GET);
-        break;
-    case LNG_SET_CMD:
-        device_status.config.lng = value;
-        xEventGroupSetBits(Config_EventHandler,EVENT_CONFIG_LNG_SET);
-        break;
-    case COM_GET_CMD:
-        device_status.info.com = value;
-        xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COM_GET);
-        break;
-    case COM_SET_CMD:
-        device_status.info.com = value;
-        xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COM_SET);
-        break;
-    case COA_GET_CMD:
-        device_status.info.coa = value;
-        xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COA_GET);
-        break;
-    case COA_SET_CMD:
-        device_status.info.coa = value;
-        xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COA_SET);
-        break;
-    case COD_GET_CMD:
-        device_status.info.cod = value;
-        xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COD_GET);
-        break;
-    case COD_SET_CMD:
-        device_status.info.cod = value;
-        xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COD_SET);
-        break;
-    case COE_GET_CMD:
-        device_status.info.coe = value;
-        xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COE_GET);
-        break;
-    case COE_SET_CMD:
-        device_status.info.coe = value;
-        xEventGroupSetBits(Info_EventHandler,EVENT_INFO_COE_SET);
-        break;
-    case CND_GET_CMD:
-        device_status.info.cnd = value;
-        xEventGroupSetBits(Info_EventHandler,EVENT_INFO_CND_GET);
-        break;
-    case SUP_GET_CMD:
-        device_status.info.sup = value;
-        xEventGroupSetBits(Info_EventHandler,EVENT_INFO_SUP_GET);
-        break;
-    case VER_GET_CMD:
-        //device_status.info.ver = value;
-        xEventGroupSetBits(Info_EventHandler,EVENT_INFO_VER_GET);
-        break;
-    case SRN_GET_CMD:
-        //device_status.info.srn = value;
-        xEventGroupSetBits(Info_EventHandler,EVENT_INFO_SRN_GET);
-        break;
-    case NET_GET_CMD:
-        device_status.tem.net = value;
-        xEventGroupSetBits(TEM_EventHandler,EVENT_TEM_NET_GET);
-        break;
-    case BAT_GET_CMD:
-        device_status.tem.bat = value;
-        xEventGroupSetBits(TEM_EventHandler,EVENT_TEM_BAT_GET);
-        break;
-    case ALA_GET_CMD:
-        device_status.tem.ala = value;
-        xEventGroupSetBits(TEM_EventHandler,EVENT_TEM_ALA_GET);
-        break;
-    case ALR_GET_CMD:
-        device_status.tem.alr = value;
-        xEventGroupSetBits(TEM_EventHandler,EVENT_TEM_ALR_GET);
-        break;
-    case RST_SET_CMD:
-        device_status.c2d.rst = value;
-        xEventGroupSetBits(C2D_EventHandler,EVENT_C2D_RST_SET);
-        break;
-    case DEF_SET_CMD:
-        device_status.c2d.def = value;
-        xEventGroupSetBits(C2D_EventHandler,EVENT_C2D_DEF_SET);
-        break;
-    case RAS_SET_CMD:
-        device_status.c2d.ras = value;
-        xEventGroupSetBits(C2D_EventHandler,EVENT_C2D_RAS_SET);
-        break;
-    case WST_GET_CMD:
-        wifi_status_get();
-        break;
-    default:
-        break;
-    }
-    if(!ap_flag)
-    {
-        switch(cmd_type)
-        {
-        case RSE_PUT_CMD:
-            config_single_upload(RSE_PUT_CMD,value);
-            device_status.config.rse = value;
-            break;
-        case RSA_PUT_CMD:
-            config_single_upload(RSA_PUT_CMD,value);
-            device_status.config.rsa = value;
-            break;
-        case RSI_PUT_CMD:
-            config_single_upload(RSI_PUT_CMD,value);
-            device_status.config.rsi = value;
-            break;
-        case RSD_PUT_CMD:
-            config_single_upload(RSD_PUT_CMD,value);
-            device_status.config.rsd = value;
-            break;
-        case CNF_PUT_CMD:
-            config_single_upload(CNF_PUT_CMD,value);
-            device_status.config.cnf = value;
-            break;
-        case CNL_PUT_CMD:
-            config_single_upload(CNL_PUT_CMD,value);
-            device_status.config.cnl = value;
-            break;
-        case SSE_PUT_CMD:
-            config_single_upload(SSE_PUT_CMD,value);
-            device_status.config.sse = value;
-            break;
-        case SSA_PUT_CMD:
-            config_single_upload(SSA_PUT_CMD,value);
-            device_status.config.ssa = value;
-            break;
-        case SSD_PUT_CMD:
-            config_single_upload(SSD_PUT_CMD,value);
-            device_status.config.ssd = value;
-            break;
-        case LNG_PUT_CMD:
-            config_single_upload(LNG_PUT_CMD,value);
-            device_status.config.lng = value;
-            break;
-        case SUP_PUT_CMD:
-            info_single_upload(SUP_PUT_CMD,value);
-            device_status.info.sup = value;
-            break;
-        case COM_PUT_CMD:
-            info_single_upload(COM_PUT_CMD,value);
-            device_status.info.com = value;
-            break;
-        case COA_PUT_CMD:
-            info_single_upload(COA_PUT_CMD,value);
-            device_status.info.coa = value;
-            break;
-        case COD_PUT_CMD:
-            info_single_upload(COD_PUT_CMD,value);
-            device_status.info.cod = value;
-            break;
-        case COE_PUT_CMD:
-            info_single_upload(COE_PUT_CMD,value);
-            device_status.info.coe = value;
-            break;
-        case CND_PUT_CMD:
-            info_single_upload(CND_PUT_CMD,value);
-            device_status.info.cnd = value;
-            break;
-        case WFA_SET_CMD:
-            set_factory();
-            platform_mcu_reset();
-            break;
-        default:
+    return(sizeof(download_cmd) / sizeof(download_cmd[0]));
+}
+/**
+ * @brief  获取制定DPID在数组中的序号
+ * @param[in] {dpid} dpid
+ * @return dp序号
+ */
+unsigned char get_dowmload_dpid_index(unsigned char dpid)
+{
+    unsigned char index;
+    unsigned char total = get_download_cmd_total();
+
+    for(index = 0; index < total; index ++) {
+        if(download_cmd[index].dp_id == dpid) {
             break;
         }
+    }
+
+    return index;
+}
+static unsigned char data_point_handle(const unsigned char value[])
+{
+    //这边是数据下发函数，请根据实际情况调用
+    unsigned char dp_id,index;
+    unsigned char dp_type;
+    unsigned char ret;
+    unsigned short dp_len;
+
+    dp_id = value[0];
+    dp_type = value[1];
+    dp_len = (value[2] <<8) + value[3];
+
+    index = get_dowmload_dpid_index(dp_id);
+
+    if(dp_type != download_cmd[index].dp_type) {
+        //错误提示
+        return 0;
+    }else {
+        ret = dp_download_handle(dp_id, value + 4, dp_len);
+    }
+
+    return ret;
+}
+
+void data_handle(unsigned short offset)
+{
+    unsigned short dp_len;
+
+    unsigned short i,total_len;
+    unsigned char cmd_type = wifi_data_process_buf[offset + FRAME_TYPE];
+    switch(cmd_type) {
+        case PRODUCT_INFO_CMD:                                //产品信息
+            total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
+            product_info_parse((unsigned char *)wifi_data_process_buf + offset + DATA_START,total_len);
+        break;
+        case TELEMETRY_CONTROL_CMD:                           //开启遥测
+            total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
+            telemetry_upload((unsigned char *)wifi_data_process_buf + offset + DATA_START,total_len);
+        break;
+        case DATA_ISSUED_CMD:                                 //命令下发
+            total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
+
+            for(i = 0 ;i < total_len; )
+            {
+                dp_len = (wifi_data_process_buf[offset + DATA_START + i + 2] << 8) | wifi_data_process_buf[offset + DATA_START + i + 3];
+
+                data_point_handle((unsigned char *)wifi_data_process_buf + offset + DATA_START + i);
+
+                i += (dp_len + 4);
+            }
+        break;
+        case WIFI_AP_ENABLE_CMD:                                 //AP控制
+            total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
+            wifi_ap_enable_control(wifi_data_process_buf[offset + DATA_START]);
+        break;
+        case UPDATE_CONTROL_CMD:                                 //升级控制
+            total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
+            if(total_len==1)
+            {
+                ota_control_parse(wifi_data_process_buf[offset + DATA_START]);
+            }
+        break;
+        case UPDATE_TRANS_CMD:                                //升级传输
+            total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
+            if(total_len==0)
+            {
+                http_uart_ack();
+            }
+            break;
+        default:break;
     }
 }

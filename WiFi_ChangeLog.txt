@@ -7,3 +7,14 @@
 3.Delete default azure config
 4.Fix a bug about heart of mqtt
 5.Create new file about ChangeLog in the root directory
+
+1.0.9&1.1.0 2022.11.22
+1.Add OTA Function of Murata
+2.Add OTA Function of ST
+3.Fix some questions about SNTP
+4.Fix some questions about keep alive
+5.Change UART Core
+6.Change RTOS to Freertos
+7.AP & STATION can work together
+8.Add wfs command
+9.Add HttpSever Enbale control command

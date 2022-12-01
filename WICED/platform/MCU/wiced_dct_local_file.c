@@ -95,6 +95,7 @@ static const uint32_t DCT_section_offsets[ ] =
     [DCT_OTA2_CONFIG_SECTION] = OFFSETOF( platform_dct_data_t, ota2_config ),
 #endif
     [DCT_MISC_SECTION]        = OFFSETOF( platform_dct_data_t, dct_misc ),
+    [DCT_AZURE_SECTION]           = OFFSETOF( platform_dct_data_t, azure_config ),
     [DCT_INTERNAL_SECTION]      = 0,
 };
 

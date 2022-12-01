@@ -92,6 +92,7 @@ typedef enum
     DCT_OTA2_CONFIG_SECTION,
     DCT_VERSION_SECTION, /* Do not use in apps */
     DCT_MISC_SECTION,
+    DCT_AZURE_SECTION,
 } dct_section_t;
 
 /******************************************************
@@ -210,6 +211,7 @@ extern wiced_result_t wiced_dct_update_p2p_config_to_current       (platform_dct
 extern wiced_result_t wiced_dct_update_ota2_config_to_current      (platform_dct_ota2_config_t* ota2_config_destination, bootloader_dct_ota2_config_t* ota2_config_source);
 extern wiced_result_t wiced_dct_update_version_to_current          (platform_dct_version_t* dct_version_destination, platform_dct_version_t* dct_version_source);
 extern wiced_result_t wiced_dct_update_misc_config_to_current      (platform_dct_misc_config_t* misc_config_destination, platform_dct_misc_config_t* misc_config_source);
+extern wiced_result_t wiced_dct_update_azure_config_to_current     (platform_dct_azure_config_t* azure_config_destination,platform_dct_azure_config_t* azure_config_source);
 
 #if  defined(OTA2_SUPPORT)
 /**

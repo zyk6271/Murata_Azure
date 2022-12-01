@@ -118,7 +118,7 @@ void rst_timer_callback(void* arg)
 }
 void rst_work(void)
 {
-    wiced_rtos_init_timer(&rst_timer, 200, rst_timer_callback, 0);
+    wiced_rtos_init_timer(&rst_timer, 1000, rst_timer_callback, 0);
     wiced_rtos_start_timer(&rst_timer);
 }
 void set_config(wiced_ssid_t ssid, wiced_wpa_key_t password)
@@ -175,8 +175,8 @@ void azc_parse(const uint8_t*pMsg, uint32_t size)
 {
     cJSON * root = NULL;
     cJSON * item = NULL;
-    user_app_t *app_dct_write;
-    app_dct_write = calloc(sizeof(user_app_t),sizeof(char));
+    platform_dct_azure_config_t *app_dct_write;
+    app_dct_write = calloc(sizeof(platform_dct_azure_config_t),sizeof(char));
 
     if (NULL == pMsg) {
         return;
@@ -184,11 +184,6 @@ void azc_parse(const uint8_t*pMsg, uint32_t size)
     root = cJSON_Parse((char*)pMsg);
     if (NULL == root) {
         return;
-    }
-    item = cJSON_GetObjectItem(root, "period");
-    if (NULL != item) {
-        printf("period is %d\r\n", item->valueint);
-        dct_app_period_write(item->valueint);
     }
     item = cJSON_GetObjectItem(root, "deviceID");
     if (NULL != item) {
@@ -214,14 +209,14 @@ void azc_parse(const uint8_t*pMsg, uint32_t size)
         strncpy(app_dct_write->mac1, item->valuestring,
                 strlen(item->valuestring));
     }
+    app_dct_write->init_flag = 1;
     dct_app_azc_write(app_dct_write);
     free(app_dct_write);
     cJSON_Delete(root);
-    rst_work();
 }
 void azc_flush(void)
 {
-    user_app_t *app_t = calloc(sizeof(user_app_t), sizeof(char));
+    platform_dct_azure_config_t *app_t = calloc(sizeof(platform_dct_azure_config_t), sizeof(char));
     char *cjson_str = NULL;
     dct_app_all_read(&app_t);
     cJSON * root = cJSON_CreateObject();
@@ -241,4 +236,5 @@ void azc_flush(void)
     cJSON_Delete(root);
     free(cjson_str);
     free(app_t);
+    rst_work();
 }

@@ -18,6 +18,8 @@ typedef struct _syr_config
     uint32_t sse;
     uint32_t ssa;
     uint32_t ssd;
+    uint32_t rcp;
+    uint32_t emr;
 }syr_config;
 typedef struct _syr_info
 {
@@ -26,8 +28,8 @@ typedef struct _syr_info
     uint32_t cod;
     uint32_t coe;
     uint32_t sup;
-    char ver[6];
-    char srn[20];
+    char ver[10];
+    char srn[10];
     uint32_t cnd;
 }syr_info;
 typedef struct _syr_tem

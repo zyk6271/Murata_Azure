@@ -39,7 +39,6 @@
 #include "wiced_low_power.h"
 #include "internal/wiced_internal_api.h"
 #include "wwd_assert.h"
-#include "heart.h"
 #ifdef WICED_USE_ETHERNET_INTERFACE
 #include "platform_ethernet.h"
 #endif /* ifdef WICED_USE_ETHERNET_INTERFACE */
@@ -50,8 +49,12 @@
 #include "default_network_config_dct.h"
 #endif /* #ifdef NETWORK_CONFIG_APPLICATION_DEFINED */
 
+#define     Azure_SDK
+
 #include "wiced_power_logger.h"
+#ifdef  Azure_SDK
 #include "heart.h"
+#endif
 #define MAC_ADDRESS_LOCALLY_ADMINISTERED_BIT  0x02
 /* IP networking status */
 wiced_bool_t ip_networking_inited[WICED_INTERFACE_MAX];
@@ -223,7 +226,6 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
     wiced_result_t result = WICED_SUCCESS;
 
     WICED_POWER_LOGGER( EVENT_PROC_ID_WIFI, EVENT_ID_WIFI_DATA, EVENT_DESC_WIFI_JOIN_TIME );
-
     if ( wiced_network_is_up( interface ) == WICED_FALSE )
     {
         if ( interface == WICED_CONFIG_INTERFACE )
@@ -287,8 +289,11 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
 #ifdef WICED_USE_WIFI_TWO_STA_INTERFACE
             result = wiced_join_ap( WICED_STA_INTERFACE );
 #else
-            wifi_status_change(2);
-            wiced_join_ap( );
+
+#ifdef  Azure_SDK
+            wifi_status_change(1);
+#endif
+            result = wiced_join_ap( );
 #endif
         }
 #ifdef WICED_USE_ETHERNET_INTERFACE
@@ -305,7 +310,11 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
 
     if ( result != WICED_SUCCESS )
     {
-        WICED_POWER_LOGGER( EVENT_PROC_ID_WIFI, EVENT_ID_WIFI_DATA, EVENT_DESC_WIFI_IDLE );
+#ifdef  Azure_SDK
+        extern void wifi_disconnect_callback(void);
+        wifi_disconnect_callback();
+#endif
+        WPRINT_APP_INFO(( "wiced_join_ap failed,restart\n" ));
         return result;
     }
     result = wiced_ip_up( interface, config, ip_settings );
@@ -313,7 +322,12 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
     {
         if ( interface == WICED_STA_INTERFACE )
         {
-            wiced_leave_ap( interface );
+            result  = wiced_leave_ap( interface );
+            WPRINT_NETWORK_INFO(("wiced_leave_ap result :%d\n",result));
+#ifdef  Azure_SDK
+            wifi_disconnect_callback();
+#endif
+            return result;
         }
         else if ( interface != WICED_ETHERNET_INTERFACE )
         {
@@ -330,6 +344,17 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
             platform_ethernet_deinit( );
         }
 #endif
+    }
+    else
+    {
+        if ( interface == WICED_STA_INTERFACE )
+        {
+#ifdef  Azure_SDK
+            extern void wifi_connect_callback(void);
+            wifi_connect_callback();
+#endif
+
+        }
     }
     WICED_POWER_LOGGER( EVENT_PROC_ID_WIFI, EVENT_ID_WIFI_DATA, EVENT_DESC_WIFI_IDLE );
 
@@ -379,7 +404,7 @@ wiced_result_t wiced_network_down( wiced_interface_t interface )
     if ( interface == WICED_STA_INTERFACE )
     {
         /* do a leave even if the interface isn't up -- need to avoid roaming back to */
-        wiced_leave_ap( interface );
+        result = wiced_leave_ap( interface );
     }
     else if ( wiced_network_is_up( interface ) == WICED_TRUE )
     {
@@ -413,8 +438,6 @@ wiced_result_t wiced_network_down( wiced_interface_t interface )
 
     return WICED_SUCCESS;
 }
-
-
 
 wiced_result_t wiced_network_register_link_callback( wiced_network_link_callback_t link_up_callback, void *link_up_user_data, wiced_network_link_callback_t link_down_callback, void *link_down_user_data, wiced_interface_t interface )
 {

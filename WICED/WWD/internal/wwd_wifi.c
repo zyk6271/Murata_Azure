@@ -1473,7 +1473,6 @@ wwd_result_t wwd_wifi_leave( wwd_interface_t interface )
     }
 
     wiced_join_status[ interface ] = 0;
-
     wwd_wifi_link_update( );
 
     return WWD_SUCCESS;

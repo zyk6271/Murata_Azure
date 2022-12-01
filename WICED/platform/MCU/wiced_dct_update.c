@@ -481,4 +481,26 @@ wiced_result_t wiced_dct_update_misc_config_to_current(platform_dct_misc_config_
     return WICED_SUCCESS;
 }
 
+wiced_result_t wiced_dct_update_azure_config_to_current(platform_dct_azure_config_t* azure_config_destination,
+                                                      platform_dct_azure_config_t* azure_config_source)
+{
+    if ((azure_config_destination == NULL) || (azure_config_source == NULL))
+    {
+        return WICED_ERROR;
+    }
+
+    if (DCT_BOOTLOADER_SDK_VERSION >= DCT_BOOTLOADER_SDK_5_0_1)
+    {
+        /* copy it */
+        memcpy(azure_config_destination, azure_config_source, sizeof(platform_dct_azure_config_t));
+    }
+    else
+    {
+        /* clear it out - fields completely changed */
+        memset(azure_config_destination, 0x00, sizeof(platform_dct_azure_config_t));
+    }
+
+    return WICED_SUCCESS;
+}
+
 #endif  /* !defined(BOOTLOADER) */

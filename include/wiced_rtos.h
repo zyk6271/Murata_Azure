@@ -282,6 +282,7 @@ wiced_result_t wiced_rtos_thread_yield (void);
  * @return    WICED_ERROR   : if an error occurred
  */
 wiced_result_t wiced_rtos_init_semaphore( wiced_semaphore_t* semaphore );
+wiced_result_t wiced_rtos_init_binary_semaphore( wiced_semaphore_t* semaphore );
 
 
 /** Set (post/put/increment) a semaphore

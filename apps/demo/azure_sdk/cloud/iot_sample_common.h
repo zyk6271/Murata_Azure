@@ -35,7 +35,7 @@
     (void)printf("SUCCESS:\t");     \
     (void)printf(__VA_ARGS__);      \
     (void)printf("\n");             \
-  } while (0)
+  } while (0)                       \
 
 #define IOT_SAMPLE_LOG(...)    \
   do                           \

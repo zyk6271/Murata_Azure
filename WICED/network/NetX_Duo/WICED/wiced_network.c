@@ -61,7 +61,7 @@
 #ifdef ENABLE_NXD_BSD_SOCKET
 #include "nxd_bsd.h"
 #endif
-
+#include "netx_applications/dns/nxd_dns.h"
 /******************************************************
  *                      Macros
  ******************************************************/
@@ -625,7 +625,6 @@ wiced_result_t wiced_init_autoipv6( wiced_interface_t interface )
 
     return WICED_SUCCESS;
 }
-
 wiced_result_t wiced_ip_up( wiced_interface_t interface, wiced_network_config_t config, const wiced_ip_setting_t* ip_settings )
 {
     UINT        status;
@@ -706,14 +705,6 @@ wiced_result_t wiced_ip_up( wiced_interface_t interface, wiced_network_config_t 
         WPRINT_NETWORK_ERROR(("Failed to enable IP fragmentation\n"));
         goto leave_wifi_and_delete_ip;
     }
-
-#ifdef ENABLE_NXD_BSD_SOCKET
-    if (bsd_initialize (&IP_HANDLE(interface), &wiced_packet_pools[0], bsd_socket_stack, 2048, 2) != 0 )
-    {
-        WPRINT_NETWORK_ERROR( ( "Failed to initialise BSD \n" ) );
-        goto leave_wifi_and_delete_ip;
-    }
-#endif
 
   /* Things need to happen in the following order, so that extra packet loss is not seen.
     * 1. disable buffering: this will allow DHCP traffic to go through in the next step
@@ -929,7 +920,31 @@ driver_not_notified_leave_wifi_and_delete_ip:
     nx_ip_delete( &IP_HANDLE(interface));
     return WICED_ERROR;
 }
-
+NX_DNS  client_dns;
+uint8_t dns_resloved;
+wiced_result_t wiced_dns_init( wiced_interface_t interface )
+{
+    if(dns_resloved == 0)
+    {
+        dns_resloved = 1;
+        if (bsd_initialize (&IP_HANDLE(interface), &wiced_packet_pools[0], bsd_socket_stack, 2048, 2) != 0 )
+        {
+            WPRINT_NETWORK_ERROR( ( "Failed to initialise BSD \n" ) );
+            return WICED_ERROR;
+        }
+    }
+    if ( nx_dns_create(&client_dns, &IP_HANDLE(interface), (UCHAR *)"DNS Client") != NX_SUCCESS )
+    {
+        WPRINT_NETWORK_ERROR(("Failed to nx_dns_create\n"));
+        return WICED_ERROR;
+    }
+    if ( nx_dns_server_add(&client_dns, IP_ADDRESS(8,8,8,8)) != NX_SUCCESS )
+    {
+        WPRINT_NETWORK_ERROR(("Failed to nx_dns_server_add\n"));
+        return WICED_ERROR;
+    }
+    return WICED_SUCCESS;
+}
 wiced_result_t wiced_ip_down( wiced_interface_t interface )
 {
     if ( IP_NETWORK_IS_INITED( interface ) == WICED_TRUE )
@@ -958,7 +973,9 @@ wiced_result_t wiced_ip_down( wiced_interface_t interface )
 #endif /* WICED_AUTO_IP_ENABLE */
 
 #ifdef ENABLE_NXD_BSD_SOCKET
-        bsd_deinit();
+        //nx_dns_server_add(&client_dns);
+        nx_dns_server_remove_all(&client_dns);
+        nx_dns_delete(&client_dns);
 #endif
         /* Tell driver interface went down */
         wiced_ip_driver_notify( interface, WICED_FALSE );

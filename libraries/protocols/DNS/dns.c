@@ -199,7 +199,6 @@ wiced_result_t dns_client_hostname_lookup( const char* hostname, wiced_resolved_
     {
         prefer_ipv4 = 1;
     }
-
     /* Create socket to send packets */
     if ( wiced_udp_create_socket( &socket, WICED_ANY_PORT, interface ) != WICED_SUCCESS )
     {

@@ -9,7 +9,15 @@
 #define SERVER_SENT_EVENT_INTERVAL_MS  ( 1 * SECONDS )
 #define MAX_SOCKETS                    ( 5 )
 
+const wiced_ip_setting_t ip_settings =
+{
+    INITIALISER_IPV4_ADDRESS( .ip_address, MAKE_IPV4_ADDRESS(192,168, 4 ,1) ),
+    INITIALISER_IPV4_ADDRESS( .netmask,    MAKE_IPV4_ADDRESS(255,255,255,0) ),
+    INITIALISER_IPV4_ADDRESS( .gateway,    MAKE_IPV4_ADDRESS(192,168, 4 ,1) ),
+};
+
 wiced_http_server_t syr_server;
+uint8_t http_status;
 
 START_OF_HTTP_PAGE_DATABASE(web_pages)
 {    "/rsa/set/rst/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_rst_set_callback, 0 },},
@@ -42,7 +50,9 @@ START_OF_HTTP_PAGE_DATABASE(web_pages)
 {    "/rsa/get/lng",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_lng_get_callback, 0 },},
 {    "/rsa/set/lng/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_lng_set_callback, 0 },},
 {    "/rsa/get/ver",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_ver_get_callback, 0 },},
+{    "/rsa/get/ver2",                            "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_ver2_get_callback, 0 },},
 {    "/rsa/get/srn",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_srn_get_callback, 0 },},
+{    "/rsa/get/srn2",                            "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_srn2_get_callback, 0 },},
 {    "/rsa/get/com",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_com_get_callback, 0 },},
 {    "/rsa/set/com/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_com_set_callback, 0 },},
 {    "/rsa/get/coa",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_coa_get_callback, 0 },},
@@ -55,12 +65,26 @@ START_OF_HTTP_PAGE_DATABASE(web_pages)
 {    "/rsa/set/wfc/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfc_set_callback, 0 },},
 {    "/rsa/get/wfk",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfk_get_callback, 0 },},
 {    "/rsa/set/wfk/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfk_set_callback, 0 },},
+{    "/rsa/get/wfs",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfs_get_callback, 0 },},
 {    "/rsa/set/azc",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_azc_set_callback, 0 },},
 {    "/rsa/get/azc",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_azc_get_callback, 0 },},
 END_OF_HTTP_PAGE_DATABASE();
 
-void http_start( void )
+void http_start( uint8_t value )
 {
-    wifi_status_change(1);
-    wiced_http_server_start( &syr_server, 5333, MAX_SOCKETS, web_pages, WICED_AP_INTERFACE, DEFAULT_URL_PROCESSOR_STACK_SIZE );
+    if(value != http_status)
+    {
+        http_status = value;
+        if(value)
+        {
+            wiced_network_up(WICED_AP_INTERFACE, WICED_USE_INTERNAL_DHCP_SERVER, &ip_settings);
+            wiced_http_server_start( &syr_server, 5333, MAX_SOCKETS, web_pages, WICED_AP_INTERFACE, DEFAULT_URL_PROCESSOR_STACK_SIZE );
+        }
+        else
+        {
+            wiced_http_server_stop(&syr_server);
+            wiced_network_down(WICED_AP_INTERFACE);
+        }
+    }
+
 }

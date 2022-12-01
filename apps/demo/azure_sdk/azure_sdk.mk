@@ -40,6 +40,8 @@ GLOBAL_INCLUDES += \
                     cloud \
                     web \
                     uart \
+                    ota \
+                    config \
                    $(AZURE_SDK_DIR) \
                    $(AZURE_SDK_DIR)/iot \
                    $(AZURE_SDK_DIR)/core \
@@ -52,6 +54,9 @@ $(NAME)_SOURCES :=  azure_sdk.c \
                     web/http_api.c \
                     uart/uart.c \
                     uart/uart_core.c \
+                    uart/system.c \
+                    ota/http_ota.c \
+                    ota/webclient.c \
                     cloud/c2d.c \
                     cloud/telemetry.c \
                     cloud/twin_upload.c \
@@ -91,7 +96,7 @@ GLOBAL_INCLUDES +=  azure \
 $(NAME)_COMPONENTS := protocols/MQTT	\
 					  utilities/cJSON 	\
 					  daemons/HTTP_server \
-					  protocols/SNTP
+					  protocols/SNTP	
 
 $(NAME)_RESOURCES  := apps/azure_iot_hub/rootca.cer \
                       apps/azure_iot_hub/client.cer \
@@ -103,7 +108,4 @@ $(NAME)_RESOURCES  := apps/azure_iot_hub/rootca.cer \
                       
 WIFI_CONFIG_DCT_H := wifi_config_dct.h
 
-ifeq ($(BUILD_TYPE),debug)
-GLOBAL_DEFINES     += APPLICATION_STACK_SIZE=8196
-GLOBAL_DEFINES     += APPLICATION_STACK_SIZE=8196
-endif
+GLOBAL_DEFINES += MAC_ADDRESS_SET_BY_HOST

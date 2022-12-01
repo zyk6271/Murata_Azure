@@ -214,6 +214,7 @@ extern wwd_result_t host_rtos_join_thread( host_thread_type_t* thread );
  * @return WWD_SUCCESS or Error code
  */
 extern wwd_result_t host_rtos_init_semaphore(  /*@special@*/ /*@out@*/ host_semaphore_type_t* semaphore ) /*@allocates *semaphore@*/  /*@defines **semaphore@*/;
+extern wwd_result_t host_rtos_init_binary_semaphore(  /*@special@*/ /*@out@*/ host_semaphore_type_t* semaphore ) /*@allocates *semaphore@*/  /*@defines **semaphore@*/;
 
 /**
  * Get a semaphore

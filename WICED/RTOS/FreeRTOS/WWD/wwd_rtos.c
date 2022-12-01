@@ -182,6 +182,23 @@ wwd_result_t host_rtos_init_semaphore(  /*@special@*/ /*@out@*/ host_semaphore_t
     /*@+compdef@*/
 }
 
+/**
+ * Creates a binary semaphore
+ *
+ * In FreeRTOS a semaphore is represented with a binary semaphore
+ *
+ * @param semaphore         : pointer to variable which will receive handle of created semaphore
+ *
+ * @returns WWD_SUCCESS on success, WICED_ERROR otherwise
+ */
+wwd_result_t host_rtos_init_binary_semaphore(  /*@special@*/ /*@out@*/ host_semaphore_type_t* semaphore ) /*@allocates *semaphore@*/  /*@defines **semaphore@*/
+{
+    *semaphore = xSemaphoreCreateBinary();
+
+    /*@-compdef@*/ /* Lint doesnt realise allocation has occurred */
+    return ( *semaphore != NULL ) ? WWD_SUCCESS : WWD_SEMAPHORE_ERROR;
+    /*@+compdef@*/
+}
 
 /**
  * Gets a semaphore

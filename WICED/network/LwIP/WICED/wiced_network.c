@@ -514,6 +514,7 @@ wiced_result_t wiced_ip_up( wiced_interface_t interface, wiced_network_config_t 
             {
                 WPRINT_NETWORK_INFO(("Unable to obtain IP address via DHCP\n"));
                 netif_remove( &IP_HANDLE(interface) );
+                WPRINT_NETWORK_INFO(("netif_remove success"));
                 return WICED_ERROR;
             }
         }

@@ -65,7 +65,7 @@ extern "C"
 //#define WPRINT_ENABLE_APP_DEBUG
 //#define WPRINT_ENABLE_APP_ERROR
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#define WPRINT_ENABLE_LIB_INFO           /* General library prints */
+//#define WPRINT_ENABLE_LIB_INFO           /* General library prints */
 //#define WPRINT_ENABLE_LIB_DEBUG
 //#define WPRINT_ENABLE_LIB_ERROR
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -77,10 +77,9 @@ extern "C"
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #define WPRINT_ENABLE_NETWORK_INFO       /* Network stack prints */
 //#define WPRINT_ENABLE_NETWORK_DEBUG
-//#define WPRINT_ENABLE_NETWORK_ERROR
 #endif
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#define WPRINT_ENABLE_RTOS_INFO          /* RTOS prints */
+//#define WPRINT_ENABLE_RTOS_INFO          /* RTOS prints */
 //#define WPRINT_ENABLE_RTOS_DEBUG
 //#define WPRINT_ENABLE_RTOS_ERROR
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -107,7 +106,6 @@ extern "C"
 //#define WPRINT_ENABLE_WWD_DEBUG
 //#define WPRINT_ENABLE_WWD_ERROR
 
-//#define WWD_ENABLE_STATS               /* Enables TX/RX/WWD buffer statistics collection in Wi-Fi driver */
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #define WPRINT_ENABLE_PLATFORM_INFO      /* Platform prints */
 //#define WPRINT_ENABLE_PLATFORM_DEBUG
@@ -116,7 +114,7 @@ extern "C"
 
 /************************************************************************
  * Default WICED networking timeouts in milliseconds */
-#define WICED_NTP_REPLY_TIMEOUT                   (1000)
+#define WICED_NTP_REPLY_TIMEOUT                   (3000)
 #define WICED_ALLOCATE_PACKET_TIMEOUT             (2000)
 #define WICED_TCP_DISCONNECT_TIMEOUT              (3000)
 #define WICED_TCP_BIND_TIMEOUT                    (3000)
@@ -130,7 +128,7 @@ extern "C"
 
 /************************************************************************
  * Default WICED IOCTL/IOVAR timeouts in milliseconds */
-#define WICED_DEFAULT_IOCTL_PACKET_TIMEOUT       ( WICED_NEVER_TIMEOUT )
+#define WICED_DEFAULT_IOCTL_PACKET_TIMEOUT       ( WICED_NEVER_TIMEOUT  )
 
 /************************************************************************
  *   WICED thread priority table
@@ -154,8 +152,8 @@ extern "C"
 #define WICED_RTOS_HIGHEST_PRIORITY        (0)
 #define WICED_NETWORK_WORKER_PRIORITY      (3)
 #define WICED_DEFAULT_WORKER_PRIORITY      (5)
-#define WICED_DEFAULT_LIBRARY_PRIORITY     (5)
-#define WICED_APPLICATION_PRIORITY         (7)
+#define WICED_DEFAULT_LIBRARY_PRIORITY     (6)
+#define WICED_APPLICATION_PRIORITY         (10)
 
 /************************************************************************
  * WICED TCP Options */
