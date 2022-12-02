@@ -973,9 +973,11 @@ wiced_result_t wiced_ip_down( wiced_interface_t interface )
 #endif /* WICED_AUTO_IP_ENABLE */
 
 #ifdef ENABLE_NXD_BSD_SOCKET
-        //nx_dns_server_add(&client_dns);
-        nx_dns_server_remove_all(&client_dns);
-        nx_dns_delete(&client_dns);
+        if(interface == WICED_STA_INTERFACE)
+        {
+            nx_dns_server_remove_all(&client_dns);
+            nx_dns_delete(&client_dns);
+        }
 #endif
         /* Tell driver interface went down */
         wiced_ip_driver_notify( interface, WICED_FALSE );

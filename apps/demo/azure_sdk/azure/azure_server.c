@@ -26,12 +26,12 @@ void azure_serv_callback( uint32_t arg )
     while ( 1 )
     {
         wiced_rtos_get_semaphore( &azure_refresh_sem, WICED_WAIT_FOREVER );
-//        config_get();
-//        info_get();
-//        twin_upload();
+        config_get();
+        info_get();
         get_device_twin_document();
-        wifi_status_change(3);
         telemetry_request();
+        wiced_rtos_delay_milliseconds(3000);
+        wifi_status_change(3);
     }
 }
 void azure_env_init(void)

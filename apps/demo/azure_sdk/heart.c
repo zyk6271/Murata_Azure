@@ -15,7 +15,7 @@ uint8_t link_status;
 uint8_t mqtt_status;
 
 #define KEEP_ALIVE_ID_NFD          0
-#define KEEP_ALIVE_PERIOD_NFD_MSEC 5000
+#define KEEP_ALIVE_PERIOD_NFD_MSEC 30000
 
 #define MAX_KEEP_ALIVE_PACKET_SIZE 512
 

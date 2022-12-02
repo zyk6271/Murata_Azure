@@ -15,7 +15,6 @@ wiced_event_flags_t OTA_EventHandler;
 
 uint32_t now_offset = 0;
 uint32_t file_size = 0;
-unsigned char stop_update_flag;
 
 extern char wifi_version[];
 extern syr_status device_status;
@@ -131,7 +130,6 @@ static int st_download_callback(char *buffer, int length)
     if(now_offset==0)
     {
         chunk_count = 0;
-        //stop_update_flag = 1;
     }
 
     send_len = 0;
@@ -221,7 +219,7 @@ int st_download(void)
 
     webclient_register_shard_position_function(session, st_download_callback);
 
-    webclient_shard_position_function(session, ST_BIN_URL, now_offset, file_size, HTTP_OTA_BUFF_LEN);
+    webclient_shard_position_function(session, ST_BIN_URL, now_offset, file_size, 512);
 
     webclient_register_shard_position_function(session, RT_NULL);
 

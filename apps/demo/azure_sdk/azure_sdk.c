@@ -18,9 +18,9 @@ extern uint8_t azure_flag;
 void link_up_callback(void)
 {
     wiced_dns_init(WICED_STA_INTERFACE);
-    wifi_status_change(2);
     keep_alive();
     sntp_start_auto_time_sync_nowait( 1000*60*30 );
+    wifi_status_change(2);
     mqtt_connect_azure();
 }
 static void link_down( void *arg)

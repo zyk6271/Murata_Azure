@@ -35,6 +35,8 @@ static az_span const cod_name = AZ_SPAN_LITERAL_FROM_STR("cod");
 static az_span const coe_name = AZ_SPAN_LITERAL_FROM_STR("coe");
 static az_span const config_span = AZ_SPAN_LITERAL_FROM_STR("deviceConfig");
 static az_span const info_span = AZ_SPAN_LITERAL_FROM_STR("deviceInfo");
+static az_span const version_span = AZ_SPAN_LITERAL_FROM_STR("$version");
+
 
 int parse_device_twin_message(
     char* topic,
@@ -96,571 +98,271 @@ void parse_get_twin(az_span const message_span)
         IOT_SAMPLE_LOG("parse_twin_message valid");
     }
     else
-      return;
-    az_json_reader_next_token(&jr);
-    az_json_reader_next_token(&jr);
-    az_json_reader_next_token(&jr);
-    if(az_json_token_is_text_equal(&jr.token, config_span))
     {
-        while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)//find command
-        {
-            if (az_json_token_is_text_equal(&jr.token, rse_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse rse ok,value is %d",value);
-                if(device_status.config.rse != value)
-                {
-                    wifi_uart_write_command_value(RSE_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSE_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_RSE_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET RSE OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, rsa_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse rsa ok,value is %d",value);
-                if(device_status.config.rsa != value)
-                {
-                    wifi_uart_write_command_value(RSA_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSA_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_RSA_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET RSA OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, rsi_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse rsi ok,value is %d",value);
-                if(device_status.config.rsi != value)
-                {
-                    wifi_uart_write_command_value(RSI_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSI_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_RSI_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET RSI OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, rsd_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse rsd ok,value is %d",value);
-                if(device_status.config.rsd != value)
-                {
-                    wifi_uart_write_command_value(RSD_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSD_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_RSD_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET RSD OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, cnf_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse cnf ok,value is %d",value);
-                if(device_status.config.cnf != value)
-                {
-                    wifi_uart_write_command_value(CNF_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_CNF_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_CNF_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET CNF OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, cnl_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse cnl ok,value is %d",value);
-                if(device_status.config.cnl != value)
-                {
-                    wifi_uart_write_command_value(CNL_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_CNL_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_CNL_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET CNL OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, lng_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse lng ok,value is %d",value);
-                if(device_status.config.lng != value)
-                {
-                    wifi_uart_write_command_value(LNG_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_LNG_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_LNG_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET LNG OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, sse_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse sse ok,value is %d",value);
-                if(device_status.config.sse != value)
-                {
-                    wifi_uart_write_command_value(SSE_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSE_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_SSE_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET SSE OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, ssa_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse ssa ok,value is %d",value);
-                if(device_status.config.ssa != value)
-                {
-                    wifi_uart_write_command_value(SSA_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSA_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_SSA_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET SSA OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, ssd_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse ssd ok,value is %d",value);
-                if(device_status.config.ssd != value)
-                {
-                    wifi_uart_write_command_value(SSD_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSD_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_SSD_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET SSD OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, emr_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse emr ok,value is %d",value);
-                if(device_status.config.emr != value)
-                {
-                    wifi_uart_write_command_value(EMR_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_EMR_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_EMR_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET EMR OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, rcp_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse rcp ok,value is %d",value);
-                if(device_status.config.rcp != value)
-                {
-                    wifi_uart_write_command_value(RCP_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RCP_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_RCP_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET RCP OK\r\n");
-                    }
-                }
-            }
-            az_json_reader_next_token(&jr);
-        }
+        IOT_SAMPLE_LOG("parse_twin_message failed");
+        return;
     }
-    az_json_reader_next_token(&jr);
-    if(az_json_token_is_text_equal(&jr.token, info_span))
+    do
     {
         az_json_reader_next_token(&jr);
-        while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)//find command
-        {
-            if (az_json_token_is_text_equal(&jr.token, com_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse com ok,value is %d",value);
-                if(device_status.info.com != value)
-                {
-                    wifi_uart_write_command_value(COM_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COM_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_INFO_COM_GET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET COM OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, coa_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse coa ok,value is %d",value);
-                if(device_status.info.coa != value)
-                {
-                    wifi_uart_write_command_value(COA_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COA_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_INFO_COA_GET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET COA OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, cod_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse cod ok,value is %d",value);
-                if(device_status.info.cod != value)
-                {
-                    wifi_uart_write_command_value(COD_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COD_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_INFO_COD_GET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET COD OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, coe_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse coe ok,value is %d",value);
-                if(device_status.info.coe != value)
-                {
-                    wifi_uart_write_command_value(COE_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COE_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_INFO_COE_GET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET COE OK\r\n");
-                    }
-                }
-            }
-            az_json_reader_next_token(&jr);
-        }
-        twin_upload();
     }
-}
-void parse_desired_twin(az_span const message_span)
-{
-    uint32_t ret,events;
-    uint32_t value;
-
-    az_json_reader jr;
-    az_json_reader_init(&jr, message_span, NULL);
-    az_json_reader_next_token(&jr);
-    if (jr.token.kind == AZ_JSON_TOKEN_BEGIN_OBJECT)
+    while(az_json_token_is_text_equal(&jr.token, config_span) == 0 && jr.token.kind != AZ_JSON_TOKEN_END_OBJECT);
+    while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)//find command
     {
-        IOT_SAMPLE_LOG("parse_twin_message valid");
+        if (az_json_token_is_text_equal(&jr.token, rse_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse rse ok,value is %d",value);
+            if(device_status.config.rse != value)
+            {
+                wifi_uart_write_command_value(RSE_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSE_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_RSE_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET RSE OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, rsa_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse rsa ok,value is %d",value);
+            if(device_status.config.rsa != value)
+            {
+                wifi_uart_write_command_value(RSA_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSA_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_RSA_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET RSA OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, rsi_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse rsi ok,value is %d",value);
+            if(device_status.config.rsi != value)
+            {
+                wifi_uart_write_command_value(RSI_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSI_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_RSI_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET RSI OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, rsd_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse rsd ok,value is %d",value);
+            if(device_status.config.rsd != value)
+            {
+                wifi_uart_write_command_value(RSD_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSD_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_RSD_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET RSD OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, cnf_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse cnf ok,value is %d",value);
+            if(device_status.config.cnf != value)
+            {
+                wifi_uart_write_command_value(CNF_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_CNF_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_CNF_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET CNF OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, cnl_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse cnl ok,value is %d",value);
+            if(device_status.config.cnl != value)
+            {
+                wifi_uart_write_command_value(CNL_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_CNL_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_CNL_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET CNL OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, lng_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse lng ok,value is %d",value);
+            if(device_status.config.lng != value)
+            {
+                wifi_uart_write_command_value(LNG_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_LNG_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_LNG_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET LNG OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, sse_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse sse ok,value is %d",value);
+            if(device_status.config.sse != value)
+            {
+                wifi_uart_write_command_value(SSE_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSE_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_SSE_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET SSE OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, ssa_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse ssa ok,value is %d",value);
+            if(device_status.config.ssa != value)
+            {
+                wifi_uart_write_command_value(SSA_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSA_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_SSA_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET SSA OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, ssd_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse ssd ok,value is %d",value);
+            if(device_status.config.ssd != value)
+            {
+                wifi_uart_write_command_value(SSD_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSD_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_SSD_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET SSD OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, emr_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse emr ok,value is %d",value);
+            if(device_status.config.emr != value)
+            {
+                wifi_uart_write_command_value(EMR_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_EMR_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_EMR_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET EMR OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, rcp_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse rcp ok,value is %d",value);
+            if(device_status.config.rcp != value)
+            {
+                wifi_uart_write_command_value(RCP_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RCP_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_RCP_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET RCP OK\r\n");
+                }
+            }
+        }
+        az_json_reader_next_token(&jr);
     }
-    else{
+    az_json_reader_next_token(&jr);
+    if(az_json_token_is_text_equal(&jr.token, info_span)==0)
+    {
+        twin_upload();
         return;
     }
     az_json_reader_next_token(&jr);
-    if(az_json_token_is_text_equal(&jr.token, config_span))
+    while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)//find command
     {
-        while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)//find command
+        if (az_json_token_is_text_equal(&jr.token, com_name))
         {
-            if (az_json_token_is_text_equal(&jr.token, rse_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse rse ok,value is %d",value);
-                if(device_status.config.rse != value)
-                {
-                    wifi_uart_write_command_value(RSE_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSE_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_RSE_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET RSE OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, rsa_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse rsa ok,value is %d",value);
-                if(device_status.config.rsa != value)
-                {
-                    wifi_uart_write_command_value(RSA_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSA_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_RSA_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET RSA OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, rsi_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse rsi ok,value is %d",value);
-                if(device_status.config.rsi != value)
-                {
-                    wifi_uart_write_command_value(RSI_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSI_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_RSI_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET RSI OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, rsd_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse rsd ok,value is %d",value);
-                if(device_status.config.rsd != value)
-                {
-                    wifi_uart_write_command_value(RSD_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RSD_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_RSD_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET RSD OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, cnf_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse cnf ok,value is %d",value);
-                if(device_status.config.cnf != value)
-                {
-                    wifi_uart_write_command_value(CNF_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_CNF_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_CNF_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET CNF OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, cnl_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse cnl ok,value is %d",value);
-                if(device_status.config.cnl != value)
-                {
-                    wifi_uart_write_command_value(CNL_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_CNL_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_CNL_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET CNL OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, lng_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse lng ok,value is %d",value);
-                if(device_status.config.lng != value)
-                {
-                    wifi_uart_write_command_value(LNG_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_LNG_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_LNG_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET LNG OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, sse_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse sse ok,value is %d",value);
-                if(device_status.config.sse != value)
-                {
-                    wifi_uart_write_command_value(SSE_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSE_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_SSE_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET SSE OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, ssa_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse ssa ok,value is %d",value);
-                if(device_status.config.ssa != value)
-                {
-                    wifi_uart_write_command_value(SSA_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSA_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_SSA_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET SSA OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, ssd_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse ssd ok,value is %d",value);
-                if(device_status.config.ssd != value)
-                {
-                    wifi_uart_write_command_value(SSD_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_SSD_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_SSD_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET SSD OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, cod_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse cod ok,value is %d",value);
-                if(device_status.info.cod != value)
-                {
-                    wifi_uart_write_command_value(COD_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COD_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_INFO_COD_GET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET COD OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, coe_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse coe ok,value is %d",value);
-                if(device_status.info.coe != value)
-                {
-                    wifi_uart_write_command_value(COE_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COE_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_INFO_COE_GET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET COE OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, emr_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse emr ok,value is %d",value);
-                if(device_status.config.emr != value)
-                {
-                    wifi_uart_write_command_value(EMR_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_EMR_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_EMR_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET EMR OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, rcp_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse rcp ok,value is %d",value);
-                if(device_status.config.rcp != value)
-                {
-                    wifi_uart_write_command_value(RCP_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_RCP_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_CONFIG_RCP_SET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET RCP OK\r\n");
-                    }
-                }
-            }
             az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse com ok,value is %d",value);
+            if(device_status.info.com != value)
+            {
+                wifi_uart_write_command_value(COM_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COM_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_INFO_COM_GET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET COM OK\r\n");
+                }
+            }
         }
-    }
-    az_json_reader_next_token(&jr);
-    if(az_json_token_is_text_equal(&jr.token, info_span))
-    {
+        else if (az_json_token_is_text_equal(&jr.token, coa_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse coa ok,value is %d",value);
+            if(device_status.info.coa != value)
+            {
+                wifi_uart_write_command_value(COA_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COA_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_INFO_COA_GET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET COA OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, cod_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse cod ok,value is %d",value);
+            if(device_status.info.cod != value)
+            {
+                wifi_uart_write_command_value(COD_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COD_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_INFO_COD_GET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET COD OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, coe_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse coe ok,value is %d",value);
+            if(device_status.info.coe != value)
+            {
+                wifi_uart_write_command_value(COE_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COE_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_INFO_COE_GET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET COE OK\r\n");
+                }
+            }
+        }
         az_json_reader_next_token(&jr);
-        while (jr.token.kind != AZ_JSON_TOKEN_END_OBJECT)//find command
-        {
-            if (az_json_token_is_text_equal(&jr.token, com_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse com ok,value is %d",value);
-                if(device_status.info.com != value)
-                {
-                    wifi_uart_write_command_value(COM_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COM_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_INFO_COM_GET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET COM OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, coa_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse coa ok,value is %d",value);
-                if(device_status.info.coa != value)
-                {
-                    wifi_uart_write_command_value(COA_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COA_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_INFO_COA_GET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET COA OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, cod_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse cod ok,value is %d",value);
-                if(device_status.info.cod != value)
-                {
-                    wifi_uart_write_command_value(COD_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COD_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_INFO_COD_GET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET COD OK\r\n");
-                    }
-                }
-            }
-            else if (az_json_token_is_text_equal(&jr.token, coe_name))
-            {
-                az_json_reader_next_token(&jr);
-                az_json_token_get_uint32(&jr,&value);
-                IOT_SAMPLE_LOG_SUCCESS("parse coe ok,value is %d",value);
-                if(device_status.info.coe != value)
-                {
-                    wifi_uart_write_command_value(COE_SET_CMD,value);
-                    ret = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COE_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-                    if(events & EVENT_INFO_COE_GET)
-                    {
-                        IOT_SAMPLE_LOG_SUCCESS("SET COE OK\r\n");
-                    }
-                }
-            }
-            az_json_reader_next_token(&jr);
-        }
-        twin_upload();
     }
+    twin_upload();
 }
 void handle_device_twin_message(
         wiced_mqtt_topic_msg_t const* message,
@@ -668,7 +370,6 @@ void handle_device_twin_message(
 {
   az_span const message_span = az_span_create((uint8_t*)message->data, message->data_len);
 
-  // Invoke appropriate action per response type (3 types only).
   switch (twin_response->response_type)
   {
     case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_GET:
@@ -682,7 +383,7 @@ void handle_device_twin_message(
 
     case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_DESIRED_PROPERTIES:
       IOT_SAMPLE_LOG("Message Type: Desired Properties");
-      parse_desired_twin(message_span);
+      parse_get_twin(message_span);
       break;
 
     case AZ_IOT_HUB_CLIENT_TWIN_RESPONSE_TYPE_REQUEST_ERROR:

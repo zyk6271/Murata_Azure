@@ -11,8 +11,6 @@ volatile unsigned char wifi_uart_tx_buf[PROTOCOL_HEAD + WIFIR_UART_SEND_BUF_LMT]
 volatile unsigned char *queue_in = NULL;
 volatile unsigned char *queue_out = NULL;
 
-extern unsigned char stop_update_flag;
-
 typedef struct {
     unsigned char dp_id;
     unsigned char dp_type;

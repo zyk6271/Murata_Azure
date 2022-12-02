@@ -48,13 +48,6 @@ int MQTT_MAX_RESOURCE_SIZE=                 (0x7fffffff);
 char USERNAME[]=                            "NULL";
 char PASSWORD[]=                            "NULL";
 
-//#define MQTT_BROKER_ADDRESS                 "SYRKR.azure-devices.net"
-//#define CLIENT_ID                           "syr_1"
-//#define WICED_MQTT_TIMEOUT                  (3000)
-//#define MQTT_MAX_RESOURCE_SIZE              (0x7fffffff)
-//#define USERNAME                           "SYRKR.azure-devices.net/syr_1/?api-version=2020-09-30"
-//#define PASSWORD                           "SharedAccessSignature sr=SYRKR.azure-devices.net%2Fdevices%2Fsyr_1&sig=R%2B6FcDtPHSHo7muafCA3oGWd3iNDquVSXmOcuFoE4Gw%3D&se=36001654129759"
-
 void handle_iot_message(wiced_mqtt_topic_msg_t* msg)
 {
     //Initialize the incoming topic to a span

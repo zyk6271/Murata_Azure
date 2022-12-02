@@ -58,12 +58,12 @@
 #define MIN_POLL_INTERVAL               (15 * 1000)
 
 #define NTP_NUM_SERVERS                 (2)
-#define NTP_SERVER_HOSTNAME             "time-a.nist.gov"
+#define NTP_SERVER_HOSTNAME             "stdtime.gov.hk"
 
 #define SNTP_WORKER_THREAD_PRIORITY     (4)
 #define SNTP_WORKER_THREAD_STACK_SIZE   (4 * 1024)
 #define SNTP_WORKER_THREAD_QUEUE_SIZE   (2)
-#define SNTP_DNS_TIMEOUT_MS             (3 * SECONDS)
+#define SNTP_DNS_TIMEOUT_MS             (2000)
 #define SNTP_DNS_RETRIES                (5)
 
 /******************************************************
@@ -320,7 +320,6 @@ static wiced_result_t sync_ntp_time( void* arg )
         connect_dns_retries = 0;
         do
         {
-            wiced_rtos_delay_milliseconds(1000);
             result = wiced_hostname_lookup(NTP_SERVER_HOSTNAME, &ntp_server_ip, SNTP_DNS_TIMEOUT_MS, sntp_interface);
         } while (result != WICED_SUCCESS && ++connect_dns_retries < SNTP_DNS_RETRIES);
 
