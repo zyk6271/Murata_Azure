@@ -31,7 +31,6 @@ static void link_down( void *arg)
 void application_start( void )
 {
     wiced_init();
-    dct_app_load();
     mqtt_config_read();
     print_wifi_config_dct();
     uart_init();

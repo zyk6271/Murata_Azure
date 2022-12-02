@@ -45,25 +45,13 @@ wiced_result_t print_wifi_config_dct( void )
 
     return WICED_SUCCESS;
 }
-wiced_result_t dct_app_load( void )
-{
-    platform_dct_azure_config_t*       app_dct                  = NULL;
-
-    wiced_dct_read_lock( (void**) &app_dct, WICED_FALSE, DCT_AZURE_SECTION, 0, sizeof( platform_dct_azure_config_t ) );
-    if(app_dct->init_flag==1)
-    {
-        WPRINT_APP_INFO( ( "device_id : %s\r\n", app_dct->device_id ) );
-        WPRINT_APP_INFO( ( "primaryKey : %s\r\n", app_dct->primaryKey ) );
-        WPRINT_APP_INFO( ( "endpointAddress : %s\r\n", app_dct->endpointAddress ) );
-        strncpy(device_status.info.srn,app_dct->device_id,strlen(app_dct->device_id));
-    }
-    wiced_dct_read_unlock( app_dct, WICED_FALSE );
-    return WICED_SUCCESS;
-}
 wiced_result_t dct_app_all_read( platform_dct_azure_config_t** app_dct )
 {
     platform_dct_azure_config_t*       app_dct_origin                  = NULL;
     wiced_dct_read_lock( (void **)&app_dct_origin, WICED_TRUE, DCT_AZURE_SECTION, 0, sizeof( platform_dct_azure_config_t ) );
+    WPRINT_APP_INFO( ( "device_id : %s\r\n", app_dct_origin->device_id ) );
+    WPRINT_APP_INFO( ( "primaryKey : %s\r\n", app_dct_origin->primaryKey ) );
+    WPRINT_APP_INFO( ( "endpointAddress : %s\r\n", app_dct_origin->endpointAddress ) );
     memcpy(*app_dct,app_dct_origin,sizeof(platform_dct_azure_config_t));
     wiced_dct_read_unlock( app_dct_origin, WICED_TRUE );
     return WICED_SUCCESS;

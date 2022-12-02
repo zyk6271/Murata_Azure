@@ -159,6 +159,18 @@ void wifi_status_change(uint8_t value)
     wifi_status = value;
     wifi_uart_write_command_value(WST_SET_CMD,value);
 }
+void ap_status_change(uint8_t value)
+{
+    if(value)
+    {
+        wifi_uart_write_command_value(WST_SET_CMD,5);
+    }
+    else
+    {
+        wifi_uart_write_command_value(WST_SET_CMD,4);
+    }
+
+}
 uint8_t wifi_status_get(void)
 {
     return wifi_status;

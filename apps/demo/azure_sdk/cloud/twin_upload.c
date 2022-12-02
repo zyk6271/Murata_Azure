@@ -17,6 +17,7 @@ static uint8_t gw_ip_buf[18];
 extern syr_status device_status;
 extern az_iot_hub_client hub_client;
 extern wiced_mqtt_object_t mqtt_object;
+extern char* device_id;
 
 extern wiced_event_flags_t Config_EventHandler;
 extern wiced_event_flags_t Info_EventHandler;
@@ -347,7 +348,7 @@ void twin_upload(void)
     az_json_writer_append_property_name(&jw, mcu_srn_name);
     az_json_writer_append_string(&jw, az_span_create_from_str(device_status.info.srn));
     az_json_writer_append_property_name(&jw, wifi_srn_name);
-    az_json_writer_append_string(&jw, az_span_create_from_str(murata_id_read()));
+    az_json_writer_append_string(&jw, az_span_create_from_str(device_id));
     az_json_writer_append_property_name(&jw, mcu_ver_name);
     az_json_writer_append_string(&jw, az_span_create_from_str(device_status.info.ver));
     az_json_writer_append_property_name(&jw, wifi_ver_name);

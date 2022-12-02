@@ -399,13 +399,6 @@ void signature_generate(char *pass, char*host, char *devname, char *key, char *t
     strcat(pass, time_exp);
     strcat(pass, "&skn=");
 }
-char id[64];
-char *murata_id_read(void)
-{
-    memset(id,0,64);
-    memcpy(id,device_id,strlen(device_id));
-    return id;
-}
 void mqtt_config_read(void)
 {
     platform_dct_azure_config_t *app_t = calloc(sizeof(platform_dct_azure_config_t), sizeof(char));

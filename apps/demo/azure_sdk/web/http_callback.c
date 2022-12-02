@@ -585,10 +585,10 @@ int32_t http_srn_get_callback(const char* url_path, const char* url_parameters, 
 }
 int32_t http_srn2_get_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
 {
-    char *id = murata_id_read();
+    extern char* device_id;
     now_stream = stream;
     LOG_D("http_srn2_callback GET\r\n");
-    http_get_flush_string("getSRN2",7 ,id,strlen(id));
+    http_get_flush_string("getSRN2",7 ,device_id,strlen(device_id));
     return 0;
 }
 int32_t http_com_get_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)
@@ -809,7 +809,7 @@ int32_t http_wfs_get_callback(const char* url_path, const char* url_parameters, 
 {
     now_stream = stream;
     LOG_D("http_wfs_callback GET\r\n");
-    http_set_flush_value(SUCCESS_CODE,"getwfs",6,wifi_status_get());
+    http_get_flush_value("getwfs",6,wifi_status_get());
     return 0;
 }
 int32_t http_azc_get_callback(const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_message_body)

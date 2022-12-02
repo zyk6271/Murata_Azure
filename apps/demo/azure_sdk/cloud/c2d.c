@@ -96,6 +96,7 @@ void parse_c2d_message(
         {
             IOT_SAMPLE_LOG_SUCCESS("SET DEF OK\r\n");
             c2d_reponse(1,1);
+            set_factory();
         }
     }
     else if (az_json_token_is_text_equal(&jr.token, ras_name))
