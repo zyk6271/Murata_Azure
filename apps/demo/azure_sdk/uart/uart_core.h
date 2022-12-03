@@ -172,12 +172,10 @@
 #define         COE_GET_CMD                  0x39
 #define         COE_PUT_CMD                  0x3A
 #define         CND_PUT_CMD                  0x3B
-#define         WST_GET_CMD                  0x3C
-#define         WST_SET_CMD                  0x3D
-#define         EMR_SET_CMD                  0x3E
-#define         EMR_GET_CMD                  0x3F
-#define         RCP_SET_CMD                  0x40
-#define         RCP_GET_CMD                  0x41
+#define         EMR_SET_CMD                  0x3C
+#define         EMR_GET_CMD                  0x3D
+#define         RCP_SET_CMD                  0x3E
+#define         RCP_GET_CMD                  0x3F
 
 #define         EVENT_CONFIG_RSE_GET         1<<0
 #define         EVENT_CONFIG_RSE_SET         1<<1

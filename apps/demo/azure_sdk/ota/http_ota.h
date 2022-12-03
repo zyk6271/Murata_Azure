@@ -3,7 +3,7 @@
 #define GET_RESP_BUFSZ              512
 
 #define Retry_Count                 5
-#define Retry_Time                  5000
+#define Retry_Time                  3000
 
 #define MURATA_VER_URL              "http://ota.sentientech.com.cn:8080/SYR/murata.txt"
 #define MURATA_BIN_URL              "http://ota.sentientech.com.cn:8080/SYR/murata.bin"

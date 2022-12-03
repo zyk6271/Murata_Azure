@@ -11,6 +11,8 @@ volatile unsigned char wifi_uart_tx_buf[PROTOCOL_HEAD + WIFIR_UART_SEND_BUF_LMT]
 volatile unsigned char *queue_in = NULL;
 volatile unsigned char *queue_out = NULL;
 
+volatile unsigned char stop_update_flag;
+
 typedef struct {
     unsigned char dp_id;
     unsigned char dp_type;
@@ -75,8 +77,6 @@ const DOWNLOAD_CMD_S download_cmd[] =
     {COE_GET_CMD , DP_TYPE_VALUE},
     {COE_PUT_CMD , DP_TYPE_VALUE},
     {CND_PUT_CMD , DP_TYPE_VALUE},
-    {WST_GET_CMD , DP_TYPE_VALUE},
-    {WST_SET_CMD , DP_TYPE_VALUE},
     {EMR_SET_CMD , DP_TYPE_VALUE},
     {EMR_GET_CMD , DP_TYPE_VALUE},
     {RCP_SET_CMD , DP_TYPE_VALUE},
@@ -330,8 +330,8 @@ unsigned char mcu_dp_value_update(unsigned char dpid,unsigned long value)
 {
     unsigned short send_len = 0;
 
-//    if(stop_update_flag == ENABLE)
-//        return SUCCESS;
+    if(stop_update_flag == ENABLE)
+        return SUCCESS;
 
     send_len = set_wifi_uart_byte(send_len,dpid);
     send_len = set_wifi_uart_byte(send_len,DP_TYPE_VALUE);
@@ -362,8 +362,8 @@ unsigned char mcu_dp_string_update(unsigned char dpid,const unsigned char value[
 {
     unsigned short send_len = 0;
 
-//    if(stop_update_flag == ENABLE)
-//        return SUCCESS;
+    if(stop_update_flag == ENABLE)
+        return SUCCESS;
     //
     send_len = set_wifi_uart_byte(send_len,dpid);
     send_len = set_wifi_uart_byte(send_len,DP_TYPE_STRING);
@@ -524,19 +524,12 @@ void wifi_uart_service(void)
             break;
         }
 
-        //数据接收完成
         if(get_check_sum((unsigned char *)wifi_data_process_buf + offset,rx_value_len - 1) != wifi_data_process_buf[offset + rx_value_len - 1]) {
             //校验出错
             printf("crc error (crc:0x%X  but data:0x%X)\r\n",get_check_sum((unsigned char *)wifi_data_process_buf + offset,rx_value_len - 1),wifi_data_process_buf[offset + rx_value_len - 1]);
             offset += 3;
             continue;
         }
-//        printf("Recv:====> ");
-//        for(uint8_t i=0;i < rx_value_len;i++)
-//        {
-//            printf("%02X ",wifi_data_process_buf[offset+i]);
-//        }
-//        printf(" <====\r\n");
         data_handle(offset);
         offset += rx_value_len;
     }

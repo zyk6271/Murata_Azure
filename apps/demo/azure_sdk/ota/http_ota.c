@@ -18,6 +18,7 @@ uint32_t file_size = 0;
 
 extern char wifi_version[];
 extern syr_status device_status;
+extern volatile unsigned char stop_update_flag;
 
 void http_uart_ack(void)
 {
@@ -127,21 +128,22 @@ static int st_download_callback(char *buffer, int length)
     uint32_t send_len = 0;
     static uint32_t chunk_count = 0;
 
+    stop_update_flag = ENABLE;
+
     if(now_offset==0)
     {
         chunk_count = 0;
     }
-
-    send_len = 0;
-    send_len = set_wifi_uart_byte(send_len,(now_offset & 0xff000000)>>24);
-    send_len = set_wifi_uart_byte(send_len,(now_offset & 0xff0000)>>16);
-    send_len = set_wifi_uart_byte(send_len,(now_offset & 0xff00)>>8);
-    send_len = set_wifi_uart_byte(send_len,now_offset & 0xff);
-    send_len = set_wifi_uart_buffer(send_len,(const unsigned char*)buffer,length);
-
     for(uint8_t i = 0;i < Retry_Count;i++)
     {
+        send_len = 0;
+        send_len = set_wifi_uart_byte(send_len,(now_offset & 0xff000000)>>24);
+        send_len = set_wifi_uart_byte(send_len,(now_offset & 0xff0000)>>16);
+        send_len = set_wifi_uart_byte(send_len,(now_offset & 0xff00)>>8);
+        send_len = set_wifi_uart_byte(send_len,now_offset & 0xff);
+        send_len = set_wifi_uart_buffer(send_len,(const unsigned char*)buffer,length);
         wifi_uart_write_frame(UPDATE_TRANS_CMD, MCU_TX_VER, send_len);
+
         if(wiced_rtos_get_semaphore( &uart_ack_sem, Retry_Time ) == 0)
         {
             chunk_count++;
@@ -168,7 +170,7 @@ static int st_download_callback(char *buffer, int length)
     printf("st_download failed\r\n");
     ota_control_send(ST_Download_Error);
 __exit:
-    //stop_update_flag = 0;
+    stop_update_flag = DISABLE;
     free(buffer);
     return ret;
 }
@@ -303,10 +305,10 @@ static int murata_download_callback(char *buffer, int length)
     static wiced_app_t app;
     static uint32_t chunk_count = 0;
 
+    stop_update_flag = ENABLE;
     if (now_offset == 0)
     {
         ota_control_send(Murata_Downloading);
-        //stop_update_flag = 1;
         chunk_count = 0;
         uint32_t current_size;
         if (wiced_framework_app_open( DCT_APP0_INDEX, &app ) != WICED_SUCCESS)
@@ -356,7 +358,6 @@ static int murata_download_callback(char *buffer, int length)
     wifi_uart_write_frame(UPDATE_PROGRSS_CMD, MCU_TX_VER, send_len);
     if( now_offset == file_size )
     {
-        //stop_update_flag = 0;
         wiced_framework_app_close( &app );
         wiced_framework_set_boot ( DCT_APP0_INDEX, PLATFORM_DEFAULT_LOAD );
         ota_control_send(Murata_Download_Done);
@@ -366,6 +367,7 @@ static int murata_download_callback(char *buffer, int length)
         wiced_framework_reboot();
     }
 __exit:
+    stop_update_flag = DISABLE;
     free(buffer);
     return ret;
 

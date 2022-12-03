@@ -157,17 +157,24 @@ void wifi_watch_init(void)
 void wifi_status_change(uint8_t value)
 {
     wifi_status = value;
-    wifi_uart_write_command_value(WST_SET_CMD,value);
+
+    uint8_t send_len = 0;
+    send_len = set_wifi_uart_byte(send_len,value);
+    wifi_uart_write_frame(WIFI_STATE_CMD, MCU_TX_VER, send_len);
 }
 void ap_status_change(uint8_t value)
 {
     if(value)
     {
-        wifi_uart_write_command_value(WST_SET_CMD,5);
+        uint8_t send_len = 0;
+        send_len = set_wifi_uart_byte(send_len,5);
+        wifi_uart_write_frame(WIFI_STATE_CMD, MCU_TX_VER, send_len);
     }
     else
     {
-        wifi_uart_write_command_value(WST_SET_CMD,4);
+        uint8_t send_len = 0;
+        send_len = set_wifi_uart_byte(send_len,4);
+        wifi_uart_write_frame(WIFI_STATE_CMD, MCU_TX_VER, send_len);
     }
 
 }
