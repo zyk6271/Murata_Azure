@@ -58,7 +58,7 @@
 #define MIN_POLL_INTERVAL               (15 * 1000)
 
 #define NTP_NUM_SERVERS                 (2)
-#define NTP_SERVER_HOSTNAME             "stdtime.gov.hk"
+#define NTP_SERVER_HOSTNAME             "time.sentientech.com.cn"
 
 #define SNTP_WORKER_THREAD_PRIORITY     (4)
 #define SNTP_WORKER_THREAD_STACK_SIZE   (4 * 1024)

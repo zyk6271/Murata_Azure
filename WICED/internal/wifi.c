@@ -184,8 +184,6 @@ wiced_result_t wiced_init( void )
     wwd_time_t elapsed_time;
 
     WPRINT_WICED_INFO( ("\nStarting WICED " WICED_VERSION "\n") );
-    wiced_rtos_delay_milliseconds(2000);
-
     CHECK_RETURN( wiced_core_init( ) );
 
     /* Track and log how long to start up */
