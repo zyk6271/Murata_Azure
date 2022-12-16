@@ -409,9 +409,9 @@ restart:
 
 exit:
     platform_mcu_powersave_enable();
-#if !defined(STM32F412xG)
+
     SDIO->MASK = SDIO_MASK_SDIOITIE;
-#endif
+
     return result;
 }
 
@@ -540,6 +540,16 @@ WWD_RTOS_DEFINE_ISR( sdio_irq )
 #if defined(STM32F412xG)
     if (current_command == SDIO_CMD_5)
         SDIO->ICR = SDIO_ICR_CCRCFAILC;
+#endif
+
+#if defined(STM32F412xG)
+
+  if ((intstatus & SDIO_STA_SDIOIT) == SDIO_STA_SDIOIT ) {
+
+      SDIO->MASK &= ~SDIO_MASK_SDIOITIE;
+
+  }
+
 #endif
     if ( ( intstatus & ( SDIO_STA_CCRCFAIL | SDIO_STA_DCRCFAIL | SDIO_STA_TXUNDERR | SDIO_STA_RXOVERR  | SDIO_STA_STBITERR )) != 0 )
     {

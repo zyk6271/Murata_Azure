@@ -49,9 +49,6 @@ wiced_result_t dct_app_all_read( platform_dct_azure_config_t** app_dct )
 {
     platform_dct_azure_config_t*       app_dct_origin                  = NULL;
     wiced_dct_read_lock( (void **)&app_dct_origin, WICED_TRUE, DCT_AZURE_SECTION, 0, sizeof( platform_dct_azure_config_t ) );
-    WPRINT_APP_INFO( ( "device_id : %s\r\n", app_dct_origin->device_id ) );
-    WPRINT_APP_INFO( ( "primaryKey : %s\r\n", app_dct_origin->primaryKey ) );
-    WPRINT_APP_INFO( ( "endpointAddress : %s\r\n", app_dct_origin->endpointAddress ) );
     memcpy(*app_dct,app_dct_origin,sizeof(platform_dct_azure_config_t));
     wiced_dct_read_unlock( app_dct_origin, WICED_TRUE );
     return WICED_SUCCESS;

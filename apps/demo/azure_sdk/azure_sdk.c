@@ -15,11 +15,17 @@
 
 extern uint8_t azure_flag;
 
+uint8_t first_link_up = 0;
+
 void link_up_callback(void)
 {
+    if(first_link_up == 0)
+    {
+        first_link_up = 1;
+        keep_alive();
+        sntp_start_auto_time_sync_nowait( 1000*60*30 );
+    }
     wiced_dns_init(WICED_STA_INTERFACE);
-    keep_alive();
-    sntp_start_auto_time_sync_nowait( 1000*60*30 );
     wifi_status_change(2);
     mqtt_connect_azure();
 }

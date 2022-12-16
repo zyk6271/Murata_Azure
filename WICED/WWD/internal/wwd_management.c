@@ -200,6 +200,7 @@ wwd_result_t wwd_management_wifi_on( wiced_country_code_t country )
     /* See <WICED-SDK>/generated_mac_address.txt for info about setting the MAC address  */
     host_platform_get_mac_address(&mac_address);
     wwd_wifi_set_mac_address(mac_address, WWD_STA_INTERFACE);
+    wwd_wifi_set_mac_address(mac_address, WWD_AP_INTERFACE);
 #endif
 
     /* Turn off SDPCM TX Glomming */
