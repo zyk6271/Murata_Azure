@@ -12,7 +12,7 @@
 uint8_t azure_flag = 0;
 extern syr_status device_status;
 
-char wifi_version[]={"1.1.0"};
+char wifi_version[]={"1.1.1"};
 
 wiced_result_t print_wifi_config_dct( void )
 {
