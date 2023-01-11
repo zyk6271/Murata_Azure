@@ -28,9 +28,10 @@ void azure_serv_callback( uint32_t arg )
         wiced_rtos_get_semaphore( &azure_refresh_sem, WICED_WAIT_FOREVER );
         config_get();
         info_get();
-        get_device_twin_document();
+        wiced_rtos_delay_milliseconds(1000);
+        twin_upload();
         telemetry_request();
-        wiced_rtos_delay_milliseconds(3000);
+        wiced_rtos_delay_milliseconds(2000);
         wifi_status_change(3);
     }
 }
