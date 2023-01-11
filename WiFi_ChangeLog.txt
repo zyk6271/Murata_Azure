@@ -18,3 +18,11 @@
 7.AP & STATION can work together
 8.Add wfs command
 9.Add HttpSever Enbale control command
+
+1.1.1 2023.01.11
+1.修复了SDIO的中断顺序问题
+2.修复了AP的mac地址设置
+3.取消了启动延迟
+4.更换了ntp服务器地址
+5.更新了TLS证书
+6.取消了联网时获取twin设置
