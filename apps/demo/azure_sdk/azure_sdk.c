@@ -13,7 +13,7 @@
 #include "sntp.h"
 #include "netx_applications/dns/nxd_dns.h"
 
-extern uint8_t azure_flag;
+extern uint8_t wifi_configured;
 
 uint8_t first_link_up = 0;
 
@@ -25,28 +25,20 @@ void link_up_callback(void)
         keep_alive();
         sntp_start_auto_time_sync_nowait( 1000*60*30 );
     }
-    wiced_dns_init(WICED_STA_INTERFACE);
-    wifi_status_change(2);
-    mqtt_connect_azure();
 }
 static void link_down( void *arg)
 {
-    wifi_status_change(1);
+    wifi_status_change(2);
     wifi_disconnect_callback();
 }
 void application_start( void )
 {
     wiced_init();
     mqtt_config_read();
-    print_wifi_config_dct();
     uart_init();
-    wifi_status_change(0);
-    http_ota_init();
-    wifi_watch_init();
-    if(!azure_flag)
+    if(!wifi_configured)
     {
-        mqtt_watch_init();
-        azure_start();
+        network_application_start();
         wiced_network_register_link_callback( NULL, NULL, link_down, NULL, WICED_STA_INTERFACE );
         wiced_network_up( WICED_STA_INTERFACE, WICED_USE_EXTERNAL_DHCP_SERVER, NULL );
     }

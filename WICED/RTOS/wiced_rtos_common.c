@@ -243,11 +243,6 @@ wiced_result_t wiced_rtos_init_semaphore( wiced_semaphore_t* semaphore )
     return (wiced_result_t) host_rtos_init_semaphore( (host_semaphore_type_t*) semaphore );
 }
 
-//wiced_result_t wiced_rtos_init_binary_semaphore( wiced_semaphore_t* semaphore )
-//{
-//    return (wiced_result_t) host_rtos_init_binary_semaphore( (host_semaphore_type_t*) semaphore );
-//}
-
 wiced_result_t wiced_rtos_set_semaphore( wiced_semaphore_t* semaphore )
 {
     return (wiced_result_t) host_rtos_set_semaphore( (host_semaphore_type_t*) semaphore, host_platform_is_in_interrupt_context( ) );

@@ -41,8 +41,6 @@ typedef struct _syr_tem
 }syr_tem;
 typedef struct _syr_c2d
 {
-    uint32_t rst;
-    uint32_t def;
     uint32_t ras;
 }syr_c2d;
 typedef struct _syr_status

@@ -78,7 +78,7 @@ void parse_c2d_message(
         c2d_reponse(0,1);
         command_found = 1;
         IOT_SAMPLE_LOG_SUCCESS("parse rst ok");
-        wifi_uart_write_command_value(RST_SET_CMD,1);
+        wifi_uart_write_frame(DEVICE_REBOOT_CMD, MCU_TX_VER, 0);
         result = wiced_rtos_wait_for_event_flags(&C2D_EventHandler,EVENT_C2D_RST_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
         if(events & EVENT_C2D_RST_SET)
         {
@@ -90,7 +90,7 @@ void parse_c2d_message(
         az_json_reader_next_token(&jr);
         command_found = 1;
         IOT_SAMPLE_LOG_SUCCESS("parse def ok");
-        wifi_uart_write_command_value(DEF_SET_CMD,1);
+        wifi_uart_write_frame(FACTORY_SET_CMD, MCU_TX_VER, 0);
         result = wiced_rtos_wait_for_event_flags(&C2D_EventHandler,EVENT_C2D_DEF_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
         if(events & EVENT_C2D_DEF_SET)
         {

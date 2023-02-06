@@ -70,20 +70,19 @@ START_OF_HTTP_PAGE_DATABASE(web_pages)
 {    "/rsa/get/azc",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_azc_get_callback, 0 },},
 END_OF_HTTP_PAGE_DATABASE();
 
-void http_start( uint8_t value )
+void http_control( uint8_t value )
 {
     if(value != http_status)
     {
+        wifi_status_change(1);
         http_status = value;
         if(value)
         {
-            ap_status_change(1);
             wiced_network_up(WICED_AP_INTERFACE, WICED_USE_INTERNAL_DHCP_SERVER, &ip_settings);
             wiced_http_server_start( &syr_server, 5333, MAX_SOCKETS, web_pages, WICED_AP_INTERFACE, DEFAULT_URL_PROCESSOR_STACK_SIZE );
         }
         else
         {
-            ap_status_change(0);
             wiced_http_server_stop(&syr_server);
             wiced_network_down(WICED_AP_INTERFACE);
         }

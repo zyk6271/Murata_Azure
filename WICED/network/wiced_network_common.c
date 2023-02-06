@@ -291,7 +291,7 @@ wiced_result_t wiced_network_up( wiced_interface_t interface, wiced_network_conf
 #else
 
 #ifdef  Azure_SDK
-            wifi_status_change(1);
+            wifi_status_change(2);
 #endif
             result = wiced_join_ap( );
 #endif

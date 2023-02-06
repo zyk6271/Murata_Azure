@@ -36,6 +36,7 @@ void uart_recv_callback( uint32_t arg )
 }
 void uart_serv_callback( uint32_t arg )
 {
+    wifi_status_change(0);
     product_info_request();
     while(1)
     {

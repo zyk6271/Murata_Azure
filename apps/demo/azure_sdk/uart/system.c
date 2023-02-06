@@ -5,7 +5,7 @@
 #include "system.h"
 #include "cJSON.h"
 
-extern uint8_t azure_flag;
+extern uint8_t wifi_configured;
 extern syr_status device_status;
 extern wiced_event_flags_t Config_EventHandler;
 extern wiced_event_flags_t Info_EventHandler;
@@ -191,16 +191,6 @@ void dp_download_handle(unsigned char dpid,const unsigned char value[], unsigned
             device_status.tem.alr = update_value;
             wiced_rtos_set_event_flags(&TEM_EventHandler,EVENT_TEM_ALR_GET);
             break;
-        case RST_SET_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            device_status.c2d.rst = update_value;
-            wiced_rtos_set_event_flags(&C2D_EventHandler,EVENT_C2D_RST_SET);
-            break;
-        case DEF_SET_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            device_status.c2d.def = update_value;
-            wiced_rtos_set_event_flags(&C2D_EventHandler,EVENT_C2D_DEF_SET);
-            break;
         case RAS_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.c2d.ras = update_value;
@@ -229,7 +219,7 @@ void dp_download_handle(unsigned char dpid,const unsigned char value[], unsigned
         default:
             break;
         }
-    if(!azure_flag)
+    if(!wifi_configured)
     {
         switch(dpid)
         {
@@ -323,6 +313,11 @@ void product_info_request(void)
     wifi_uart_write_frame(PRODUCT_INFO_CMD, MCU_TX_VER, 0);
 }
 
+void factory_set_request(void)
+{
+    set_factory();
+}
+
 void product_info_parse(unsigned char* data_buf,unsigned short data_len)
 {
     cJSON *root = NULL,*item = NULL;
@@ -368,5 +363,5 @@ void ota_control_parse(unsigned char data)
 }
 void wifi_ap_enable_control(unsigned char data)
 {
-    http_start(data);
+    http_control(data);
 }

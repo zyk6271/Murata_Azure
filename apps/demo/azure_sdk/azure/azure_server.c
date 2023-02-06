@@ -22,6 +22,8 @@ void azure_refresh(void)
 }
 void azure_serv_callback( uint32_t arg )
 {
+    wiced_rtos_init_semaphore( &azure_refresh_sem );
+    azure_env_init();
     mqtt_init();
     while ( 1 )
     {
@@ -32,7 +34,7 @@ void azure_serv_callback( uint32_t arg )
         twin_upload();
         telemetry_request();
         wiced_rtos_delay_milliseconds(2000);
-        wifi_status_change(3);
+        wifi_status_change(4);
     }
 }
 void azure_env_init(void)
@@ -49,9 +51,10 @@ void azure_env_init(void)
     }
 
 }
-void azure_start(void)
+void network_application_start(void)
 {
-    wiced_rtos_init_semaphore( &azure_refresh_sem );
-    azure_env_init();
+    http_ota_init();
+    wifi_watch_init();
+    mqtt_watch_init();
     wiced_rtos_create_thread( &azure_serv_t, 7, "azure_serv", azure_serv_callback, 8192, 0 );
 }

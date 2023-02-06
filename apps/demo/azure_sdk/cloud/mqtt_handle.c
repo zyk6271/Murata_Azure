@@ -209,6 +209,11 @@ wiced_result_t mqtt_app_publish( wiced_mqtt_object_t mqtt_obj, uint8_t qos, char
 uint8_t mqtt_resolve(void)
 {
     wiced_result_t ret = WICED_SUCCESS;
+    static uint8_t resolved_flag;
+    if(resolved_flag)
+    {
+        return WICED_SUCCESS;
+    }
     for(uint8_t i=0;i<WICED_MQTT_RETRY_COUNT;i++)
     {
         wiced_ip_address_t reslove_address = {0};
@@ -224,6 +229,7 @@ uint8_t mqtt_resolve(void)
         }
         else
         {
+            resolved_flag = 1;
             memcpy(&broker_address,&reslove_address,sizeof(wiced_ip_address_t));
             return WICED_SUCCESS;
         }
@@ -292,57 +298,33 @@ uint8_t mqtt_start_subsribe(void)
 __success:
     return WICED_SUCCESS;
 }
-extern uint8_t mqtt_status;
-void mqtt_stop(void)
+void mqtt_connection_stop(void)
 {
-    mqtt_connection_t *conn = (mqtt_connection_t*) mqtt_object;
-    if(mqtt_status)
-    {
-        mqtt_status = 0;
-        mqtt_backend_connection_close( conn );
-    }
-}
-static void mqtt_start(void)
-{
-    if(mqtt_status == 0)
-    {
-        mqtt_status = 1;
-    }
-}
-static void mqtt_restart(void)
-{
-    mqtt_stop();
-    mqtt_start();
+    mqtt_backend_connection_close( (mqtt_connection_t*) mqtt_object );
 }
 void mqtt_connect_azure(void)
 {
     wiced_result_t ret = WICED_SUCCESS;
 
-    mqtt_restart();
-
     ret = mqtt_resolve();
     if(ret != WICED_SUCCESS)
     {
-        goto __net_err;
+        wifi_disconnect_callback();
+        return;
     }
     ret = mqtt_start_connect();
     if(ret != WICED_SUCCESS)
     {
-        goto __net_err;
+        wifi_disconnect_callback();
+        return;
     }
     ret = mqtt_start_subsribe();
     if(ret != WICED_SUCCESS)
     {
-        goto __mqtt_err;
+        mqtt_disconnect_callabck();
+        return;
     }
     azure_refresh();
-    return;
-__net_err:
-    wifi_disconnect_callback();
-    return;
-__mqtt_err:
-    mqtt_disconnect_callabck();
-    return;
 
 }
 void urlencode(char *dst, char *src, int len) {
@@ -435,6 +417,7 @@ void mqtt_config_read(void)
         strncpy(endpoint_key,PASSWORD,strlen(PASSWORD));
     }
     free(app_t);
+    print_wifi_config_dct();
 }
 void mqtt_init(void)
 {

@@ -118,7 +118,7 @@ void rst_timer_callback(void* arg)
 }
 void rst_work(void)
 {
-    wiced_rtos_init_timer(&rst_timer, 1000, rst_timer_callback, 0);
+    wiced_rtos_init_timer(&rst_timer, 3000, rst_timer_callback, 0);
     wiced_rtos_start_timer(&rst_timer);
 }
 void set_config(wiced_ssid_t ssid, wiced_wpa_key_t password)

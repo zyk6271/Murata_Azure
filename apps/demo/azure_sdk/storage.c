@@ -9,7 +9,7 @@
 #include "wiced_result.h"
 #include "wiced_apps_common.h"
 
-uint8_t azure_flag = 0;
+uint8_t wifi_configured = 0;
 extern syr_status device_status;
 
 char wifi_version[]={"1.1.1"};
@@ -40,7 +40,7 @@ wiced_result_t print_wifi_config_dct( void )
     WPRINT_APP_INFO( ( "    DCT mac_address                 : ") );
     print_mac_address( (wiced_mac_t*) &dct_wifi_config->mac_address );
     WPRINT_APP_INFO( ("\r\n") );
-    azure_flag = dct_wifi_config->device_configured;
+    wifi_configured = dct_wifi_config->device_configured;
     wiced_dct_read_unlock( dct_wifi_config, WICED_FALSE );
 
     return WICED_SUCCESS;

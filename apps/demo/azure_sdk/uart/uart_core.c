@@ -20,8 +20,6 @@ typedef struct {
 
 const DOWNLOAD_CMD_S download_cmd[] =
 {
-    {RST_SET_CMD , DP_TYPE_VALUE},
-    {DEF_SET_CMD , DP_TYPE_VALUE},
     {RAS_SET_CMD , DP_TYPE_VALUE},
     {RAS_GET_CMD , DP_TYPE_VALUE},
     {RAS_PUT_CMD , DP_TYPE_VALUE},
@@ -598,6 +596,9 @@ void data_handle(unsigned short offset)
     unsigned short i,total_len;
     unsigned char cmd_type = wifi_data_process_buf[offset + FRAME_TYPE];
     switch(cmd_type) {
+        case FACTORY_SET_CMD:                                //恢复出厂
+            factory_set_request();
+        break;
         case PRODUCT_INFO_CMD:                                //产品信息
             total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
             product_info_parse((unsigned char *)wifi_data_process_buf + offset + DATA_START,total_len);

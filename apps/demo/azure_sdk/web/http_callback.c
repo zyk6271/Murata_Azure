@@ -29,7 +29,7 @@ int32_t http_rst_set_callback(const char* url_path, const char* url_parameters, 
     char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
     LOG_D("http_rst_callback value %ld,size %ld\r\n",value,size);
-    wifi_uart_write_command_value(RST_SET_CMD,1);
+    wifi_uart_write_frame(DEVICE_REBOOT_CMD, MCU_TX_VER, 0);
     ret = wiced_rtos_wait_for_event_flags(&C2D_EventHandler,EVENT_C2D_RST_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
     if(events & EVENT_C2D_RST_SET)
     {
@@ -50,7 +50,7 @@ int32_t http_def_set_callback(const char* url_path, const char* url_parameters, 
     char* value_buf = flite_value(url_path,(void *)&size);
     value = atoi(value_buf);
     LOG_D("http_def_set_callback value %ld,size %ld\r\n",value,size);
-    wifi_uart_write_command_value(DEF_SET_CMD,1);
+    wifi_uart_write_frame(FACTORY_SET_CMD, MCU_TX_VER, 0);
     ret = wiced_rtos_wait_for_event_flags(&C2D_EventHandler,EVENT_C2D_DEF_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
     if(events & EVENT_C2D_DEF_SET)
     {
