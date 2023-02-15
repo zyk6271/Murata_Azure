@@ -807,7 +807,7 @@ wiced_result_t wiced_join_ap_specific( wiced_ap_info_t* details, uint8_t securit
 wiced_result_t wiced_leave_ap( wiced_interface_t interface )
 {
     /* Deregister the link event handler and leave the current AP */
-    wwd_management_set_event_handler(link_events, NULL, 0, WICED_TO_WWD_INTERFACE( interface ) );
+    //wwd_management_set_event_handler(link_events, NULL, 0, WICED_TO_WWD_INTERFACE( interface ) );
     wwd_wifi_leave( WICED_TO_WWD_INTERFACE( interface ) );
     if ( (interface == WICED_STA_INTERFACE )
 #ifdef WICED_USE_WIFI_TWO_STA_INTERFACE

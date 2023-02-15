@@ -146,8 +146,8 @@ void wifi_watch_callback( uint32_t arg )
             wifi_status_change(1);
             mqtt_connection_stop();
             wiced_wifi_disable_keep_alive( 0 );
-            wiced_rtos_delay_milliseconds(1000);
             ret = wiced_network_down(WICED_STA_INTERFACE);
+            //ret = wiced_ip_down( WICED_STA_INTERFACE );
             printf("wiced_network_down is %d\r\n",ret);
             wiced_network_up( WICED_STA_INTERFACE, WICED_USE_EXTERNAL_DHCP_SERVER, NULL );
         }
