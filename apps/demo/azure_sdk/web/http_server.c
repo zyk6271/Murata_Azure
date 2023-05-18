@@ -26,8 +26,6 @@ START_OF_HTTP_PAGE_DATABASE(web_pages)
 {    "/rsa/get/cnd",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_cnd_get_callback, 0 },},
 {    "/rsa/get/net",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_net_get_callback, 0 },},
 {    "/rsa/get/bat",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_bat_get_callback, 0 },},
-{    "/rsa/get/ala",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_ala_get_callback, 0 },},
-{    "/rsa/get/alr",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_alr_get_callback, 0 },},
 {    "/rsa/get/sup",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_sup_get_callback, 0 },},
 {    "/rsa/get/rse",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_rse_get_callback, 0 },},
 {    "/rsa/set/rse/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_rse_set_callback, 0 },},
@@ -52,7 +50,6 @@ START_OF_HTTP_PAGE_DATABASE(web_pages)
 {    "/rsa/get/ver",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_ver_get_callback, 0 },},
 {    "/rsa/get/ver2",                            "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_ver2_get_callback, 0 },},
 {    "/rsa/get/srn",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_srn_get_callback, 0 },},
-{    "/rsa/get/srn2",                            "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_srn2_get_callback, 0 },},
 {    "/rsa/get/com",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_com_get_callback, 0 },},
 {    "/rsa/set/com/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_com_set_callback, 0 },},
 {    "/rsa/get/coa",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_coa_get_callback, 0 },},
@@ -65,24 +62,53 @@ START_OF_HTTP_PAGE_DATABASE(web_pages)
 {    "/rsa/set/wfc/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfc_set_callback, 0 },},
 {    "/rsa/get/wfk",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfk_get_callback, 0 },},
 {    "/rsa/set/wfk/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfk_set_callback, 0 },},
-{    "/rsa/get/wfs",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfs_get_callback, 0 },},
 {    "/rsa/set/azc",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_azc_set_callback, 0 },},
 {    "/rsa/get/azc",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_azc_get_callback, 0 },},
+{    "/rsa/get/vlv",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_vlv_get_callback, 0 },},
+{    "/rsa/get/wfs",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfs_get_callback, 0 },},
+{    "/rsa/get/alm",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_alm_get_callback, 0 },},
+{    "/rsa/get/aln",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_aln_get_callback, 0 },},
+{    "/rsa/get/alw",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_alw_get_callback, 0 },},
+{    "/rsa/get/ala",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_ala_get_callback, 0 },},
+{    "/rsa/get/not",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_not_get_callback, 0 },},
+{    "/rsa/get/wrn",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wrn_get_callback, 0 },},
+{    "/rsa/get/apt",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_apt_get_callback, 0 },},
+{    "/rsa/set/apt/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_apt_set_callback, 0 },},
+{    "/rsa/get/emr",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_emr_get_callback, 0 },},
+{    "/rsa/set/emr/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_emr_set_callback, 0 },},
+{    "/rsa/get/rcp",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_rcp_get_callback, 0 },},
+{    "/rsa/set/rcp/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_rcp_set_callback, 0 },},
+{    "/rsa/get/wti",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wti_get_callback, 0 },},
+{    "/rsa/set/wti/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wti_set_callback, 0 },},
+{    "/rsa/get/wfr",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_wfr_get_callback, 0 },},
+{    "/rsa/get/rtc",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_rtc_get_callback, 0 },},
+{    "/rsa/set/rtc/*",                           "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_rtc_set_callback, 0 },},
+{    "/rsa/get/*",                               "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_nsc_get_callback, 0 },},
+{    "/rsa/set/*/*",                             "application/json",         WICED_DYNAMIC_URL_CONTENT,     .url_content.dynamic_data  = { http_nsc_set_callback, 0 },},
 END_OF_HTTP_PAGE_DATABASE();
 
 void http_control( uint8_t value )
 {
+    extern uint8_t wifi_configured;
+    ap_status_change(value);
     if(value != http_status)
     {
-        wifi_status_change(1);
         http_status = value;
         if(value)
         {
+            if(wifi_configured)
+            {
+                wifi_status_change(1);
+            }
             wiced_network_up(WICED_AP_INTERFACE, WICED_USE_INTERNAL_DHCP_SERVER, &ip_settings);
             wiced_http_server_start( &syr_server, 5333, MAX_SOCKETS, web_pages, WICED_AP_INTERFACE, DEFAULT_URL_PROCESSOR_STACK_SIZE );
         }
         else
         {
+            if(wifi_configured)
+            {
+                wifi_status_change(0);
+            }
             wiced_http_server_stop(&syr_server);
             wiced_network_down(WICED_AP_INTERFACE);
         }

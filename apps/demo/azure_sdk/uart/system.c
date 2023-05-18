@@ -5,7 +5,6 @@
 #include "system.h"
 #include "cJSON.h"
 
-extern uint8_t wifi_configured;
 extern syr_status device_status;
 extern wiced_event_flags_t Config_EventHandler;
 extern wiced_event_flags_t Info_EventHandler;
@@ -171,6 +170,23 @@ void dp_download_handle(unsigned char dpid,const unsigned char value[], unsigned
             device_status.info.sup = update_value;
             wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_SUP_GET);
             break;
+        case VLV_GET_CMD:
+            update_value = mcu_get_dp_download_value(value,length);
+            device_status.info.vlv = update_value;
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_VLV_GET);
+            break;
+        case ALM_GET_CMD:
+            strncpy(device_status.info.alm_array,value,length);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_ALM_GET);
+            break;
+        case ALW_GET_CMD:
+            strncpy(device_status.info.alw_array,value,length);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_ALW_GET);
+            break;
+        case ALN_GET_CMD:
+            strncpy(device_status.info.aln_array,value,length);
+            wiced_rtos_set_event_flags(&Info_EventHandler,EVENT_INFO_ALN_GET);
+            break;
         case NET_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
             device_status.tem.net = update_value;
@@ -180,16 +196,6 @@ void dp_download_handle(unsigned char dpid,const unsigned char value[], unsigned
             update_value = mcu_get_dp_download_value(value,length);
             device_status.tem.bat = update_value;
             wiced_rtos_set_event_flags(&TEM_EventHandler,EVENT_TEM_BAT_GET);
-            break;
-        case ALA_GET_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            device_status.tem.ala = update_value;
-            wiced_rtos_set_event_flags(&TEM_EventHandler,EVENT_TEM_ALA_GET);
-            break;
-        case ALR_GET_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            device_status.tem.alr = update_value;
-            wiced_rtos_set_event_flags(&TEM_EventHandler,EVENT_TEM_ALR_GET);
             break;
         case RAS_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
@@ -216,97 +222,39 @@ void dp_download_handle(unsigned char dpid,const unsigned char value[], unsigned
             device_status.config.rcp = update_value;
             wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_RCP_GET);
             break;
-        default:
-            break;
-        }
-    if(!wifi_configured)
-    {
-        switch(dpid)
-        {
-        case RSE_PUT_CMD:
+        case WTI_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
-            config_single_upload(RSE_PUT_CMD,update_value);
-            device_status.config.rse = update_value;
+            device_status.config.wti = update_value;
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_WTI_SET);
             break;
-        case RSA_PUT_CMD:
+        case WTI_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
-            config_single_upload(RSA_PUT_CMD,update_value);
-            device_status.config.rsa = update_value;
+            device_status.config.wti = update_value;
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_WTI_GET);
             break;
-        case RSI_PUT_CMD:
+        case APT_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
-            config_single_upload(RSI_PUT_CMD,update_value);
-            device_status.config.rsi = update_value;
+            device_status.config.apt = update_value;
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_APT_SET);
             break;
-        case RSD_PUT_CMD:
+        case APT_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
-            config_single_upload(RSD_PUT_CMD,update_value);
-            device_status.config.rsd = update_value;
+            device_status.config.apt = update_value;
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_APT_GET);
             break;
-        case CNF_PUT_CMD:
+        case WAD_SET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
-            config_single_upload(CNF_PUT_CMD,update_value);
-            device_status.config.cnf = update_value;
+            device_status.config.wad = update_value;
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_WAD_SET);
             break;
-        case CNL_PUT_CMD:
+        case WAD_GET_CMD:
             update_value = mcu_get_dp_download_value(value,length);
-            config_single_upload(CNL_PUT_CMD,update_value);
-            device_status.config.cnl = update_value;
-            break;
-        case SSE_PUT_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            config_single_upload(SSE_PUT_CMD,update_value);
-            device_status.config.sse = update_value;
-            break;
-        case SSA_PUT_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            config_single_upload(SSA_PUT_CMD,update_value);
-            device_status.config.ssa = update_value;
-            break;
-        case SSD_PUT_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            config_single_upload(SSD_PUT_CMD,update_value);
-            device_status.config.ssd = update_value;
-            break;
-        case LNG_PUT_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            config_single_upload(LNG_PUT_CMD,update_value);
-            device_status.config.lng = update_value;
-            break;
-        case SUP_PUT_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            info_single_upload(SUP_PUT_CMD,update_value);
-            device_status.info.sup = update_value;
-            break;
-        case COM_PUT_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            info_single_upload(COM_PUT_CMD,update_value);
-            device_status.info.com = update_value;
-            break;
-        case COA_PUT_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            info_single_upload(COA_PUT_CMD,update_value);
-            device_status.info.coa = update_value;
-            break;
-        case COD_PUT_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            info_single_upload(COD_PUT_CMD,update_value);
-            device_status.info.cod = update_value;
-            break;
-        case COE_PUT_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            info_single_upload(COE_PUT_CMD,update_value);
-            device_status.info.coe = update_value;
-            break;
-        case CND_PUT_CMD:
-            update_value = mcu_get_dp_download_value(value,length);
-            info_single_upload(CND_PUT_CMD,update_value);
-            device_status.info.cnd = update_value;
+            device_status.config.wad = update_value;
+            wiced_rtos_set_event_flags(&Config_EventHandler,EVENT_CONFIG_WAD_GET);
             break;
         default:
             break;
         }
-    }
 }
 void product_info_request(void)
 {
@@ -316,6 +264,11 @@ void product_info_request(void)
 void factory_set_request(void)
 {
     set_factory();
+}
+
+void wfc_start_request(void)
+{
+    wifi_uart_write_frame(WFC_CONTROL_CMD, MCU_TX_VER, 0);
 }
 
 void product_info_parse(unsigned char* data_buf,unsigned short data_len)
@@ -337,11 +290,11 @@ void product_info_parse(unsigned char* data_buf,unsigned short data_len)
     }
     strncpy(device_status.info.ver,item->valuestring,strlen(item->valuestring));
 
-    item = cJSON_GetObjectItem(root, "srn");
+    item = cJSON_GetObjectItem(root, "ap");
     if(NULL == item){
         goto PARSE_ERR;
     }
-    strncpy(device_status.info.srn,item->valuestring,strlen(item->valuestring));
+    wifi_ap_control(item->valueint);
 
     cJSON_Delete(root);
     return;
@@ -361,7 +314,7 @@ void ota_control_parse(unsigned char data)
 {
     ota_event_send(data);
 }
-void wifi_ap_enable_control(unsigned char data)
+void wifi_ap_control(unsigned char data)
 {
     http_control(data);
 }

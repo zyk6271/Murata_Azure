@@ -831,10 +831,10 @@ typedef dct_header_to_use           platform_dct_header_t;
 typedef struct
 {
     uint8_t  init_flag ;
-    char     device_id[20];
-    char     primaryKey[200];
-    char     endpointAddress[50];
-    char     mac1[30];
+    char     device_id[32];
+    char     primaryKey[256];
+    char     endpointAddress[64];
+    char     mac1[32];
 } platform_dct_azure_config_t;
 /* The structure for the complete system DCT layout.
  * The application DCT data follows this structure in the DCT section of FLASH.

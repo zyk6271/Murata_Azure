@@ -2,6 +2,6 @@
 #define TWIN_UPLOAD_H
 
 void info_upload(void);
-void info_single_upload(uint8_t command,uint32_t value);
+void twin_single_upload(char* json,uint32_t length);
 
 #endif

@@ -255,6 +255,11 @@ const platform_dct_data_t initial_dct =
     .network_config.interface          = CONFIG_NETWORK_INTERFACE,
     .network_config.hostname.value     = CONFIG_NETWORK_IP_HOSTNAME,
 
+    .azure_config.device_id = "NULL",
+    .azure_config.primaryKey = "NULL",
+    .azure_config.endpointAddress = "NULL",
+    .azure_config.mac1 = "NULL",
+
 #ifdef DCT_GENERATED_ETHERNET_MAC_ADDRESS
     .ethernet_config.mac_address.octet = DCT_GENERATED_ETHERNET_MAC_ADDRESS,
 #endif

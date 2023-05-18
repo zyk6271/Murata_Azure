@@ -51,8 +51,8 @@ extern "C" {
  */
 
 /* This is the soft AP used for device configuration */
-#define CONFIG_AP_SSID       "NOT USED FOR THIS APP"
-#define CONFIG_AP_PASSPHRASE "NOT USED FOR THIS APP"
+#define CONFIG_AP_SSID       "NULL"
+#define CONFIG_AP_PASSPHRASE "NULL"
 #define CONFIG_AP_SECURITY   WICED_SECURITY_OPEN
 #define CONFIG_AP_CHANNEL    1
 
@@ -63,8 +63,8 @@ extern "C" {
 #define SOFT_AP_CHANNEL      1
 
 /* This is the default AP the device will connect to (as a client) */
-#define CLIENT_AP_SSID       "NOT USED FOR THIS APP"
-#define CLIENT_AP_PASSPHRASE "NOT USED FOR THIS APP"
+#define CLIENT_AP_SSID       "NULL"
+#define CLIENT_AP_PASSPHRASE "NULL"
 #define CLIENT_AP_BSS_TYPE   WICED_BSS_TYPE_INFRASTRUCTURE
 #define CLIENT_AP_SECURITY   WICED_SECURITY_OPEN
 #define CLIENT_AP_CHANNEL    1
@@ -76,6 +76,14 @@ extern "C" {
 
 /* This is the network interface the device will work with */
 #define WICED_NETWORK_INTERFACE   WICED_AP_INTERFACE
+
+#define CONFIG_DEFAULT_ID          "NULL"
+
+#define CONFIG_DEFAULT_ADDRESS     "NULL"
+
+#define CONFIG_DEFAULT_KEY         "NULL"
+
+#define CONFIG_DEFAULT_MAC         "NULL"
 /******************************************************
  *                   Enumerations
  ******************************************************/

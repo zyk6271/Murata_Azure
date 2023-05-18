@@ -42,6 +42,31 @@ void print_keep_alive_info( wiced_keep_alive_packet_t* packet_info )
     }
     WPRINT_APP_INFO( ( "\n\n" ) );
 }
+
+uint32_t sta_rssi_get(void)
+{
+    uint32_t rssi;
+    wiced_bss_info_t*    ap_info;
+    wiced_security_t    security;
+
+    /* Find name of connection */
+    ap_info = (wiced_bss_info_t*)malloc(sizeof(wiced_bss_info_t));
+    uint8_t current_ap[64];
+    if (ap_info != NULL)
+    {
+        if (wiced_wifi_get_ap_info( ap_info, &security ) == WICED_SUCCESS)
+        {
+            rssi = (uint32_t)((abs(ap_info->RSSI))/1.2);
+        }
+        else
+        {
+            rssi = 0;
+        }
+        free(ap_info);
+        return rssi;
+    }
+}
+
 void keep_alive(void)
 {
     wiced_result_t            status;
@@ -136,18 +161,17 @@ void wifi_watch_callback( uint32_t arg )
             printf("wifi_connect_callback\n");
             wifi_status_change(3);
             keep_alive();
-            sntp_start_auto_time_sync_nowait( 1000*60*30 );
             wiced_dns_init(WICED_STA_INTERFACE);
+            sntp_start_auto_time_sync_nowait( 1000*60*30 );
             mqtt_connect_azure();
         }
         else if(events & EVENT_WIFI_DISCONNECTED)
         {
             printf("wifi_disconnect_callback\n");
-            wifi_status_change(1);
+            wifi_status_change(2);
             mqtt_connection_stop();
-            wiced_wifi_disable_keep_alive( 0 );
+            wiced_wifi_disable_keep_alive(0);
             ret = wiced_network_down(WICED_STA_INTERFACE);
-            //ret = wiced_ip_down( WICED_STA_INTERFACE );
             printf("wiced_network_down is %d\r\n",ret);
             wiced_network_up( WICED_STA_INTERFACE, WICED_USE_EXTERNAL_DHCP_SERVER, NULL );
         }
@@ -168,19 +192,9 @@ void wifi_status_change(uint8_t value)
 }
 void ap_status_change(uint8_t value)
 {
-    if(value)
-    {
-        uint8_t send_len = 0;
-        send_len = set_wifi_uart_byte(send_len,5);
-        wifi_uart_write_frame(WIFI_STATE_CMD, MCU_TX_VER, send_len);
-    }
-    else
-    {
-        uint8_t send_len = 0;
-        send_len = set_wifi_uart_byte(send_len,4);
-        wifi_uart_write_frame(WIFI_STATE_CMD, MCU_TX_VER, send_len);
-    }
-
+    uint8_t send_len = 0;
+    send_len = set_wifi_uart_byte(send_len,value);
+    wifi_uart_write_frame(WIFI_AP_CONTROL_CMD, MCU_TX_VER, send_len);
 }
 uint8_t wifi_status_get(void)
 {

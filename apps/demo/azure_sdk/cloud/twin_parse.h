@@ -19,8 +19,13 @@ typedef struct _syr_config
     uint32_t ssa;
     uint32_t ssd;
     uint32_t rcp;
+    uint32_t wti;
     uint32_t emr;
+    uint32_t apt;
+    uint32_t wad;
+
 }syr_config;
+
 typedef struct _syr_info
 {
     uint32_t com;
@@ -29,9 +34,16 @@ typedef struct _syr_info
     uint32_t coe;
     uint32_t sup;
     char ver[10];
-    char srn[10];
     uint32_t cnd;
+    uint32_t vlv;
+    uint8_t alm_array[32];
+    uint8_t alw_array[32];
+    uint8_t aln_array[32];
+    uint32_t ala;
+    uint32_t not;
+    uint32_t wrn;
 }syr_info;
+
 typedef struct _syr_tem
 {
     uint32_t net;
@@ -39,10 +51,12 @@ typedef struct _syr_tem
     uint32_t ala;
     uint32_t alr;
 }syr_tem;
+
 typedef struct _syr_c2d
 {
     uint32_t ras;
 }syr_c2d;
+
 typedef struct _syr_status
 {
     syr_config config;

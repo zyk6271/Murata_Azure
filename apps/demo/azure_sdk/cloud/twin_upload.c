@@ -13,6 +13,7 @@ static uint8_t mac_buf[18];
 static uint8_t ipv4_buf[18];
 static uint8_t mask_buf[18];
 static uint8_t gw_ip_buf[18];
+static uint8_t ssid_name_buf[32];
 
 extern syr_status device_status;
 extern az_iot_hub_client hub_client;
@@ -22,26 +23,25 @@ extern char* device_id;
 extern wiced_event_flags_t Config_EventHandler;
 extern wiced_event_flags_t Info_EventHandler;
 
-#define LOG_D
+#define LOG_D printf
 
 static az_span const twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
 static az_span const deviceInfo_name = AZ_SPAN_LITERAL_FROM_STR("deviceInfo");
 static az_span const deviceConfig_name = AZ_SPAN_LITERAL_FROM_STR("deviceConfig");
 static az_span const ras_name = AZ_SPAN_LITERAL_FROM_STR("ras");
-static az_span const mac_name = AZ_SPAN_LITERAL_FROM_STR("mac");
+static az_span const mac_name = AZ_SPAN_LITERAL_FROM_STR("mac1");
 static az_span const mcu_srn_name = AZ_SPAN_LITERAL_FROM_STR("srn");
-static az_span const wifi_srn_name = AZ_SPAN_LITERAL_FROM_STR("srn2");
+static az_span const wifi_srn_name = AZ_SPAN_LITERAL_FROM_STR("srn");
 static az_span const sup_name = AZ_SPAN_LITERAL_FROM_STR("sup");
 static az_span const mcu_ver_name = AZ_SPAN_LITERAL_FROM_STR("ver");
 static az_span const wifi_ver_name = AZ_SPAN_LITERAL_FROM_STR("ver2");
+static az_span const alm_name = AZ_SPAN_LITERAL_FROM_STR("alm");
+static az_span const alw_name = AZ_SPAN_LITERAL_FROM_STR("alw");
+static az_span const aln_name = AZ_SPAN_LITERAL_FROM_STR("aln");
 static az_span const wnk_name = AZ_SPAN_LITERAL_FROM_STR("wnk");
 static az_span const wgw_name = AZ_SPAN_LITERAL_FROM_STR("wgw");
 static az_span const wip_name = AZ_SPAN_LITERAL_FROM_STR("wip");
-static az_span const com_name = AZ_SPAN_LITERAL_FROM_STR("com");
-static az_span const coa_name = AZ_SPAN_LITERAL_FROM_STR("coa");
-static az_span const cod_name = AZ_SPAN_LITERAL_FROM_STR("cod");
-static az_span const coe_name = AZ_SPAN_LITERAL_FROM_STR("coe");
-static az_span const cnd_name = AZ_SPAN_LITERAL_FROM_STR("cnd");
+static az_span const wfc_name = AZ_SPAN_LITERAL_FROM_STR("wfc");
 static az_span const rse_name = AZ_SPAN_LITERAL_FROM_STR("rse");
 static az_span const rsa_name = AZ_SPAN_LITERAL_FROM_STR("rsa");
 static az_span const rsi_name = AZ_SPAN_LITERAL_FROM_STR("rsi");
@@ -54,124 +54,11 @@ static az_span const ssd_name = AZ_SPAN_LITERAL_FROM_STR("ssd");
 static az_span const lng_name = AZ_SPAN_LITERAL_FROM_STR("lng");
 static az_span const rcp_name = AZ_SPAN_LITERAL_FROM_STR("rcp");
 static az_span const emr_name = AZ_SPAN_LITERAL_FROM_STR("emr");
-
-void info_single_upload(uint8_t command,uint32_t value)//主动上传
-{
-    char payload_buffer[2048];
-    az_span payload = AZ_SPAN_FROM_BUFFER(payload_buffer);
-    az_span out_payload;
-    az_json_writer jw;
-
-    char twin_patch_topic_buffer[128];
-    az_iot_hub_client_twin_patch_get_publish_topic(
-        &hub_client,
-        twin_patch_topic_request_id,
-        twin_patch_topic_buffer,
-        sizeof(twin_patch_topic_buffer),
-        NULL);
-
-    az_json_writer_init(&jw, payload, NULL);
-    az_json_writer_append_begin_object(&jw);
-
-    az_json_writer_append_property_name(&jw, deviceInfo_name);
-    az_json_writer_append_begin_object(&jw);
-    switch(command)
-    {
-    case RAS_PUT_CMD:
-        az_json_writer_append_property_name(&jw, ras_name);
-        break;
-    case SUP_PUT_CMD:
-        az_json_writer_append_property_name(&jw, sup_name);
-        break;
-    case COM_PUT_CMD:
-        az_json_writer_append_property_name(&jw, com_name);
-        break;
-    case COA_PUT_CMD:
-        az_json_writer_append_property_name(&jw, coa_name);
-        break;
-    case COD_PUT_CMD:
-        az_json_writer_append_property_name(&jw, cod_name);
-        break;
-    case COE_PUT_CMD:
-        az_json_writer_append_property_name(&jw, coe_name);
-        break;
-    case CND_PUT_CMD:
-        az_json_writer_append_property_name(&jw, cnd_name);
-        break;
-    default:
-        return;
-    }
-    az_json_writer_append_int32(&jw, value);
-    az_json_writer_append_end_object(&jw);
-
-    az_json_writer_append_end_object(&jw);
-    out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
-    wiced_mqtt_publish(mqtt_object,twin_patch_topic_buffer,az_span_ptr(out_payload),az_span_size(out_payload),0);
-}
-void config_single_upload(uint8_t command,uint32_t value)//主动上传
-{
-    char payload_buffer[2048];
-    az_span payload = AZ_SPAN_FROM_BUFFER(payload_buffer);
-    az_span out_payload;
-    az_json_writer jw;
-
-    char twin_patch_topic_buffer[128];
-    az_iot_hub_client_twin_patch_get_publish_topic(
-        &hub_client,
-        twin_patch_topic_request_id,
-        twin_patch_topic_buffer,
-        sizeof(twin_patch_topic_buffer),
-        NULL);
-
-    az_json_writer_init(&jw, payload, NULL);
-    az_json_writer_append_begin_object(&jw);
-
-    az_json_writer_append_property_name(&jw, deviceConfig_name);
-    az_json_writer_append_begin_object(&jw);
-    switch(command)
-    {
-    case RSE_PUT_CMD:
-        az_json_writer_append_property_name(&jw, rse_name);
-        break;
-    case RSA_PUT_CMD:
-        az_json_writer_append_property_name(&jw, rsa_name);
-        break;
-    case RSI_PUT_CMD:
-        az_json_writer_append_property_name(&jw, rsi_name);
-        break;
-    case RSD_PUT_CMD:
-        az_json_writer_append_property_name(&jw, rsd_name);
-        break;
-    case CNF_PUT_CMD:
-        az_json_writer_append_property_name(&jw, cnf_name);
-        break;
-    case CNL_PUT_CMD:
-        az_json_writer_append_property_name(&jw, cnl_name);
-        break;
-    case SSE_PUT_CMD:
-        az_json_writer_append_property_name(&jw, sse_name);
-        break;
-    case SSA_PUT_CMD:
-        az_json_writer_append_property_name(&jw, ssa_name);
-        break;
-    case SSD_PUT_CMD:
-        az_json_writer_append_property_name(&jw, ssd_name);
-        break;
-    case LNG_PUT_CMD:
-        az_json_writer_append_property_name(&jw, lng_name);
-        break;
-    default:
-        return;
-    }
-    az_json_writer_append_int32(&jw, value);
-    az_json_writer_append_end_object(&jw);
-
-    az_json_writer_append_end_object(&jw);
-
-    out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
-    wiced_mqtt_publish(mqtt_object,twin_patch_topic_buffer,az_span_ptr(out_payload),az_span_size(out_payload),0);
-    printf("config_single_upload,topic is %s\r\n",twin_patch_topic_buffer);
-}
+static az_span const wti_name = AZ_SPAN_LITERAL_FROM_STR("wti");
+static az_span const apt_name = AZ_SPAN_LITERAL_FROM_STR("apt");
+static az_span const rtc_name = AZ_SPAN_LITERAL_FROM_STR("rtc");
+static az_span const hwv_name = AZ_SPAN_LITERAL_FROM_STR("hwv");
+static az_span const wad_name = AZ_SPAN_LITERAL_FROM_STR("wad");
 
 void config_get(void)
 {
@@ -243,46 +130,78 @@ void config_get(void)
     {
         LOG_D("GET RCP %d\r\n",device_status.config.rcp);
     }
+    wifi_uart_write_command_value(WTI_GET_CMD,0);
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_WTI_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_WTI_GET)
+    {
+        LOG_D("GET WTI %d\r\n",device_status.config.wti);
+    }
     wifi_uart_write_command_value(EMR_GET_CMD,0);
     result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_EMR_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
     if(events & EVENT_CONFIG_EMR_GET)
     {
         LOG_D("GET EMR %d\r\n",device_status.config.emr);
     }
+    wifi_uart_write_command_value(APT_GET_CMD,0);
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_APT_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_APT_GET)
+    {
+        LOG_D("GET APT %d\r\n",device_status.config.apt);
+    }
+    wifi_uart_write_command_value(WAD_GET_CMD,0);
+    result = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_WAD_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_CONFIG_WAD_GET)
+    {
+        LOG_D("GET WAD %d\r\n",device_status.config.wad);
+    }
 }
 void info_get(void)
 {
     uint32_t result,events;
-    wifi_uart_write_command_value(COM_GET_CMD,0);
-    result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COM_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-    if(events & EVENT_INFO_COM_GET)
-    {
-        LOG_D("GET COM %d\r\n",device_status.info.com);
-    }
-    wifi_uart_write_command_value(COA_GET_CMD,0);
-    result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COA_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-    if(events & EVENT_INFO_COA_GET)
-    {
-        LOG_D("GET COA %d\r\n",device_status.info.coa);
-    }
-    wifi_uart_write_command_value(COD_GET_CMD,0);
-    result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COD_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-    if(events & EVENT_INFO_COD_GET)
-    {
-        LOG_D("GET COD %d\r\n",device_status.info.cod);
-    }
-    wifi_uart_write_command_value(COE_GET_CMD,0);
-    result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_COE_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
-    if(events & EVENT_INFO_COE_GET)
-    {
-        LOG_D("GET COE %d\r\n",device_status.info.coe);
-    }
     wifi_uart_write_command_value(SUP_GET_CMD,0);
     result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_SUP_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
     if(events & EVENT_INFO_SUP_GET)
     {
         LOG_D("GET SUP %d\r\n",device_status.info.sup);
     }
+    wifi_uart_write_command_value(ALM_GET_CMD,0);
+    result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_ALM_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_INFO_ALM_GET)
+    {
+        LOG_D("GET ALM %s\r\n",device_status.info.alm_array);
+    }
+    wifi_uart_write_command_value(ALW_GET_CMD,0);
+    result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_ALW_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_INFO_ALW_GET)
+    {
+        LOG_D("GET ALW %s\r\n",device_status.info.alw_array);
+    }
+    wifi_uart_write_command_value(ALN_GET_CMD,0);
+    result = wiced_rtos_wait_for_event_flags(&Info_EventHandler,EVENT_INFO_ALN_GET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+    if(events & EVENT_INFO_ALN_GET)
+    {
+        LOG_D("GET ALN %s\r\n",device_status.info.aln_array);
+    }
+}
+void twin_single_upload(char* json,uint32_t length)
+{
+    char payload_buffer[512] = {0};
+    memset(payload_buffer,0,512);
+    az_span payload = AZ_SPAN_FROM_BUFFER(payload_buffer);
+    az_span out_payload;
+    az_json_writer jw;
+    ULONG ip_address, network_mask,gateway_ip;
+
+    char twin_patch_topic_buffer[128];
+    az_iot_hub_client_twin_patch_get_publish_topic(
+        &hub_client,
+        twin_patch_topic_request_id,
+        twin_patch_topic_buffer,
+        sizeof(twin_patch_topic_buffer),
+        NULL);
+
+    wiced_mqtt_publish(mqtt_object,twin_patch_topic_buffer,json,length,0);
+    LOG_D("twin_single_upload,size is %d,payload is %s\r\n",length,json);
 }
 void twin_upload(void)
 {
@@ -331,22 +250,20 @@ void twin_upload(void)
     az_json_writer_append_int32(&jw, device_status.config.rcp);
     az_json_writer_append_property_name(&jw, emr_name);
     az_json_writer_append_int32(&jw, device_status.config.emr);
+    az_json_writer_append_property_name(&jw, wti_name);
+    az_json_writer_append_int32(&jw, device_status.config.wti);
+    az_json_writer_append_property_name(&jw, apt_name);
+    az_json_writer_append_int32(&jw, device_status.config.apt);
+    az_json_writer_append_property_name(&jw, rtc_name);
+    az_json_writer_append_int32(&jw,get_time());
+    az_json_writer_append_property_name(&jw, wad_name);
+    az_json_writer_append_int32(&jw,device_status.config.wad);
     az_json_writer_append_end_object(&jw);
 
     az_json_writer_append_property_name(&jw, deviceInfo_name);
     az_json_writer_append_begin_object(&jw);
     az_json_writer_append_property_name(&jw, sup_name);
     az_json_writer_append_int32(&jw, device_status.info.sup);
-    az_json_writer_append_property_name(&jw, com_name);
-    az_json_writer_append_int32(&jw, device_status.info.com);
-    az_json_writer_append_property_name(&jw, coa_name);
-    az_json_writer_append_int32(&jw, device_status.info.coa);
-    az_json_writer_append_property_name(&jw, cod_name);
-    az_json_writer_append_int32(&jw, device_status.info.cod);
-    az_json_writer_append_property_name(&jw, coe_name);
-    az_json_writer_append_int32(&jw, device_status.info.coe);
-    az_json_writer_append_property_name(&jw, mcu_srn_name);
-    az_json_writer_append_string(&jw, az_span_create_from_str(device_status.info.srn));
     az_json_writer_append_property_name(&jw, wifi_srn_name);
     az_json_writer_append_string(&jw, az_span_create_from_str(device_id));
     az_json_writer_append_property_name(&jw, mcu_ver_name);
@@ -370,10 +287,22 @@ void twin_upload(void)
     az_json_writer_append_string(&jw, az_span_create_from_str(mask_buf));
     az_json_writer_append_property_name(&jw, wgw_name);
     az_json_writer_append_string(&jw, az_span_create_from_str(gw_ip_buf));
+    az_json_writer_append_property_name(&jw, alm_name);
+    az_json_writer_append_string(&jw, az_span_create_from_str(device_status.info.alm_array));
+    az_json_writer_append_property_name(&jw, alw_name);
+    az_json_writer_append_string(&jw, az_span_create_from_str(device_status.info.alw_array));
+    az_json_writer_append_property_name(&jw, aln_name);
+    az_json_writer_append_string(&jw, az_span_create_from_str(device_status.info.aln_array));
+    az_json_writer_append_property_name(&jw, hwv_name);
+    az_json_writer_append_string(&jw, az_span_create_from_str("35"));
+    dct_read_first_ap_ssid_name(ssid_name_buf);
+    az_json_writer_append_property_name(&jw, wfc_name);
+    az_json_writer_append_string(&jw, az_span_create_from_str(ssid_name_buf));
     az_json_writer_append_end_object(&jw);
 
     az_json_writer_append_end_object(&jw);
     out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
     wiced_mqtt_publish(mqtt_object,twin_patch_topic_buffer,az_span_ptr(out_payload),az_span_size(out_payload),0);
-    LOG_D("info_upload,size is %d,payload is %s\r\n",az_span_size(out_payload),az_span_ptr(out_payload));
+    LOG_D("twin_upload,size is %d,payload is %s\r\n",az_span_size(out_payload),az_span_ptr(out_payload));
+
 }

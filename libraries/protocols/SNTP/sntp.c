@@ -58,12 +58,12 @@
 #define MIN_POLL_INTERVAL               (15 * 1000)
 
 #define NTP_NUM_SERVERS                 (2)
-#define NTP_SERVER_HOSTNAME             "time.sentientech.com.cn"
+#define NTP_SERVER_HOSTNAME             "ntp.aliyun.com"
 
 #define SNTP_WORKER_THREAD_PRIORITY     (4)
 #define SNTP_WORKER_THREAD_STACK_SIZE   (4 * 1024)
 #define SNTP_WORKER_THREAD_QUEUE_SIZE   (2)
-#define SNTP_DNS_TIMEOUT_MS             (2000)
+#define SNTP_DNS_TIMEOUT_MS             (5000)
 #define SNTP_DNS_RETRIES                (5)
 
 /******************************************************
@@ -322,10 +322,11 @@ static wiced_result_t sync_ntp_time( void* arg )
         {
             result = wiced_hostname_lookup(NTP_SERVER_HOSTNAME, &ntp_server_ip, SNTP_DNS_TIMEOUT_MS, sntp_interface);
         } while (result != WICED_SUCCESS && ++connect_dns_retries < SNTP_DNS_RETRIES);
+        WPRINT_APP_INFO( ( "wiced_hostname_lookup ntp server %d\r\n",connect_dns_retries) );
 
         if (result == WICED_SUCCESS)
         {
-            WPRINT_APP_DEBUG( ( "Sending global request ... ") );
+            WPRINT_APP_INFO( ( "Sending global request ... ") );
             result = sntp_get_time( &ntp_server_ip, &current_time );
         }
 
@@ -351,6 +352,7 @@ static wiced_result_t sync_ntp_time( void* arg )
         wiced_utc_time_ms_t utc_time_ms = (uint64_t)current_time.seconds * (uint64_t)1000 + ( current_time.microseconds / 1000 );
 
         /* Set & Print the time */
+        printf("utc_time_ms is: %lld\n", (uint64_t)utc_time_ms);
         wiced_time_set_utc_time_ms( &utc_time_ms );
     }
 

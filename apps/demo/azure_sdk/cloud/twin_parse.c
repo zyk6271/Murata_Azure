@@ -13,7 +13,6 @@ extern az_iot_hub_client hub_client;
 extern wiced_mqtt_object_t mqtt_object;
 extern wiced_event_flags_t Config_EventHandler;
 extern wiced_event_flags_t Info_EventHandler;
-extern wiced_event_flags_t C2D_EventHandler;
 
 static az_span const twin_document_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
 static az_span const rse_name = AZ_SPAN_LITERAL_FROM_STR("rse");
@@ -28,11 +27,15 @@ static az_span const ssa_name = AZ_SPAN_LITERAL_FROM_STR("ssa");
 static az_span const ssd_name = AZ_SPAN_LITERAL_FROM_STR("ssd");
 static az_span const emr_name = AZ_SPAN_LITERAL_FROM_STR("emr");
 static az_span const rcp_name = AZ_SPAN_LITERAL_FROM_STR("rcp");
-
+static az_span const wti_name = AZ_SPAN_LITERAL_FROM_STR("wti");
+static az_span const apt_name = AZ_SPAN_LITERAL_FROM_STR("apt");
 static az_span const com_name = AZ_SPAN_LITERAL_FROM_STR("com");
 static az_span const coa_name = AZ_SPAN_LITERAL_FROM_STR("coa");
 static az_span const cod_name = AZ_SPAN_LITERAL_FROM_STR("cod");
 static az_span const coe_name = AZ_SPAN_LITERAL_FROM_STR("coe");
+static az_span const rtc_name = AZ_SPAN_LITERAL_FROM_STR("rtc");
+static az_span const wad_name = AZ_SPAN_LITERAL_FROM_STR("wad");
+
 static az_span const config_span = AZ_SPAN_LITERAL_FROM_STR("deviceConfig");
 static az_span const info_span = AZ_SPAN_LITERAL_FROM_STR("deviceInfo");
 static az_span const version_span = AZ_SPAN_LITERAL_FROM_STR("$version");
@@ -286,6 +289,60 @@ void parse_get_twin(az_span const message_span)
                 if(events & EVENT_CONFIG_RCP_SET)
                 {
                     IOT_SAMPLE_LOG_SUCCESS("SET RCP OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, wti_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse wti ok,value is %d",value);
+            if(device_status.config.wti != value)
+            {
+                wifi_uart_write_command_value(WTI_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_WTI_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_WTI_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET WTI OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, apt_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse apt ok,value is %d",value);
+            if(device_status.config.apt != value)
+            {
+                wifi_uart_write_command_value(APT_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_APT_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_APT_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET APT OK\r\n");
+                }
+            }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, rtc_name))
+        {
+            uint64_t timestamp;
+            az_json_reader_next_token(&jr);
+            az_json_token_get_int64(&jr,&timestamp);
+            IOT_SAMPLE_LOG_SUCCESS("parse rtc ok,value is %ld",timestamp);
+            timestamp *= 1000;
+            wiced_time_set_utc_time_ms(&timestamp);
+        }
+        else if (az_json_token_is_text_equal(&jr.token, wad_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_uint32(&jr,&value);
+            IOT_SAMPLE_LOG_SUCCESS("parse wad ok,value is %d",value);
+            if(device_status.config.wad != value)
+            {
+                wifi_uart_write_command_value(WAD_SET_CMD,value);
+                ret = wiced_rtos_wait_for_event_flags(&Config_EventHandler,EVENT_CONFIG_WAD_SET, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,100);
+                if(events & EVENT_CONFIG_WAD_SET)
+                {
+                    IOT_SAMPLE_LOG_SUCCESS("SET WAD OK\r\n");
                 }
             }
         }

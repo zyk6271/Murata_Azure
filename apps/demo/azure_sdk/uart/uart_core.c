@@ -13,73 +13,6 @@ volatile unsigned char *queue_out = NULL;
 
 volatile unsigned char stop_update_flag;
 
-typedef struct {
-    unsigned char dp_id;
-    unsigned char dp_type;
-} DOWNLOAD_CMD_S;
-
-const DOWNLOAD_CMD_S download_cmd[] =
-{
-    {RAS_SET_CMD , DP_TYPE_VALUE},
-    {RAS_GET_CMD , DP_TYPE_VALUE},
-    {RAS_PUT_CMD , DP_TYPE_VALUE},
-    {CND_GET_CMD , DP_TYPE_VALUE},
-    {NET_GET_CMD , DP_TYPE_VALUE},
-    {BAT_GET_CMD , DP_TYPE_VALUE},
-    {ALA_GET_CMD , DP_TYPE_VALUE},
-    {ALA_SET_CMD , DP_TYPE_VALUE},
-    {ALR_GET_CMD , DP_TYPE_VALUE},
-    {ALR_SET_CMD , DP_TYPE_VALUE},
-    {RSE_SET_CMD , DP_TYPE_VALUE},
-    {RSE_GET_CMD , DP_TYPE_VALUE},
-    {RSE_PUT_CMD , DP_TYPE_VALUE},
-    {RSA_SET_CMD , DP_TYPE_VALUE},
-    {RSA_GET_CMD , DP_TYPE_VALUE},
-    {RSA_PUT_CMD , DP_TYPE_VALUE},
-    {RSI_SET_CMD , DP_TYPE_VALUE},
-    {RSI_GET_CMD , DP_TYPE_VALUE},
-    {RSI_PUT_CMD , DP_TYPE_VALUE},
-    {RSD_SET_CMD , DP_TYPE_VALUE},
-    {RSD_GET_CMD , DP_TYPE_VALUE},
-    {RSD_PUT_CMD , DP_TYPE_VALUE},
-    {CNF_SET_CMD , DP_TYPE_VALUE},
-    {CNF_GET_CMD , DP_TYPE_VALUE},
-    {CNF_PUT_CMD , DP_TYPE_VALUE},
-    {CNL_SET_CMD , DP_TYPE_VALUE},
-    {CNL_GET_CMD , DP_TYPE_VALUE},
-    {CNL_PUT_CMD , DP_TYPE_VALUE},
-    {SSE_SET_CMD , DP_TYPE_VALUE},
-    {SSE_GET_CMD , DP_TYPE_VALUE},
-    {SSE_PUT_CMD , DP_TYPE_VALUE},
-    {SSA_SET_CMD , DP_TYPE_VALUE},
-    {SSA_GET_CMD , DP_TYPE_VALUE},
-    {SSA_PUT_CMD , DP_TYPE_VALUE},
-    {SSD_SET_CMD , DP_TYPE_VALUE},
-    {SSD_GET_CMD , DP_TYPE_VALUE},
-    {SSD_PUT_CMD , DP_TYPE_VALUE},
-    {LNG_SET_CMD , DP_TYPE_VALUE},
-    {LNG_GET_CMD , DP_TYPE_VALUE},
-    {LNG_PUT_CMD , DP_TYPE_VALUE},
-    {SUP_GET_CMD , DP_TYPE_VALUE},
-    {SUP_PUT_CMD , DP_TYPE_VALUE},
-    {COM_SET_CMD , DP_TYPE_VALUE},
-    {COM_GET_CMD , DP_TYPE_VALUE},
-    {COM_PUT_CMD , DP_TYPE_VALUE},
-    {COA_SET_CMD , DP_TYPE_VALUE},
-    {COA_GET_CMD , DP_TYPE_VALUE},
-    {COA_PUT_CMD , DP_TYPE_VALUE},
-    {COD_SET_CMD , DP_TYPE_VALUE},
-    {COD_GET_CMD , DP_TYPE_VALUE},
-    {COD_PUT_CMD , DP_TYPE_VALUE},
-    {COE_SET_CMD , DP_TYPE_VALUE},
-    {COE_GET_CMD , DP_TYPE_VALUE},
-    {COE_PUT_CMD , DP_TYPE_VALUE},
-    {CND_PUT_CMD , DP_TYPE_VALUE},
-    {EMR_SET_CMD , DP_TYPE_VALUE},
-    {EMR_GET_CMD , DP_TYPE_VALUE},
-    {RCP_SET_CMD , DP_TYPE_VALUE},
-    {RCP_GET_CMD , DP_TYPE_VALUE},
-};
 unsigned long my_strlen(unsigned char *str)
 {
     unsigned long len = 0;
@@ -385,6 +318,8 @@ void wifi_uart_write_command_value(unsigned char command, unsigned int data)
 {
     mcu_dp_value_update(command,data);
 }
+
+
 /**
  * @brief  向wifi串口发送一帧数据
  * @param[in] {fr_type} 帧类型
@@ -537,34 +472,7 @@ void wifi_uart_service(void)
         my_memcpy((char *)wifi_data_process_buf,(const char *)wifi_data_process_buf + offset,rx_in);
     }
 }
-/**
- * @brief  获取所有dp命令总和
- * @param[in] Null
- * @return 下发命令总和
- * @note   该函数用户不能修改
- */
-unsigned char get_download_cmd_total(void)
-{
-    return(sizeof(download_cmd) / sizeof(download_cmd[0]));
-}
-/**
- * @brief  获取制定DPID在数组中的序号
- * @param[in] {dpid} dpid
- * @return dp序号
- */
-unsigned char get_dowmload_dpid_index(unsigned char dpid)
-{
-    unsigned char index;
-    unsigned char total = get_download_cmd_total();
 
-    for(index = 0; index < total; index ++) {
-        if(download_cmd[index].dp_id == dpid) {
-            break;
-        }
-    }
-
-    return index;
-}
 static unsigned char data_point_handle(const unsigned char value[])
 {
     //这边是数据下发函数，请根据实际情况调用
@@ -577,14 +485,7 @@ static unsigned char data_point_handle(const unsigned char value[])
     dp_type = value[1];
     dp_len = (value[2] <<8) + value[3];
 
-    index = get_dowmload_dpid_index(dp_id);
-
-    if(dp_type != download_cmd[index].dp_type) {
-        //错误提示
-        return 0;
-    }else {
-        ret = dp_download_handle(dp_id, value + 4, dp_len);
-    }
+    ret = dp_download_handle(dp_id, value + 4, dp_len);
 
     return ret;
 }
@@ -607,7 +508,19 @@ void data_handle(unsigned short offset)
             total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
             telemetry_upload((unsigned char *)wifi_data_process_buf + offset + DATA_START,total_len);
         break;
-        case DATA_ISSUED_CMD:                                 //命令下发
+        case ALARM_CONTROL_CMD:                           //报警上报
+            total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
+            alarm_upload((unsigned char *)wifi_data_process_buf + offset + DATA_START,total_len);
+        break;
+        case EVENT_CONTROL_CMD:                           //事件上报
+            total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
+            event_upload((unsigned char *)wifi_data_process_buf + offset + DATA_START,total_len);
+        break;
+        case DP_UPLOAD_CMD:                           //DP主动上报
+            total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
+            twin_single_upload((unsigned char *)wifi_data_process_buf + offset + DATA_START,total_len);
+            break;
+        case STATE_UPLOAD_CMD:                                 //状态上报
             total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
 
             for(i = 0 ;i < total_len; )
@@ -619,9 +532,9 @@ void data_handle(unsigned short offset)
                 i += (dp_len + 4);
             }
         break;
-        case WIFI_AP_ENABLE_CMD:                                 //AP控制
+        case WIFI_AP_CONTROL_CMD:                                 //AP控制
             total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
-            wifi_ap_enable_control(wifi_data_process_buf[offset + DATA_START]);
+            wifi_ap_control(wifi_data_process_buf[offset + DATA_START]);
         break;
         case UPDATE_CONTROL_CMD:                                 //升级控制
             total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];

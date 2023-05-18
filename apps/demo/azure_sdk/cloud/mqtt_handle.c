@@ -146,7 +146,6 @@ wiced_result_t mqtt_conn_open( wiced_mqtt_object_t mqtt_obj, wiced_ip_address_t 
     conninfo.password = (uint8_t*)endpoint_key;
     conninfo.peer_cn = NULL;
 
-
     ret = wiced_mqtt_connect( mqtt_obj, address, interface, callback, security, &conninfo );
     if ( ret != WICED_SUCCESS )
     {
@@ -385,37 +384,20 @@ void mqtt_config_read(void)
 {
     platform_dct_azure_config_t *app_t = calloc(sizeof(platform_dct_azure_config_t), sizeof(char));
     dct_app_all_read(&app_t);
-    if(app_t->init_flag==1)
-    {
-        endpoint_adress = calloc(sizeof(app_t->endpointAddress), sizeof(char));
-        strncpy(endpoint_adress,app_t->endpointAddress,strlen(app_t->endpointAddress));
+    endpoint_adress = calloc(sizeof(app_t->endpointAddress), sizeof(char));
+    strncpy(endpoint_adress,app_t->endpointAddress,strlen(app_t->endpointAddress));
 
-        device_id = calloc(sizeof(app_t->device_id), sizeof(char));
-        strncpy(device_id,app_t->device_id,strlen(app_t->device_id));
+    device_id = calloc(sizeof(app_t->device_id), sizeof(char));
+    strncpy(device_id,app_t->device_id,strlen(app_t->device_id));
 
-        endpoint_user = calloc(sizeof(app_t->endpointAddress) + sizeof(app_t->device_id) + 30, sizeof(char));
-        strncpy(endpoint_user,app_t->endpointAddress,strlen(app_t->endpointAddress));
-        strcat(endpoint_user,"/");
-        strcat(endpoint_user,device_id);
-        strcat(endpoint_user,"/?api-version=2020-09-30");
+    endpoint_user = calloc(sizeof(app_t->endpointAddress) + sizeof(app_t->device_id) + 30, sizeof(char));
+    strncpy(endpoint_user,app_t->endpointAddress,strlen(app_t->endpointAddress));
+    strcat(endpoint_user,"/");
+    strcat(endpoint_user,device_id);
+    strcat(endpoint_user,"/?api-version=2020-09-30");
 
-        endpoint_key = calloc(sizeof(app_t->primaryKey), sizeof(char));
-        signature_generate(endpoint_key,endpoint_adress,device_id,app_t->primaryKey,"1693097521");
-    }
-    else
-    {
-        endpoint_adress = calloc(sizeof(MQTT_BROKER_ADDRESS), sizeof(char));
-        strncpy(endpoint_adress,MQTT_BROKER_ADDRESS,strlen(MQTT_BROKER_ADDRESS));
-
-        device_id = calloc(sizeof(CLIENT_ID), sizeof(char));
-        strncpy(device_id,CLIENT_ID,strlen(CLIENT_ID));
-
-        endpoint_user = calloc(sizeof(USERNAME), sizeof(char));
-        strncpy(endpoint_user,USERNAME,strlen(USERNAME));
-
-        endpoint_key = calloc(sizeof(PASSWORD), sizeof(char));
-        strncpy(endpoint_key,PASSWORD,strlen(PASSWORD));
-    }
+    endpoint_key = calloc(sizeof(app_t->primaryKey), sizeof(char));
+    signature_generate(endpoint_key,endpoint_adress,device_id,app_t->primaryKey,"1693097521");
     free(app_t);
     print_wifi_config_dct();
 }

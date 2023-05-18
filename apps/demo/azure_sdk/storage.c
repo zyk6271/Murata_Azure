@@ -10,9 +10,10 @@
 #include "wiced_apps_common.h"
 
 uint8_t wifi_configured = 0;
+
 extern syr_status device_status;
 
-char wifi_version[]={"1.1.1"};
+char wifi_version[]={"1.1.2"};
 
 wiced_result_t print_wifi_config_dct( void )
 {
@@ -51,6 +52,44 @@ wiced_result_t dct_app_all_read( platform_dct_azure_config_t** app_dct )
     wiced_dct_read_lock( (void **)&app_dct_origin, WICED_TRUE, DCT_AZURE_SECTION, 0, sizeof( platform_dct_azure_config_t ) );
     memcpy(*app_dct,app_dct_origin,sizeof(platform_dct_azure_config_t));
     wiced_dct_read_unlock( app_dct_origin, WICED_TRUE );
+    return WICED_SUCCESS;
+}
+wiced_result_t dct_read_device_id(uint8_t* id_buffer)
+{
+    platform_dct_azure_config_t* app_dct_origin = NULL;
+
+    if (wiced_dct_read_lock((void**)&app_dct_origin, WICED_FALSE, DCT_AZURE_SECTION, 0, sizeof(platform_dct_azure_config_t)) != WICED_SUCCESS) {
+        return WICED_ERROR;
+    }
+
+    if (id_buffer == NULL) {
+        wiced_dct_read_unlock(app_dct_origin, WICED_FALSE);
+        return WICED_ERROR;
+    }
+
+    memcpy(id_buffer, app_dct_origin->device_id, strlen(app_dct_origin->device_id));
+    id_buffer[strlen(app_dct_origin->device_id)] = '\0';
+
+    wiced_dct_read_unlock(app_dct_origin, WICED_FALSE);
+    return WICED_SUCCESS;
+}
+wiced_result_t dct_read_first_ap_ssid_name(uint8_t* ssid)
+{
+    platform_dct_wifi_config_t* dct_wifi_config = NULL;
+
+    if (wiced_dct_read_lock((void**)&dct_wifi_config, WICED_FALSE, DCT_WIFI_CONFIG_SECTION, 0, sizeof(*dct_wifi_config)) != WICED_SUCCESS) {
+        return WICED_ERROR;
+    }
+
+    if (ssid == NULL) {
+        wiced_dct_read_unlock(dct_wifi_config, WICED_FALSE);
+        return WICED_ERROR;
+    }
+
+    memcpy(ssid, dct_wifi_config->stored_ap_list[0].details.SSID.value, dct_wifi_config->stored_ap_list[0].details.SSID.length);
+    ssid[dct_wifi_config->stored_ap_list[0].details.SSID.length] = '\0';
+
+    wiced_dct_read_unlock(dct_wifi_config, WICED_FALSE);
     return WICED_SUCCESS;
 }
 wiced_result_t dct_app_azc_write( platform_dct_azure_config_t* app_dct )

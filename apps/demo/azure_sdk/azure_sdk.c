@@ -15,20 +15,8 @@
 
 extern uint8_t wifi_configured;
 
-uint8_t first_link_up = 0;
-
-void link_up_callback(void)
-{
-    if(first_link_up == 0)
-    {
-        first_link_up = 1;
-        keep_alive();
-        sntp_start_auto_time_sync_nowait( 1000*60*30 );
-    }
-}
 static void link_down( void *arg)
 {
-    wifi_status_change(2);
     wifi_disconnect_callback();
 }
 void application_start( void )

@@ -27,6 +27,123 @@ char* flite_value(const char *source, uint32_t **size)
         return dest;
     }
 }
+
+uint32_t extract_value_from_path(const char* path, char* dest)
+{
+    char* value_str = strrchr(path, '/') + 1;
+    uint32_t value_len = strlen(value_str);
+    strncpy(dest, value_str, value_len);
+    dest[value_len] = '\0';
+    return value_len;
+}
+
+uint32_t flite_url_key(const char *source, char *dest)
+{
+    char *ret;
+    ret = strchr(source, 0x2F);
+    strncpy(dest,&ret[1],strlen(ret)-1);
+    printf("flite_url_value source is %s\r\n",source);
+    printf("flite_url_value dest is %s\r\n",dest);
+    return strlen(ret)-1;
+}
+uint32_t flite_url_value(const char *source, char *dest)
+{
+    char *ret;
+    ret = strrchr(source, 0x2F);
+    strncpy(dest,&ret[1],strlen(ret)-1);
+    printf("flite_url_value source is %s\r\n",source);
+    printf("flite_url_value dest is %s\r\n",dest);
+    return strlen(ret)-1;
+}
+
+uint32_t flite_extract_get_path(const char *source, char **dest)
+{
+    char *ret = strrchr(source, '/');
+    if (ret == NULL) {
+        return 0;  // URL中没有'/'，无法提取值，返回0长度
+    }
+
+    size_t copy_len = strlen(ret + 1);
+    char *value = malloc(copy_len + 5);  // 分配足够大的内存空间
+    if (value == NULL) {
+        return 0;  // 内存分配失败，返回0长度
+    }
+    strncpy(value, ret + 1, copy_len);
+    value[copy_len] = '\0';  // 添加字符串结尾标记
+
+    for (int i = 0; i < copy_len; i++) {
+        value[i] = toupper(value[i]);  // 将提取出的字符串转换成大写
+    }
+
+    char *tmp = malloc(strlen(value) + 4);
+    if (tmp == NULL) {
+        free(value); // 分配失败，释放内存空间
+        return 0;    // 返回0长度
+    }
+    sprintf(tmp, "get%s", value); // 添加 "get" 字符串
+
+    *dest = tmp;
+    free(value);
+    return strlen(tmp);
+}
+
+uint32_t flite_extract_set_path(const char *source, char **dest)
+{
+    // 查找 "/set/" 字符串
+   const char *set_str = strstr(source, "/set/");
+   if (set_str == NULL) {
+       return 0;  // URL 中没有 "/set/"，无法提取值，返回0长度
+   }
+   set_str += 5;  // 跳过 "/set/" 子串
+
+   // 找到 "/set/" 之后的两个部分
+   const char *slash = strchr(set_str, '/');
+   if (slash == NULL) {
+       return 0;  // "/set/" 之后没有 '/'，无法提取值，返回0长度
+   }
+
+   // 提取和转换第一个值
+   size_t value1_len = slash - set_str;
+   char *value1 = malloc(value1_len + 1);  // 分配足够大的内存空间
+   if (value1 == NULL) {
+       return 0;  // 内存分配失败，返回0长度
+   }
+   strncpy(value1, set_str, value1_len);
+   value1[value1_len] = '\0';  // 添加字符串结尾标记
+   for (int i = 0; i < value1_len; i++) {
+       value1[i] = toupper(value1[i]);  // 将提取出的字符串转换成大写
+   }
+
+   // 提取和转换第二个值
+   set_str = slash + 1;  // 跳过 '/' 字符
+   size_t value2_len = strlen(set_str);
+   char *value2 = malloc(value2_len + 1);  // 分配足够大的内存空间
+   if (value2 == NULL) {
+       free(value1); // 内存分配失败，释放 value1 内存
+       return 0;     // 返回0长度
+   }
+   strncpy(value2, set_str, value2_len);
+   value2[value2_len] = '\0';  // 添加字符串结尾标记
+   for (int i = 0; i < value2_len; i++) {
+       value2[i] = toupper(value2[i]);  // 将提取出的字符串转换成大写
+   }
+
+   // 拼接 "set" 和 "value1" 和 "value2"
+   size_t result_len = 3 + value1_len + value2_len;
+   char *result = malloc(result_len + 1);  // 分配足够大的内存空间
+   if (result == NULL) {
+       free(value1); // 内存分配失败，释放 value1 和 value2 内存
+       free(value2);
+       return 0;     // 返回0长度
+   }
+   snprintf(result, result_len + 1, "set%s%s", value1, value2);
+
+   free(value1); // 释放 value1 和 value2 内存
+   free(value2);
+
+   *dest = result;
+   return result_len;
+}
 void http_get_flush_value(char *msg, uint32_t msg_size, uint32_t value)
 {
     char *cjson_str = NULL;
@@ -75,7 +192,14 @@ void http_set_flush_value(char code, char *msg, uint32_t msg_size,uint32_t value
     strcpy(cat_tmp, key_tmp);
     strcat(cat_tmp, value_tmp);
     cJSON * root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, cat_tmp, cJSON_CreateString("OK"));
+    if(code == ERRDATA_CODE)
+    {
+        cJSON_AddItemToObject(root, cat_tmp, cJSON_CreateString("MIMA"));
+    }
+    else
+    {
+        cJSON_AddItemToObject(root, cat_tmp, cJSON_CreateString("OK"));
+    }
     cjson_str = cJSON_PrintUnformatted(root);
     wiced_http_response_stream_enable_chunked_transfer(now_stream);
     wiced_http_response_stream_write(now_stream, (const void*) cjson_str,
@@ -88,6 +212,7 @@ void http_set_flush_value(char code, char *msg, uint32_t msg_size,uint32_t value
     free(value_tmp);
     free(cjson_str);
 }
+
 void http_set_flush_string(char code, char *msg, uint32_t msg_size,char * value, uint32_t value_size)
 {
     char *cjson_str = NULL;
@@ -99,7 +224,14 @@ void http_set_flush_string(char code, char *msg, uint32_t msg_size,char * value,
     strcpy(cat_tmp, key_tmp);
     strcat(cat_tmp, value_tmp);
     cJSON * root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, cat_tmp, cJSON_CreateString("OK"));
+    if(code == ERRDATA_CODE)
+    {
+        cJSON_AddItemToObject(root, cat_tmp, cJSON_CreateString("MIMA"));
+    }
+    else
+    {
+        cJSON_AddItemToObject(root, cat_tmp, cJSON_CreateString("OK"));
+    }
     cjson_str = cJSON_PrintUnformatted(root);
     wiced_http_response_stream_enable_chunked_transfer(now_stream);
     wiced_http_response_stream_write(now_stream, (const void*) cjson_str,
@@ -236,5 +368,4 @@ void azc_flush(void)
     cJSON_Delete(root);
     free(cjson_str);
     free(app_t);
-    rst_work();
 }
