@@ -50,7 +50,8 @@ GLOBAL_INCLUDES := . \
 # Global defines
 GLOBAL_DEFINES  := USE_STDPERIPH_DRIVER \
                    _STM3x_ \
-                   _STM32x_
+                   _STM32x_	\
+                   WICED_DISABLE_MCU_POWERSAVE
 
 ifeq (1, $(OTA2_SUPPORT))
 EXTERNAL_DCT := 1

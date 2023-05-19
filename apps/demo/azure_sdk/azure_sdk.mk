@@ -108,8 +108,5 @@ $(NAME)_RESOURCES  := apps/azure_iot_hub/rootca.cer \
                       
 WIFI_CONFIG_DCT_H := wifi_config_dct.h
 
-#
-#GLOBAL_DEFINES += MAC_ADDRESS_SET_BY_HOST \
-#				  WICED_DISABLE_MCU_POWERSAVE
 
-GLOBAL_DEFINES += MAC_ADDRESS_SET_BY_HOST
+GLOBAL_DEFINES += MAC_ADDRESS_SET_BY_HOST 

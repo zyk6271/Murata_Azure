@@ -32,9 +32,9 @@ void azure_serv_callback( uint32_t arg )
         info_get();
         wiced_rtos_delay_milliseconds(1000);
         twin_upload();
-        telemetry_request();
-        wiced_rtos_delay_milliseconds(2000);
+        wiced_rtos_delay_milliseconds(1000);
         wifi_status_change(4);
+        telemetry_request();
     }
 }
 void azure_env_init(void)

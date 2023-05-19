@@ -35,7 +35,7 @@ void telemetry_reponse(void)
 void telemetry_upload(unsigned char* data_buf,unsigned short data_len)
 {
     uint8_t device_buffer[32];
-    char payload_buffer[2048];
+    char payload_buffer[512];
     az_span payload = AZ_SPAN_FROM_BUFFER(payload_buffer);
     az_span out_payload;
     az_json_writer jw;

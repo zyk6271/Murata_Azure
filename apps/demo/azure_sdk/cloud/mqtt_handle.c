@@ -137,11 +137,11 @@ wiced_result_t mqtt_conn_open( wiced_mqtt_object_t mqtt_obj, wiced_ip_address_t 
 
     memset( &conninfo, 0, sizeof( conninfo ) );
 
-    conninfo.port_number = 0;                   /* set to 0 indicates library to use default settings */
+    conninfo.port_number = 8883;                   /* set to 0 indicates library to use default settings */
     conninfo.mqtt_version = WICED_MQTT_PROTOCOL_VER4;
     conninfo.clean_session = 0;
     conninfo.client_id = (uint8_t*) device_id;
-    conninfo.keep_alive = 60;
+    conninfo.keep_alive = 30;
     conninfo.username = (uint8_t*)endpoint_user;
     conninfo.password = (uint8_t*)endpoint_key;
     conninfo.peer_cn = NULL;
@@ -397,7 +397,7 @@ void mqtt_config_read(void)
     strcat(endpoint_user,"/?api-version=2020-09-30");
 
     endpoint_key = calloc(sizeof(app_t->primaryKey), sizeof(char));
-    signature_generate(endpoint_key,endpoint_adress,device_id,app_t->primaryKey,"1693097521");
+    signature_generate(endpoint_key,endpoint_adress,device_id,app_t->primaryKey,"4072593214");
     free(app_t);
     print_wifi_config_dct();
 }

@@ -45,26 +45,25 @@ void print_keep_alive_info( wiced_keep_alive_packet_t* packet_info )
 
 uint32_t sta_rssi_get(void)
 {
-    uint32_t rssi;
+    uint32_t rssi = 0;
     wiced_bss_info_t*    ap_info;
     wiced_security_t    security;
 
     /* Find name of connection */
     ap_info = (wiced_bss_info_t*)malloc(sizeof(wiced_bss_info_t));
-    uint8_t current_ap[64];
     if (ap_info != NULL)
     {
         if (wiced_wifi_get_ap_info( ap_info, &security ) == WICED_SUCCESS)
         {
-            rssi = (uint32_t)((abs(ap_info->RSSI))/1.2);
+            rssi = 100 - ((uint32_t)abs(ap_info->RSSI/1.2));
         }
         else
         {
             rssi = 0;
         }
         free(ap_info);
-        return rssi;
     }
+    return rssi;
 }
 
 void keep_alive(void)
