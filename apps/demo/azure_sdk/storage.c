@@ -13,7 +13,7 @@ uint8_t wifi_configured = 0;
 
 extern syr_status device_status;
 
-char wifi_version[]={"1.1.2"};
+char wifi_version[]={"1.1.3"};
 
 wiced_result_t print_wifi_config_dct( void )
 {
