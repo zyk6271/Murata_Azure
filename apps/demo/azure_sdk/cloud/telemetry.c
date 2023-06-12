@@ -49,7 +49,7 @@ void telemetry_upload(unsigned char* data_buf,unsigned short data_len)
         NULL);
 
     dct_read_device_id(device_buffer);
-    az_span device_data = az_span_create(data_buf,data_len);
+    az_span device_data = az_span_create(data_buf,data_len-1);
 
     az_json_writer_init(&jw, payload, NULL);
     az_json_writer_append_begin_object(&jw);
@@ -57,15 +57,19 @@ void telemetry_upload(unsigned char* data_buf,unsigned short data_len)
     az_json_writer_append_string(&jw,telemetry_span);
     az_json_writer_append_property_name(&jw, timestamp_span);
     az_json_writer_append_int32(&jw,get_time());
-    az_json_writer_append_property_name(&jw, rssi_name);
-    az_json_writer_append_int32(&jw,sta_rssi_get());
+
     az_json_writer_append_property_name(&jw, deviceid_span);
     az_json_writer_append_string(&jw,az_span_create_from_str(device_buffer));
+
     az_json_writer_append_property_name(&jw, data_name);
     az_json_writer_append_json_text(&jw,device_data);
+    az_json_writer_append_property_name(&jw, rssi_name);
+    az_json_writer_append_int32(&jw,sta_rssi_get());
 
     az_json_writer_append_end_object(&jw);
     out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+    out_payload._internal.ptr[out_payload._internal.size] = '}';
+    out_payload._internal.size += 1;
     if(wifi_status_get() == 4)
     {
         wiced_mqtt_publish(mqtt_object,topic_buffer,az_span_ptr(out_payload),az_span_size(out_payload),0);
@@ -90,7 +94,7 @@ void alarm_upload(unsigned char* data_buf,unsigned short data_len)
         sizeof(topic_buffer),
         NULL);
 
-    az_span device_data = az_span_create(data_buf,data_len);
+    az_span device_data = az_span_create(data_buf,data_len-1);
 
     az_json_writer_init(&jw, payload, NULL);
     az_json_writer_append_begin_object(&jw);
@@ -108,6 +112,8 @@ void alarm_upload(unsigned char* data_buf,unsigned short data_len)
 
     az_json_writer_append_end_object(&jw);
     out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+    out_payload._internal.ptr[out_payload._internal.size] = '}';
+    out_payload._internal.size += 1;
     printf("alarm_upload,payload is %s\r\n",az_span_ptr(out_payload));
     if(wifi_status_get() == 4)
     {
@@ -131,7 +137,7 @@ void event_upload(unsigned char* data_buf,unsigned short data_len)
         sizeof(topic_buffer),
         NULL);
 
-    az_span device_data = az_span_create(data_buf,data_len);
+    az_span device_data = az_span_create(data_buf,data_len-1);
 
     az_json_writer_init(&jw, payload, NULL);
     az_json_writer_append_begin_object(&jw);
@@ -150,6 +156,8 @@ void event_upload(unsigned char* data_buf,unsigned short data_len)
 
     az_json_writer_append_end_object(&jw);
     out_payload = az_json_writer_get_bytes_used_in_destination(&jw);
+    out_payload._internal.ptr[out_payload._internal.size] = '}';
+    out_payload._internal.size += 1;
     printf("event_upload,payload is %s\r\n",az_span_ptr(out_payload));
     if(wifi_status_get() == 4)
     {

@@ -761,7 +761,7 @@ az_json_writer_append_json_text(az_json_writer* ref_json_writer, az_span json_te
 
   // This runtime validation is necessary since the input could be user defined and malformed.
   // This cannot be caught at dev time by a precondition, especially since they can be turned off.
-  _az_RETURN_IF_FAILED(_az_validate_json(json_text, &first_token_kind, &last_token_kind));
+  //_az_RETURN_IF_FAILED(_az_validate_json(json_text, &first_token_kind, &last_token_kind));
 
   // It is guaranteed that first_token_kind is NOT:
   // AZ_JSON_TOKEN_NONE, AZ_JSON_TOKEN_END_ARRAY, AZ_JSON_TOKEN_END_OBJECT,

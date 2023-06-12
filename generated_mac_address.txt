@@ -4,6 +4,6 @@
  * Please read this document for further information.                                
  */
 
-#define NVRAM_GENERATED_MAC_ADDRESS        "macaddr=00:A0:50:1a:e0:28"
-#define DCT_GENERATED_MAC_ADDRESS          "\x00\xA0\x50\x28\x1a\xe0"
-#define DCT_GENERATED_ETHERNET_MAC_ADDRESS "\x00\xA0\x50\x28\x1a\xe1"
+#define NVRAM_GENERATED_MAC_ADDRESS        "macaddr=00:A0:50:c6:d0:a9"
+#define DCT_GENERATED_MAC_ADDRESS          "\x00\xA0\x50\xa9\xc6\xd0"
+#define DCT_GENERATED_ETHERNET_MAC_ADDRESS "\x00\xA0\x50\xa9\xc6\xd1"

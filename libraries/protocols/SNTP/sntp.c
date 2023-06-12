@@ -58,7 +58,7 @@
 #define MIN_POLL_INTERVAL               (15 * 1000)
 
 #define NTP_NUM_SERVERS                 (2)
-#define NTP_SERVER_HOSTNAME             "ntp.aliyun.com"
+#define NTP_SERVER_HOSTNAME             "pool.ntp.org"
 
 #define SNTP_WORKER_THREAD_PRIORITY     (4)
 #define SNTP_WORKER_THREAD_STACK_SIZE   (4 * 1024)

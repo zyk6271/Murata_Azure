@@ -835,6 +835,7 @@ typedef struct
     char     primaryKey[256];
     char     endpointAddress[64];
     char     mac1[32];
+    char     rurl[64];
 } platform_dct_azure_config_t;
 /* The structure for the complete system DCT layout.
  * The application DCT data follows this structure in the DCT section of FLASH.

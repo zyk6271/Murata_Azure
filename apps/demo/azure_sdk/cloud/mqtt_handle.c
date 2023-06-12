@@ -58,19 +58,19 @@ void handle_iot_message(wiced_mqtt_topic_msg_t* msg)
     az_iot_hub_client_twin_response twin_response;
     if (az_result_succeeded(az_iot_hub_client_methods_parse_received_topic(&hub_client, incoming_topic, &method_request)))
     {
-      IOT_SAMPLE_LOG_SUCCESS("Methods request %.*s\r\n",(int) msg->data_len, msg->data);
-      IOT_SAMPLE_LOG_SUCCESS("Client parsed method request.");
+        IOT_SAMPLE_LOG_SUCCESS("Methods request %.*s\r\n",(int) msg->data_len, msg->data);
+        IOT_SAMPLE_LOG_SUCCESS("Client parsed method request.");
     }
     else if (az_result_succeeded(az_iot_hub_client_c2d_parse_received_topic(&hub_client, incoming_topic, &c2d_request)))
     {
-      parse_c2d_message(msg->topic, msg->topic_len, msg, &c2d_request);
+        parse_c2d_message(msg->topic, msg->topic_len, msg, &c2d_request);
     }
     else if (az_result_succeeded(az_iot_hub_client_twin_parse_received_topic(&hub_client, incoming_topic, &twin_response)))
     {
-      if(parse_device_twin_message(msg->topic, msg->topic_len, msg, &twin_response))
-      {
-          handle_device_twin_message(msg, &twin_response);
-      }
+        if(parse_device_twin_message(msg->topic, msg->topic_len, msg, &twin_response))
+        {
+            handle_device_twin_message(msg, &twin_response);
+        }
     }
 }
 void mqtt_print_status( wiced_result_t result, const char * ok_message, const char * error_message )

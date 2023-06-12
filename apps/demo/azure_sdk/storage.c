@@ -11,8 +11,6 @@
 
 uint8_t wifi_configured = 0;
 
-extern syr_status device_status;
-
 char wifi_version[]={"1.1.3"};
 
 wiced_result_t print_wifi_config_dct( void )
@@ -43,7 +41,6 @@ wiced_result_t print_wifi_config_dct( void )
     WPRINT_APP_INFO( ("\r\n") );
     wifi_configured = dct_wifi_config->device_configured;
     wiced_dct_read_unlock( dct_wifi_config, WICED_FALSE );
-
     return WICED_SUCCESS;
 }
 wiced_result_t dct_app_all_read( platform_dct_azure_config_t** app_dct )
@@ -115,5 +112,30 @@ wiced_result_t dct_app_azc_write( platform_dct_azure_config_t* app_dct )
         mac_read.octet[i] = (uint8_t) values[i];
     }
     wiced_dct_write( &mac_read, DCT_WIFI_CONFIG_SECTION, OFFSETOF(platform_dct_wifi_config_t,mac_address), sizeof(wiced_mac_t) );
+    return WICED_SUCCESS;
+}
+wiced_result_t dct_app_rurl_write( uint8_t* url,uint32_t size )
+{
+    wiced_dct_write( url, DCT_AZURE_SECTION, OFFSETOF(platform_dct_azure_config_t,rurl),size);
+    return WICED_SUCCESS;
+}
+wiced_result_t dct_app_rurl_read(uint8_t* url)
+{
+    char default_rurl[] = "http://OTA.sentientech.com.cn:8080/";
+    platform_dct_azure_config_t* dct_azure_config = NULL;
+
+    if (wiced_dct_read_lock((void**)&dct_azure_config, WICED_FALSE, DCT_AZURE_SECTION, 0, sizeof(platform_dct_azure_config_t)) != WICED_SUCCESS) {
+        return WICED_ERROR;
+    }
+    if(strlen(dct_azure_config->rurl) < 10)
+    {
+        memcpy(url, default_rurl, strlen(default_rurl));
+    }
+    else
+    {
+        memcpy(url, dct_azure_config->rurl, strlen(dct_azure_config->rurl));
+    }
+
+    wiced_dct_read_unlock(dct_azure_config, WICED_FALSE);
     return WICED_SUCCESS;
 }

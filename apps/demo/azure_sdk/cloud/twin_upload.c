@@ -28,13 +28,12 @@ extern wiced_event_flags_t Info_EventHandler;
 static az_span const twin_patch_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("reported_prop");
 static az_span const deviceInfo_name = AZ_SPAN_LITERAL_FROM_STR("deviceInfo");
 static az_span const deviceConfig_name = AZ_SPAN_LITERAL_FROM_STR("deviceConfig");
-static az_span const ras_name = AZ_SPAN_LITERAL_FROM_STR("ras");
 static az_span const mac_name = AZ_SPAN_LITERAL_FROM_STR("mac1");
-static az_span const mcu_srn_name = AZ_SPAN_LITERAL_FROM_STR("srn");
 static az_span const wifi_srn_name = AZ_SPAN_LITERAL_FROM_STR("srn");
 static az_span const sup_name = AZ_SPAN_LITERAL_FROM_STR("sup");
 static az_span const mcu_ver_name = AZ_SPAN_LITERAL_FROM_STR("ver");
 static az_span const wifi_ver_name = AZ_SPAN_LITERAL_FROM_STR("ver2");
+static az_span const rurl_name = AZ_SPAN_LITERAL_FROM_STR("rurl");
 static az_span const alm_name = AZ_SPAN_LITERAL_FROM_STR("alm");
 static az_span const alw_name = AZ_SPAN_LITERAL_FROM_STR("alw");
 static az_span const aln_name = AZ_SPAN_LITERAL_FROM_STR("aln");
@@ -212,6 +211,7 @@ void twin_upload(void)
     az_span out_payload;
     az_json_writer jw;
     ULONG ip_address, network_mask,gateway_ip;
+    char url_buffer[64] = {0};
 
     char twin_patch_topic_buffer[128];
     az_iot_hub_client_twin_patch_get_publish_topic(
@@ -258,6 +258,10 @@ void twin_upload(void)
     az_json_writer_append_int32(&jw,get_time());
     az_json_writer_append_property_name(&jw, wad_name);
     az_json_writer_append_int32(&jw,device_status.config.wad);
+    az_json_writer_append_property_name(&jw, rurl_name);
+
+    dct_app_rurl_read(url_buffer);
+    az_json_writer_append_string(&jw,az_span_create_from_str(url_buffer));
     az_json_writer_append_end_object(&jw);
 
     az_json_writer_append_property_name(&jw, deviceInfo_name);

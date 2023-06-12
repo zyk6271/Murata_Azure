@@ -15,6 +15,7 @@ extern wiced_event_flags_t Config_EventHandler;
 extern wiced_event_flags_t Info_EventHandler;
 
 static az_span const twin_document_topic_request_id = AZ_SPAN_LITERAL_FROM_STR("get_twin");
+static az_span const rurl_name = AZ_SPAN_LITERAL_FROM_STR("rurl");
 static az_span const rse_name = AZ_SPAN_LITERAL_FROM_STR("rse");
 static az_span const rsa_name = AZ_SPAN_LITERAL_FROM_STR("rsa");
 static az_span const rsi_name = AZ_SPAN_LITERAL_FROM_STR("rsi");
@@ -38,8 +39,6 @@ static az_span const wad_name = AZ_SPAN_LITERAL_FROM_STR("wad");
 
 static az_span const config_span = AZ_SPAN_LITERAL_FROM_STR("deviceConfig");
 static az_span const info_span = AZ_SPAN_LITERAL_FROM_STR("deviceInfo");
-static az_span const version_span = AZ_SPAN_LITERAL_FROM_STR("$version");
-
 
 int parse_device_twin_message(
     char* topic,
@@ -92,6 +91,8 @@ void parse_get_twin(az_span const message_span)
 {
     uint32_t ret,events;
     uint32_t value;
+    uint32_t size;
+    uint32_t value_ptr[128];
 
     az_json_reader jr;
     az_json_reader_init(&jr, message_span, NULL);
@@ -345,6 +346,13 @@ void parse_get_twin(az_span const message_span)
                     IOT_SAMPLE_LOG_SUCCESS("SET WAD OK\r\n");
                 }
             }
+        }
+        else if (az_json_token_is_text_equal(&jr.token, rurl_name))
+        {
+            az_json_reader_next_token(&jr);
+            az_json_token_get_string(&jr,value_ptr,128,&size);
+            IOT_SAMPLE_LOG_SUCCESS("parse rurl ok,buf is %s",value_ptr);
+            dct_app_rurl_write(value_ptr,size);
         }
         az_json_reader_next_token(&jr);
     }
