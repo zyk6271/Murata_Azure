@@ -57,6 +57,8 @@ $(NAME)_SOURCES :=  azure_sdk.c \
                     uart/system.c \
                     ota/http_ota.c \
                     ota/webclient.c \
+                    ota/tls_client.c \
+                    ota/tls_certificate.c \
                     cloud/c2d.c \
                     cloud/telemetry.c \
                     cloud/twin_upload.c \
@@ -107,7 +109,6 @@ $(NAME)_RESOURCES  := apps/azure_iot_hub/rootca.cer \
                       images/favicon.ico
                       
 WIFI_CONFIG_DCT_H := wifi_config_dct.h
-
 
 GLOBAL_DEFINES += MAC_ADDRESS_SET_BY_HOST \
                    WICED_DISABLE_MCU_POWERSAVE

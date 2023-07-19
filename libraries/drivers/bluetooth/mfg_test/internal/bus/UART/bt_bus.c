@@ -288,3 +288,14 @@ wiced_result_t bluetooth_wiced_update_baudrate_uart( const platform_uart_config_
 
 
 
+
+wiced_result_t bluetooth_wiced_update_baudrate_uart( const platform_uart_config_t* bt_uart_config )
+{
+    wiced_result_t result;
+
+    result = platform_uart_update_baudrate( wiced_bt_uart_driver, wiced_bt_uart_peripheral, bt_uart_config, (wiced_ring_buffer_t*) &rx_ring_buffer );
+    return result;
+}
+
+
+

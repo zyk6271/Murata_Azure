@@ -61,8 +61,8 @@ uint32_t sta_rssi_get(void)
         {
             rssi = 0;
         }
-        free(ap_info);
     }
+    free(ap_info);
     return rssi;
 }
 

@@ -29,12 +29,19 @@ void ota_event_send(uint32_t value)
     switch(value)
     {
     case 0x1:
-        wiced_rtos_set_event_flags(&OTA_EventHandler,EVENT_OTA_MURATA_START);
+        wiced_rtos_set_event_flags(&OTA_EventHandler,EVENT_OTA_MURATA_VER_START);
     break;
     case 0x2:
-        wiced_rtos_set_event_flags(&OTA_EventHandler,EVENT_OTA_ST_START);
+        wiced_rtos_set_event_flags(&OTA_EventHandler,EVENT_OTA_ST_VER_START);
     break;
-    default:break;
+    case 0x3:
+        wiced_rtos_set_event_flags(&OTA_EventHandler,EVENT_OTA_MURATA_BIN_START);
+    break;
+    case 0x4:
+        wiced_rtos_set_event_flags(&OTA_EventHandler,EVENT_OTA_ST_BIN_START);
+    break;
+    default:
+        break;
     }
 }
 void http_ota_callback( uint32_t arg )
@@ -42,14 +49,22 @@ void http_ota_callback( uint32_t arg )
     uint32_t ret,events;
     while(1)
     {
-        ret = wiced_rtos_wait_for_event_flags(&OTA_EventHandler,EVENT_OTA_ST_START|EVENT_OTA_MURATA_START, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,WICED_WAIT_FOREVER);
-        if(events & EVENT_OTA_MURATA_START)
+        ret = wiced_rtos_wait_for_event_flags(&OTA_EventHandler,EVENT_OTA_MURATA_VER_START|EVENT_OTA_MURATA_BIN_START|EVENT_OTA_ST_VER_START|EVENT_OTA_ST_BIN_START, &events, WICED_TRUE, WAIT_FOR_ANY_EVENT,WICED_WAIT_FOREVER);
+        if(events & EVENT_OTA_MURATA_VER_START)
         {
-            murata_ota_start();
+            murata_ota_ver_start();
         }
-        else
+        else if(events & EVENT_OTA_MURATA_BIN_START)
         {
-            st_ota_start();
+            murata_ota_bin_start();
+        }
+        else if(events & EVENT_OTA_ST_VER_START)
+        {
+            st_ota_ver_start();
+        }
+        else if(events & EVENT_OTA_ST_BIN_START)
+        {
+            st_ota_bin_start();
         }
     }
 }
@@ -60,22 +75,28 @@ void http_ota_init(void)
     wiced_rtos_init_semaphore( &uart_ack_sem );
     wiced_rtos_create_thread( &http_ota_t, 6, "http_ota", http_ota_callback, 4096, 0 );
 }
+
 static void st_version_callback(char *buffer, int length)
 {
     printf("st_version_callback get version %s,now version %s\r\n",buffer,device_status.info.ver);
     if(my_strcmp(buffer,device_status.info.ver))
     {
-        st_download();
+        ota_event_send(4);
     }
     else
     {
         ota_control_send(ST_No_Upadate);
     }
 }
-int st_ota_start(void)
+
+int st_ota_ver_start(void)
 {
+    char url_buffer[128] = {0};
     int ret = RT_EOK;
     struct webclient_session* session = RT_NULL;
+
+    dct_app_rurl_read(url_buffer);
+    strcat(url_buffer,"/ota/st.txt");
 
     session = webclient_session_create(GET_HEADER_BUFSZ);
     if (!session)
@@ -84,9 +105,9 @@ int st_ota_start(void)
         ret = -RT_ERROR;
         goto __exit;
     }
-    LOG_I("open uri success %s.\n",ST_VER_URL);
+    LOG_I("open uri success %s.\n",url_buffer);
     /* get the real data length */
-    ret = webclient_shard_head_function(session, ST_VER_URL, &file_size);
+    ret = webclient_shard_head_function(session, url_buffer, &file_size);
     if(ret < 0)
     {
         LOG_E("Request fail!\n");
@@ -110,7 +131,7 @@ int st_ota_start(void)
 
     webclient_register_shard_position_function(session, st_version_callback);
 
-    webclient_shard_position_function(session, ST_VER_URL, now_offset, file_size, 16);
+    webclient_shard_position_function(session, url_buffer, now_offset, file_size, 16);
 
     webclient_register_shard_position_function(session, RT_NULL);
 
@@ -122,6 +143,7 @@ __exit:
     }
     return ret;
 }
+
 static int st_download_callback(char *buffer, int length)
 {
     uint8_t ret = RT_EOK;
@@ -174,10 +196,15 @@ __exit:
     free(buffer);
     return ret;
 }
-int st_download(void)
+
+int st_ota_bin_start(void)
 {
+    char url_buffer[128] = {0};
     int ret = RT_EOK;
     struct webclient_session* session = RT_NULL;
+
+    dct_app_rurl_read(url_buffer);
+    strcat(url_buffer,"/ota/st.bin");
 
     session = webclient_session_create(GET_HEADER_BUFSZ);
     if (!session)
@@ -186,9 +213,9 @@ int st_download(void)
         ret = -RT_ERROR;
         goto __exit;
     }
-    LOG_I("open uri success %s.\n",ST_BIN_URL);
+    LOG_I("open uri success %s.\n",url_buffer);
 
-    ret = webclient_shard_head_function(session, ST_BIN_URL, &file_size);
+    ret = webclient_shard_head_function(session, url_buffer, &file_size);
     if(ret < 0)
     {
         LOG_E("Request fail!\n");
@@ -221,7 +248,7 @@ int st_download(void)
 
     webclient_register_shard_position_function(session, st_download_callback);
 
-    webclient_shard_position_function(session, ST_BIN_URL, now_offset, file_size, 512);
+    webclient_shard_position_function(session, url_buffer, now_offset, file_size, 512);
 
     webclient_register_shard_position_function(session, RT_NULL);
 
@@ -233,22 +260,28 @@ __exit:
     }
     return ret;
 }
+
 static void murata_version_callback(char *buffer, int length)
 {
     printf("murata_version_callback get version %s,now version %s\r\n",buffer,wifi_version);
     if(my_strcmp(buffer,wifi_version))
     {
-        murata_download();
+        ota_event_send(3);
     }
     else
     {
         ota_control_send(Murata_No_Upadate);
     }
 }
-int murata_ota_start(void)
+
+int murata_ota_ver_start(void)
 {
+    char url_buffer[128] = {0};
     int ret = RT_EOK;
     struct webclient_session* session = RT_NULL;
+
+    dct_app_rurl_read(url_buffer);
+    strcat(url_buffer,"/ota/murata.txt");
 
     /* create webclient session and set header response size */
     session = webclient_session_create(GET_HEADER_BUFSZ);
@@ -258,9 +291,9 @@ int murata_ota_start(void)
         ret = -RT_ERROR;
         goto __exit;
     }
-    LOG_I("open uri success %s.\n",MURATA_VER_URL);
+    LOG_I("open uri success %s.\n",url_buffer);
     /* get the real data length */
-    ret = webclient_shard_head_function(session, MURATA_VER_URL, &file_size);
+    ret = webclient_shard_head_function(session, url_buffer, &file_size);
     if(ret < 0)
     {
         LOG_E("Request fail!\n");
@@ -285,7 +318,7 @@ int murata_ota_start(void)
     webclient_register_shard_position_function(session, murata_version_callback);
 
     /* the "memory size" that you can provide in the project and uri */
-    webclient_shard_position_function(session, MURATA_VER_URL, now_offset, file_size, 16);
+    webclient_shard_position_function(session, url_buffer, now_offset, file_size, 16);
 
     /* clear the handle function */
     webclient_register_shard_position_function(session, RT_NULL);
@@ -361,8 +394,7 @@ static int murata_download_callback(char *buffer, int length)
         wiced_framework_app_close( &app );
         wiced_framework_set_boot ( DCT_APP0_INDEX, PLATFORM_DEFAULT_LOAD );
         ota_control_send(Murata_Download_Done);
-        LOG_I("Download firmware to flash success.\n");
-        LOG_I("System now restart...\n");
+        LOG_I("Download firmware to flash success,System now restart...\n");
         chunk_count = 0;
         wiced_framework_reboot();
     }
@@ -372,10 +404,15 @@ __exit:
     return ret;
 
 }
-int murata_download(void)
+
+int murata_ota_bin_start(void)
 {
+    char url_buffer[128] = {0};
     int ret = RT_EOK;
     struct webclient_session* session = RT_NULL;
+
+    dct_app_rurl_read(url_buffer);
+    strcat(url_buffer,"/ota/murata.bin");
 
     session = webclient_session_create(GET_HEADER_BUFSZ);
     if (!session)
@@ -384,9 +421,9 @@ int murata_download(void)
         ret = -RT_ERROR;
         goto __exit;
     }
-    LOG_I("open uri success %s.\n",MURATA_BIN_URL);
+    LOG_I("open uri success %s.\n",url_buffer);
 
-    ret = webclient_shard_head_function(session, MURATA_BIN_URL, &file_size);
+    ret = webclient_shard_head_function(session, url_buffer, &file_size);
     if(ret < 0)
     {
         LOG_E("Request fail!\n");
@@ -406,11 +443,12 @@ int murata_download(void)
         ret = -RT_ERROR;
         goto __exit;
     }
+
     now_offset = 0;
 
     webclient_register_shard_position_function(session, murata_download_callback);
 
-    webclient_shard_position_function(session, MURATA_BIN_URL, now_offset, file_size, HTTP_OTA_BUFF_LEN);
+    webclient_shard_position_function(session, url_buffer, now_offset, file_size, HTTP_OTA_BUFF_LEN);
 
     webclient_register_shard_position_function(session, RT_NULL);
 

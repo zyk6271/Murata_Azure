@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "wiced_network.h": "c",
+        "functional": "c",
+        "coroutine": "c",
+        "condition_variable": "c",
+        "future": "c",
+        "wiced_defaults.h": "c",
+        "md5.h": "c"
+    }
+}

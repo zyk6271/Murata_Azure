@@ -818,7 +818,7 @@ static int ssl_receive_packet( void *ctx, unsigned char **buf, size_t len )
              socket->tls_context->context.defragmentation_buffer        = tls_host_get_defragmentation_buffer( socket->tls_context->context.defragmentation_buffer_length );
              if ( socket->tls_context->context.defragmentation_buffer == NULL )
              {
-                 WPRINT_SECURITY_ERROR(("No memory available to allocate for defragmentation buffer \n"));
+                 WPRINT_SECURITY_ERROR(("(1)No memory available to allocate for defragmentation buffer \n"));
                  tls_host_free_packet( socket->tls_context->context.received_packet );
                  socket->tls_context->context.received_packet = NULL;
                  return TLS_ERROR_OUT_OF_MEMORY;
@@ -861,7 +861,7 @@ static int ssl_receive_packet( void *ctx, unsigned char **buf, size_t len )
             socket->tls_context->context.defragmentation_buffer        = tls_host_get_defragmentation_buffer( socket->tls_context->context.defragmentation_buffer_length );
             if ( socket->tls_context->context.defragmentation_buffer == NULL )
             {
-                WPRINT_SECURITY_ERROR(("No memory available to allocate for defragmentation buffer \n"));
+                WPRINT_SECURITY_ERROR(("(2)No memory available to allocate for defragmentation buffer \n"));
                 tls_host_free_packet( socket->tls_context->context.received_packet );
                 socket->tls_context->context.received_packet = NULL;
                 return TLS_ERROR_OUT_OF_MEMORY;
@@ -884,7 +884,7 @@ static int ssl_receive_packet( void *ctx, unsigned char **buf, size_t len )
             socket->tls_context->context.defragmentation_buffer        = tls_host_get_defragmentation_buffer( socket->tls_context->context.defragmentation_buffer_length );
             if ( socket->tls_context->context.defragmentation_buffer == NULL )
             {
-                WPRINT_SECURITY_ERROR(("No memory available to allocate for defragmentation buffer \n"));
+                WPRINT_SECURITY_ERROR(("(3)No memory available to allocate for defragmentation buffer \n"));
                 tls_host_free_packet( socket->tls_context->context.received_packet );
                 socket->tls_context->context.received_packet = NULL;
                 return TLS_ERROR_OUT_OF_MEMORY;
@@ -2300,7 +2300,7 @@ static int eap_ssl_receive_packet( void *ctx, unsigned char **buf, size_t len )
         workspace->tls_context->context.defragmentation_buffer = tls_host_get_defragmentation_buffer( workspace->tls_context->context.defragmentation_buffer_length );
         if ( workspace->tls_context->context.defragmentation_buffer == NULL )
         {
-            WPRINT_SECURITY_ERROR(("No memory available to allocate for defragmentation buffer \n"));
+            WPRINT_SECURITY_ERROR(("(4)No memory available to allocate for defragmentation buffer \n"));
             tls_host_free_packet( workspace->tls_context->context.received_packet );
             workspace->tls_context->context.received_packet = NULL;
             return TLS_ERROR_OUT_OF_MEMORY;

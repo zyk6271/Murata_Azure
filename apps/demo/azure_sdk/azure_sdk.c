@@ -19,6 +19,7 @@ static void link_down( void *arg)
 {
     wifi_disconnect_callback();
 }
+
 void application_start( void )
 {
     wiced_init();

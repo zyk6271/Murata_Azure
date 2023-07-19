@@ -8,11 +8,60 @@
 #include "wiced_defaults.h"
 #include "wiced_result.h"
 #include "wiced_apps_common.h"
+#include "malloc.h"
 
 uint8_t wifi_configured = 0;
 
-char wifi_version[]={"1.1.3"};
+char wifi_version[]={"1.1.4"};
 
+void print_memory(void)
+{
+//    volatile struct mallinfo mi = mallinfo( );
+//
+//    printf( "malloc_info {\r\n"
+//
+//            "\tarena:   \t%5d;\t/* total space allocated from system */\r\n"
+//
+//            "\tordblks: \t%5d;\t/* number of non-inuse chunks */\r\n"
+//
+//            "\tsmblks:  \t%5d;\t/* unused -- always zero */\r\n"
+//
+//            "\thblks:   \t%5d;\t/* number of mmapped regions */\r\n"
+//
+//            "\thblkhd:  \t%5d;\t/* total space in mmapped regions */\r\n"
+//
+//            "\tusmblks: \t%5d;\t/* unused -- always zero */\r\n"
+//
+//            "\tfsmblks: \t%5d;\t/* unused -- always zero */\r\n"
+//
+//            "\tuordblks:\t%5d;\t/* total allocated space */\r\n"
+//
+//            "\tfordblks:\t%5d;\t/* total non-inuse space */\r\n"
+//
+//            "\tkeepcost:\t%5d;\t/* top-most, releasable (via malloc_trim) space */\r\n"
+//
+//            "};\r\n",
+//
+//            mi.arena,
+//
+//            mi.ordblks,
+//
+//            mi.smblks,
+//
+//            mi.hblks,
+//
+//            mi.hblkhd,
+//
+//            mi.usmblks,
+//
+//            mi.fsmblks,
+//
+//            mi.uordblks,
+//
+//            mi.fordblks,
+//
+//            mi.keepcost );
+}
 wiced_result_t print_wifi_config_dct( void )
 {
     platform_dct_wifi_config_t* dct_wifi_config = NULL;
@@ -121,7 +170,8 @@ wiced_result_t dct_app_rurl_write( uint8_t* url,uint32_t size )
 }
 wiced_result_t dct_app_rurl_read(uint8_t* url)
 {
-    char default_rurl[] = "http://OTA.sentientech.com.cn:8080/";
+//    char default_rurl[] = "http://ota.sentientech.com.cn:8080/";
+    char default_rurl[] = "https://cs110032001e4afc55e.blob.core.windows.net";
     platform_dct_azure_config_t* dct_azure_config = NULL;
 
     if (wiced_dct_read_lock((void**)&dct_azure_config, WICED_FALSE, DCT_AZURE_SECTION, 0, sizeof(platform_dct_azure_config_t)) != WICED_SUCCESS) {

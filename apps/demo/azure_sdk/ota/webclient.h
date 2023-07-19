@@ -19,9 +19,11 @@
 
 #include <stddef.h>
 #include <assert.h>
+#define WEBCLIENT_USING_MBED_TLS
 
 #if defined(WEBCLIENT_USING_MBED_TLS) || defined(WEBCLIENT_USING_SAL_TLS)
-#include <tls_client.h>
+#include "tls_client.h"
+#include "mbedtls/ssl.h"
 #endif
 
 #ifdef __cplusplus

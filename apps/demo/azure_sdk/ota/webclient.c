@@ -1069,6 +1069,8 @@ int webclient_shard_position_function(struct webclient_session *session, const c
             end_position = total_len - 1;
         }
 
+        print_memory();
+
         /* splice header and send header */
         LOG_D("Range: [%04d -> %04d]", start_position, end_position);
         webclient_header_fields_add(session, "Range: bytes=%d-%d\r\n", start_position, end_position);

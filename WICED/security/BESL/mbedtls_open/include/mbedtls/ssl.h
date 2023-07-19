@@ -3221,6 +3221,7 @@ int mbedtls_ssl_renegotiate( mbedtls_ssl_context *ssl );
  */
 /* WICED_MBEDTLS Start */
 int mbedtls_ssl_read( mbedtls_ssl_context *ssl, unsigned char **buf, size_t len );
+int mbedtls_ssl_user_read( mbedtls_ssl_context *ssl, unsigned char **buf, size_t len );
 /* WICED_MBEDTLS End */
 /**
  * \brief          Try to write exactly 'len' application data bytes
